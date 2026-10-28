@@ -86,6 +86,8 @@ jobs:
         with:
           toolchain: stable
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          cache-on-failure: true
       - name: Validate release signing key
         shell: pwsh
         env:
@@ -183,9 +185,9 @@ jobs:
           Copy-Item THIRD-PARTY-NOTICES.txt $p
           Copy-Item -Recurse extension "$p/extension"
           Copy-Item -Recurse extension "$p/extension-firefox"
-          Remove-Item -Recurse -Force "$p/extension/test", "$p/extension-firefox/test"
-          Copy-Item -Force "$p/extension-firefox/manifest.firefox.json" "$p/extension-firefox/manifest.json"
-          Remove-Item -Force "$p/extension-firefox/manifest.firefox.json", "$p/extension/manifest.firefox.json"
+          Remove-Item -Recurse -Force "$p/extension/test"
+          # extension-firefox already contains its Firefox manifest.json.
+          Remove-Item -Force "$p/extension/manifest.firefox.json"
           # the add-on has its own version (manifest.firefox.json)
           $extVersion = (Get-Content extension/manifest.firefox.json -Raw | ConvertFrom-Json).version
           # Firefox keeps only add-ons signed by Mozilla; a version can be signed
