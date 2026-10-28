@@ -8,6 +8,21 @@
   window.__keroDownload = true;
   const TOP = window.top === window;
 
+  // Safely send fire-and-forget events across Chrome, Brave and Firefox.
+  // Chromium callback-style sendMessage can return undefined (not a Promise).
+  const sendQuietly = (message) => {
+    try {
+      const result = apiBrowser.runtime.sendMessage(message, () => {
+        // Read lastError to acknowledge a disconnected/reloaded extension.
+        void apiBrowser.runtime.lastError;
+      });
+      if (result && typeof result.catch === "function") result.catch(() => {});
+    } catch (_) {
+      // Content scripts can outlive the extension during reload/update.
+    }
+  };
+
+
   let items = [];
   // Options > File Types > "Download panel for web players"
   let panel = { enabled: true, skipSites: [] };
@@ -78,7 +93,7 @@
       const url = node.src || node.data || "";
       if (/^https?:/i.test(url) && (/\.pdf(?:[?#]|$)/i.test(url) || /pdf/i.test(node.type || ""))) pdfs.push({ url, ext: "pdf", label: "PDF document" });
     }
-    if (pdfs.length) apiBrowser.runtime.sendMessage({ type: "swiftget-files-found", items: pdfs.slice(0, 24) }).catch?.(() => {});
+    if (pdfs.length) sendQuietly({ type: "swiftget-files-found", items: pdfs.slice(0, 24) });
   }
   // Offer any file-like URL, excluding server-side page routes. A download
   // attribute or a response attachment can identify extensionless files too.
@@ -102,7 +117,7 @@
     };
     if (root.matches?.("a[href]")) add(root);
     for (const node of root.querySelectorAll("a[href]")) { add(node); if (links.length >= 24) break; }
-    if (links.length) apiBrowser.runtime.sendMessage({ type: "swiftget-files-found", items: links }).catch?.(() => {});
+    if (links.length) sendQuietly({ type: "swiftget-files-found", items: links });
   }
   function observeRoot(root) {
     if (rootObservers.has(root)) return;
@@ -223,7 +238,7 @@
     if (page !== lastPage || (!TOP && !lastPage)) {
       if (!TOP && lastPage === "frame:" + page) return;
       lastPage = TOP ? page : "frame:" + page;
-      apiBrowser.runtime.sendMessage({ type: "swiftget-video-seen", page, src: directSrc(v), frame: !TOP }).catch?.(() => {});
+      sendQuietly({ type: "swiftget-video-seen", page, src: directSrc(v), frame: !TOP });
     }
   }
 
@@ -465,11 +480,20 @@
   }
 
   function itemsOf(b) {
-    if (b.own) return b.own;
-    const known = isMain(b.video) ? items : [];
+    const whatsapp = /(^|\.)web\.whatsapp\.com$/i.test(location.hostname);
+    // WhatsApp serves preview JPEGs and encrypted attachment fragments. Neither
+    // is the video the user is watching. Prefer the actual HTMLMediaElement.
     const blob = b.video.currentSrc || b.video.src || "";
-    if (/^blob:/i.test(blob) && /(^|\.)web\.whatsapp\.com$/.test(location.hostname)) {
-      return [{ label: "WhatsApp status video", blob, ext: "mp4", sub: "Save the opened status" }];
+    if (whatsapp && /^blob:/i.test(blob)) {
+      return [{ label: "WhatsApp status · original video", blob, ext: "mp4", sub: "Save video from the player to KeRo" }];
+    }
+    if (b.own && !whatsapp) return b.own;
+    const known = isMain(b.video) ? items : [];
+    if (whatsapp) {
+      const direct = directSrc(b.video);
+      if (/^https?:/i.test(direct) && /\.(?:mp4|webm|mov)(?:[?#]|$)/i.test(direct))
+        return [{ label: "WhatsApp status · video", url: direct, ext: (direct.match(/\.(mp4|webm|mov)(?:[?#]|$)/i) || [,'mp4'])[1].toLowerCase(), sub: "Video source" }];
+      return [{ label: "Video source unavailable", disabled: true, sub: "Open and play the status to expose its media source" }];
     }
     if (known.some((item) => !item.disabled)) return known;
     const src = directSrc(b.video);
@@ -927,7 +951,7 @@
     addEventListener(
       "mousedown",
       (e) => {
-        apiBrowser.runtime.sendMessage({ type: "swiftget-keys", alt: e.altKey, ctrl: e.ctrlKey, shift: e.shiftKey }).catch?.(() => {});
+        sendQuietly({ type: "swiftget-keys", alt: e.altKey, ctrl: e.ctrlKey, shift: e.shiftKey });
       },
       true
     );

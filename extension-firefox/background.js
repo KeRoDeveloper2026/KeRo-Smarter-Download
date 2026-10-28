@@ -511,6 +511,10 @@ apiBrowser.webRequest.onHeadersReceived.addListener(
     if (/googlevideo\.com/i.test(url)) return; // YouTube has its own handler below
     const h = headerMap(d.responseHeaders);
     const type = (h["content-type"] || "").toLowerCase();
+    // WhatsApp status thumbnails may be tiny encrypted .jpg responses with
+    // opaque query strings. Do not offer them as downloadable videos.
+    if (/^https?:\/\/[^/]*\.whatsapp\.net\//i.test(url) &&
+        (/^image\//i.test(type) || /\.(?:jpe?g|png|webp)(?:[?#]|$)/i.test(url))) return;
     const isHls = HLS_TYPE.test(type) || /\.m3u8(\?|$)/i.test(url);
     // DASH: a list of the parts of a video in several qualities (.mpd)
     const isDash = DASH_TYPE.test(type) || /\.mpd(\?|$)/i.test(url);
