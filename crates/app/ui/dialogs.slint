@@ -3709,15 +3709,51 @@ export component BrowserDialog inherits ThemedWindow {
 
 // ------------------------------------------------------------------ About
 
+component PaymentCard inherits Rectangle {
+    in property <image> qr;
+    in property <string> brand;
+    in property <color> brand-color;
+    in property <color> detail-color;
+    callback activate();
+    height: 270px;
+    background: Theme.input-bg;
+    border-radius: 14px;
+    border-width: 1px;
+    border-color: Theme.line;
+    VerticalLayout {
+        padding: 10px;
+        spacing: 10px;
+        Rectangle {
+            background: #ffffff;
+            border-radius: 8px;
+            height: 198px;
+            Image { source: root.qr; image-fit: contain; }
+            TouchArea { clicked => { root.activate(); } }
+        }
+        Rectangle {
+            height: 42px;
+            background: hit.has-hover ? root.detail-color : root.brand-color;
+            border-radius: 9px;
+            Rectangle { x: 10px; y: 10px; width: 5px; height: 22px; border-radius: 2px; background: root.detail-color; }
+            Text { text: root.brand; color: #ffffff; font-weight: 800; font-size: 20px; horizontal-alignment: center; vertical-alignment: center; }
+            hit := TouchArea { clicked => { root.activate(); } }
+        }
+    }
+}
+
 export component AboutDialog inherits ThemedWindow {
     // set for a moment so the window comes in front of the browser
     in property <bool> front;
     always-on-top: root.front;
     title: @tr("About KeRo Smarter Download");
-    preferred-width: 420px;
+    preferred-width: 560px;
+    preferred-height: 700px;
+    min-width: 500px;
+    min-height: 440px;
     in property <string> version;
     callback open-link(string);
     callback close-window();
+    ScrollView {
     VerticalLayout {
         padding: 22px;
         spacing: 10px;
@@ -3725,8 +3761,8 @@ export component AboutDialog inherits ThemedWindow {
             alignment: center;
             Image {
                 source: @image-url("kero-logo.png");
-                width: 150px;
-                height: 150px;
+                width: 96px;
+                height: 96px;
             }
         }
         Text {
@@ -3748,26 +3784,21 @@ export component AboutDialog inherits ThemedWindow {
             color: Theme.muted;
             wrap: word-wrap;
         }
-        Rectangle {
-            background: Theme.input-bg;
-            border-width: 1px;
-            border-color: Theme.line;
-            border-radius: 6px;
-            VerticalLayout {
-                padding: 10px;
-                spacing: 6px;
-                Text {
-                    text: @tr("Support number: 01202271952");
-                    horizontal-alignment: center;
-                    font-weight: 600;
-                    color: Theme.text;
-                }
-                Text {
-                    text: @tr("Etisalat Cash: 01140797535");
-                    horizontal-alignment: center;
-                    font-weight: 600;
-                    color: Theme.text;
-                }
+        HorizontalLayout {
+            spacing: 12px;
+            PaymentCard {
+                qr: @image-url("instapay-qr.jpg");
+                brand: "inesta pay";
+                brand-color: #522065;
+                detail-color: #e87924;
+                activate => { root.open-link("https://ipn.eg/S/kerohaz/instapay/1bOc4O"); }
+            }
+            PaymentCard {
+                qr: @image-url("etisalat-cash-qr.jpg");
+                brand: "e& cash";
+                brand-color: #c8102e;
+                detail-color: #222222;
+                activate => { root.open-link("https://app.etisalat.eg/?appScreens=cash&appScreen=cash&extra=screenId:send_money;dial:01140797535"); }
             }
         }
         Rectangle {
@@ -3786,6 +3817,7 @@ export component AboutDialog inherits ThemedWindow {
                 }
             }
         }
+    }
     }
 }
 
@@ -3876,23 +3908,13 @@ export component WhatsNewDialog inherits ThemedWindow {
                 padding: 12px;
                 spacing: 8px;
                 Text {
-                    text: @tr("KeRo Smarter Download is free and has no ads. If it helps you and you would like to support its development, you can support us on the numbers below. Thank you!");
+                    text: @tr("KeRo Smarter Download is free and has no ads. If it helps you and you would like to support its development, you can support us using the payment options below. Thank you!");
                     color: Theme.text;
                     wrap: word-wrap;
                     horizontal-alignment: root.side;
                 }
-                Text {
-                    text: @tr("Support number: 01202271952");
-                    color: Theme.text;
-                    font-weight: 600;
-                    horizontal-alignment: root.side;
-                }
-                Text {
-                    text: @tr("Etisalat Cash: 01140797535");
-                    color: Theme.text;
-                    font-weight: 600;
-                    horizontal-alignment: root.side;
-                }
+                Button { text: "inesta pay"; clicked => { root.open-link("https://ipn.eg/S/kerohaz/instapay/1bOc4O"); } }
+                Button { text: "e& cash"; clicked => { root.open-link("https://app.etisalat.eg/?appScreens=cash&appScreen=cash&extra=screenId:send_money;dial:01140797535"); } }
             }
         }
         HRow {
