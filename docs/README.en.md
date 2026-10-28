@@ -23,9 +23,9 @@ Download speed, available formats and resume support depend on the source and ne
 
 ## Getting started
 
-Requires Windows 10/11 x64. The installer download link is pending upload. When available, extract the Setup ZIP and run `KeRoDownload-Setup.exe`.
+Requires Windows 10/11 x64. Download the owner-supplied [Windows installer (EXE)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRoDownload-Setup.exe), or the [Setup ZIP](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRoDownload-Setup.zip). Run `KeRoDownload-Setup.exe`; extract the ZIP first if you choose the archive.
 
-Direct extension downloads: [Chromium](https://raw.githubusercontent.com/KeRoDeveloper2026/KeRo-Smarter-Download/main/KeRo-Extension-Chromium.zip) · [Firefox](https://raw.githubusercontent.com/KeRoDeveloper2026/KeRo-Smarter-Download/main/KeRo-Extension-Firefox.zip) · [Combined bundle](https://raw.githubusercontent.com/KeRoDeveloper2026/KeRo-Smarter-Download/main/KeRo-Smarter-Download.zip).
+Direct extension downloads: [Chromium](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Extension-Chromium.zip) · [Firefox](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Extension-Firefox.zip) · [Combined bundle](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Smarter-Download.zip).
 
 The combined bundle contains browser extensions only. For full source, use GitHub's Code → Download ZIP. The uploaded installer was not executed or validated on Windows in the repository preparation environment. See [SHA256SUMS.txt](../SHA256SUMS.txt) for download integrity hashes.
 
