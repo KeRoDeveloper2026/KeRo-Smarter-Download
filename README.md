@@ -24,14 +24,13 @@
 
 | الملف | رابط التنزيل | طريقة الاستخدام |
 |---|---|---|
-| مثبّت Windows مباشر | [تنزيل Setup — EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRoDownload-Setup.exe) | شغّل الملف لبدء التثبيت |
-| المثبّت داخل ملف مضغوط | [تنزيل Setup — ZIP](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRoDownload-Setup.zip) | فك الضغط ثم شغّل `KeRoDownload-Setup.exe` |
+| مثبّت Windows مباشر | [تنزيل Setup — EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.1/KeRoDownload-Setup.exe) | شغّل الملف لبدء التثبيت |
 | إضافة Chrome وBrave وEdge | [تنزيل إضافة Chromium](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Extension-Chromium.zip) | فك الضغط ثم اختر المجلد عبر Load unpacked |
 | إضافة Firefox | [تنزيل إضافة Firefox](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Extension-Firefox.zip) | فك الضغط ثم حمّل manifest.json مؤقتًا من about:debugging |
 | حزمة الإضافتين كاملة | [تنزيل حزمة الإضافات](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Smarter-Download.zip) | تحتوي على مجلدي extension وextension-firefox |
-| بصمات الملفات | [SHA256SUMS.txt](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/SHA256SUMS.txt) | للتحقق من سلامة التنزيل |
+| بصمة المثبّت وتوقيع التحديث | [version.json](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.1/version.json) | SHA-256 وتوقيع Ed25519 للمثبّت الجديد |
 
-**مهم:** ملف `KeRo-Smarter-Download.zip` هنا حزمة إضافات فقط. للحصول على المصدر الكامل استخدم **Code → Download ZIP**. نسخة Firefox غير موقّعة ومخصصة للتحميل المؤقت. المثبّت المرفق مقدّم من مالك المشروع ولم يُختبر تشغيله في بيئة تجهيز المستودع.
+**مهم:** ملف `KeRo-Smarter-Download.zip` هنا حزمة إضافات فقط. للحصول على المصدر الكامل استخدم **Code → Download ZIP**. نسخة Firefox غير موقّعة ومخصصة للتحميل المؤقت. مثبّت التطبيق 1.1.1 مبني عبر GitHub Actions؛ نجاح البناء لا يغني عن تجربة التثبيت والتشغيل الفعلي على Windows.
 
 ## عن المشروع
 
@@ -39,7 +38,7 @@
 
 تدعم الواجهة **العربية والإنجليزية والفرنسية والإسبانية والألمانية والبرتغالية والتركية والروسية**، مع اتجاه من اليمين إلى اليسار للعربية.
 
-> **حالة النسخة:** مصدر الإصدار **1.1.1** يربط التحديثات بهذا المستودع؛ نشر مثبّت جديد يتطلب تجهيز مفتاح التوقيع كما في [دليل الإصدارات](docs/RELEASING.md). المثبّت المقدّم من مالك المشروع متاح الآن في [الإصدار v1.1.0](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.0)؛ لم يُختبر تشغيله على Windows في بيئة تجهيز المستودع.
+> **حالة النسخة:** الإصدار **1.1.1** يربط التحديثات بهذا المستودع ويُرفق المثبّت مع `version.json` الموقّع في [الإصدار v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.1). ثبّت هذه النسخة يدويًا مرة واحدة بدل النسخة القديمة لتفعيل التحديثات التالية. اختبارات البناء نجحت؛ تجربة التثبيت والتشغيل الفعلي تحتاج إلى Windows.
 
 ## المميزات
 
@@ -58,8 +57,8 @@
 
 ## البدء
 
-1. نزّل **Setup — EXE** من جدول التحميل المباشر أعلاه، أو اختر ZIP إذا كنت تفضّل نسخة مضغوطة.
-2. شغّل `KeRoDownload-Setup.exe`؛ عند اختيار ZIP فك الضغط أولًا.
+1. نزّل **Setup — EXE** من جدول التحميل المباشر أعلاه.
+2. شغّل `KeRoDownload-Setup.exe` لتثبيت النسخة الجديدة.
 3. افتح البرنامج وأضف رابطًا، أو نزّل إضافة متصفحك واتبع خطوات تركيبها أدناه.
 
 للحصول على إصدار تبنيه بنفسك، اتبع [البناء من المصدر](#البناء-من-المصدر). ملف المصدر الذي يوفّره GitHub عبر **Code → Download ZIP** يحتاج إلى تجميع، بعكس ملف المثبّت المرفق.
@@ -166,7 +165,7 @@ node extension/test/content.sim.js --firefox
 | الإضافة لا ترسل التنزيل | تأكد من تشغيل التطبيق والإضافة، وأعد تحميل الصفحة، وأوقف النسخ القديمة المتكررة |
 | لا تظهر كل الجودات | قد يقيّد الموقع الجودات أو يحتاج إلى جلسة دخول؛ أعد تحليل الرابط وتحقق من صلاحية الوصول |
 | تحذير SmartScreen | قد يظهر للملفات غير الموقّعة؛ تحقّق من مصدر الملف قبل تشغيله |
-| لا يوجد EXE بعد تنزيل ZIP | تأكد أنك نزّلت Setup ZIP؛ أرشيف الإضافات والمصدر لا يحتويان على المثبّت |
+| لا يوجد EXE بعد تنزيل ZIP | نزّل Setup — EXE من جدول التحميل؛ أرشيف الإضافات والمصدر لا يحتويان على المثبّت |
 
 ## خريطة المشروع
 

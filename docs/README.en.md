@@ -23,11 +23,11 @@ Download speed, available formats and resume support depend on the source and ne
 
 ## Getting started
 
-Requires Windows 10/11 x64. Download the owner-supplied [Windows installer (EXE)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRoDownload-Setup.exe), or the [Setup ZIP](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRoDownload-Setup.zip). Run `KeRoDownload-Setup.exe`; extract the ZIP first if you choose the archive.
+Requires Windows 10/11 x64. Download the [Windows installer 1.1.1 (EXE)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.1/KeRoDownload-Setup.exe). Run `KeRoDownload-Setup.exe`. Install this first connected version manually once; later releases use the signed updater.
 
 Direct extension downloads: [Chromium](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Extension-Chromium.zip) · [Firefox](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Extension-Firefox.zip) · [Combined bundle](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Smarter-Download.zip).
 
-The combined bundle contains browser extensions only. For full source, use GitHub's Code → Download ZIP. The uploaded installer was not executed or validated on Windows in the repository preparation environment. See [SHA256SUMS.txt](../SHA256SUMS.txt) for download integrity hashes.
+The combined bundle contains browser extensions only. For full source, use GitHub's Code → Download ZIP. The 1.1.1 installer is built by GitHub Actions and accompanied by a signed version.json containing its SHA-256. Actual installation and GUI behavior still need testing on Windows. Root SHA256SUMS.txt describes the older 1.1.0 assets.
 
 To build on Windows, run `BUILD.bat`. It uses winget to install missing development tools, downloads helper tools and creates `dist/KeRoDownload-Setup.exe` after successful packaging. Tool installation may require administrator permission.
 
@@ -35,7 +35,7 @@ For Chromium browsers, enable Developer mode on the extensions page and load the
 
 ## Verification and release status
 
-Source version: **1.1.1**. The updater now targets this repository; a new signed installer must be built and published after configuring the signing secret. See [release setup](RELEASING.md). Browser API simulations are distinct from live browser tests. Windows compilation, installation and runtime behavior require verification on Windows. See the [test report](../TEST_REPORT.md) for the original verification scope.
+Source version: **1.1.1**. The updater now targets this repository; the release includes a signed update manifest, with the matching private key held in GitHub Actions Secrets. See [release setup](RELEASING.md). Browser API simulations are distinct from live browser tests. Windows compilation, installation and runtime behavior require verification on Windows. See the [test report](../TEST_REPORT.md) for the original verification scope.
 
 The updater accepts signed releases from this repository. See [release preparation](RELEASING.md) for one-time signing setup, manual first installation and publishing from Actions.
 
