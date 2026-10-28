@@ -1,0 +1,714 @@
+// Live download badge: the percentage is text, never baked into the logo.
+
+
+component BadgeButton inherits Rectangle {
+    in property <string> label;
+    in property <string> hint;
+    callback clicked();
+    width: 24px; height: 24px;
+    border-radius: 12px;
+    background: touch.has-hover ? #07567b : #071e36;
+    border-width: 1px; border-color: #25cbe8;
+    Text {
+        text: root.label; color: #8af6ff; font-size: 15px;
+        horizontal-alignment: center; vertical-alignment: center;
+    }
+    touch := TouchArea { clicked => { root.clicked(); } }
+    if touch.has-hover: Rectangle {
+        x: -45px; y: -28px; width: 132px; height: 24px;
+        background: #071e36; border-radius: 5px;
+        Text { text: root.hint; font-size: 10px; color: #8af6ff;
+            horizontal-alignment: center; vertical-alignment: center; overflow: elide; }
+    }
+}
+
+export component FloatingDownload inherits Window {
+    title: root.percent + " · " + root.name;
+    icon: @image-url("icon-window.png");
+    no-frame: true;
+    always-on-top: true;
+    background: transparent;
+    in-out property <bool> compact: false;
+    in-out property <bool> completion-shown: false;
+    in property <string> name;
+    in property <string> percent: "0%";
+    in property <float> progress;
+    in property <int> state;
+    in property <bool> rtl;
+    width: root.compact ? 116px : 204px;
+    height: root.width + 30px;
+    callback restore();
+    callback resize-badge();
+    callback to-tray();
+    callback start-drag();
+    callback toggle-pause();
+
+    disc := Rectangle {
+        x: 4px; y: 4px;
+        width: root.width - 8px; height: self.width;
+        border-radius: self.width / 2;
+        background: @linear-gradient(135deg, #133d63 0%, #031025 100%);
+        border-width: 2px; border-color: #b9964f;
+        Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 100 9 A 91 91 0 1 1 100 191 A 91 91 0 1 1 100 9";
+            fill: transparent; stroke: #164465; stroke-width: 9px;
+        }
+        if root.progress >= 0.01: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 100.0000 9.0000 A 91 91 0 0 1 105.7139 9.1796";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.02: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 105.7139 9.1796 A 91 91 0 0 1 111.4053 9.7176";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.03: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 111.4053 9.7176 A 91 91 0 0 1 117.0517 10.6119";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.04: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 117.0517 10.6119 A 91 91 0 0 1 122.6308 11.8589";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.05: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 122.6308 11.8589 A 91 91 0 0 1 128.1205 13.4539";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.06: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 128.1205 13.4539 A 91 91 0 0 1 133.4993 15.3903";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.07: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 133.4993 15.3903 A 91 91 0 0 1 138.7459 17.6607";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.08: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 138.7459 17.6607 A 91 91 0 0 1 143.8396 20.2561";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.09: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 143.8396 20.2561 A 91 91 0 0 1 148.7602 23.1662";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.10: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 148.7602 23.1662 A 91 91 0 0 1 153.4885 26.3795";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.11: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 153.4885 26.3795 A 91 91 0 0 1 158.0056 29.8833";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.12: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 158.0056 29.8833 A 91 91 0 0 1 162.2938 33.6639";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.13: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 162.2938 33.6639 A 91 91 0 0 1 166.3361 37.7062";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.14: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 166.3361 37.7062 A 91 91 0 0 1 170.1167 41.9944";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.15: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 170.1167 41.9944 A 91 91 0 0 1 173.6205 46.5115";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.16: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 173.6205 46.5115 A 91 91 0 0 1 176.8338 51.2398";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.17: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 176.8338 51.2398 A 91 91 0 0 1 179.7439 56.1604";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.18: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 179.7439 56.1604 A 91 91 0 0 1 182.3393 61.2541";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.19: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 182.3393 61.2541 A 91 91 0 0 1 184.6097 66.5007";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.20: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 184.6097 66.5007 A 91 91 0 0 1 186.5461 71.8795";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.21: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 186.5461 71.8795 A 91 91 0 0 1 188.1411 77.3692";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.22: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 188.1411 77.3692 A 91 91 0 0 1 189.3881 82.9483";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.23: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 189.3881 82.9483 A 91 91 0 0 1 190.2824 88.5947";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.24: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 190.2824 88.5947 A 91 91 0 0 1 190.8204 94.2861";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.25: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 190.8204 94.2861 A 91 91 0 0 1 191.0000 100.0000";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.26: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 191.0000 100.0000 A 91 91 0 0 1 190.8204 105.7139";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.27: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 190.8204 105.7139 A 91 91 0 0 1 190.2824 111.4053";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.28: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 190.2824 111.4053 A 91 91 0 0 1 189.3881 117.0517";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.29: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 189.3881 117.0517 A 91 91 0 0 1 188.1411 122.6308";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.30: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 188.1411 122.6308 A 91 91 0 0 1 186.5461 128.1205";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.31: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 186.5461 128.1205 A 91 91 0 0 1 184.6097 133.4993";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.32: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 184.6097 133.4993 A 91 91 0 0 1 182.3393 138.7459";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.33: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 182.3393 138.7459 A 91 91 0 0 1 179.7439 143.8396";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.34: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 179.7439 143.8396 A 91 91 0 0 1 176.8338 148.7602";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.35: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 176.8338 148.7602 A 91 91 0 0 1 173.6205 153.4885";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.36: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 173.6205 153.4885 A 91 91 0 0 1 170.1167 158.0056";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.37: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 170.1167 158.0056 A 91 91 0 0 1 166.3361 162.2938";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.38: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 166.3361 162.2938 A 91 91 0 0 1 162.2938 166.3361";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.39: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 162.2938 166.3361 A 91 91 0 0 1 158.0056 170.1167";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.40: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 158.0056 170.1167 A 91 91 0 0 1 153.4885 173.6205";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.41: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 153.4885 173.6205 A 91 91 0 0 1 148.7602 176.8338";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.42: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 148.7602 176.8338 A 91 91 0 0 1 143.8396 179.7439";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.43: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 143.8396 179.7439 A 91 91 0 0 1 138.7459 182.3393";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.44: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 138.7459 182.3393 A 91 91 0 0 1 133.4993 184.6097";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.45: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 133.4993 184.6097 A 91 91 0 0 1 128.1205 186.5461";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.46: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 128.1205 186.5461 A 91 91 0 0 1 122.6308 188.1411";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.47: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 122.6308 188.1411 A 91 91 0 0 1 117.0517 189.3881";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.48: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 117.0517 189.3881 A 91 91 0 0 1 111.4053 190.2824";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.49: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 111.4053 190.2824 A 91 91 0 0 1 105.7139 190.8204";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.50: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 105.7139 190.8204 A 91 91 0 0 1 100.0000 191.0000";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.51: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 100.0000 191.0000 A 91 91 0 0 1 94.2861 190.8204";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.52: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 94.2861 190.8204 A 91 91 0 0 1 88.5947 190.2824";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.53: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 88.5947 190.2824 A 91 91 0 0 1 82.9483 189.3881";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.54: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 82.9483 189.3881 A 91 91 0 0 1 77.3692 188.1411";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.55: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 77.3692 188.1411 A 91 91 0 0 1 71.8795 186.5461";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.56: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 71.8795 186.5461 A 91 91 0 0 1 66.5007 184.6097";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.57: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 66.5007 184.6097 A 91 91 0 0 1 61.2541 182.3393";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.58: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 61.2541 182.3393 A 91 91 0 0 1 56.1604 179.7439";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.59: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 56.1604 179.7439 A 91 91 0 0 1 51.2398 176.8338";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.60: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 51.2398 176.8338 A 91 91 0 0 1 46.5115 173.6205";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.61: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 46.5115 173.6205 A 91 91 0 0 1 41.9944 170.1167";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.62: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 41.9944 170.1167 A 91 91 0 0 1 37.7062 166.3361";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.63: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 37.7062 166.3361 A 91 91 0 0 1 33.6639 162.2938";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.64: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 33.6639 162.2938 A 91 91 0 0 1 29.8833 158.0056";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.65: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 29.8833 158.0056 A 91 91 0 0 1 26.3795 153.4885";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.66: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 26.3795 153.4885 A 91 91 0 0 1 23.1662 148.7602";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.67: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 23.1662 148.7602 A 91 91 0 0 1 20.2561 143.8396";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.68: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 20.2561 143.8396 A 91 91 0 0 1 17.6607 138.7459";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.69: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 17.6607 138.7459 A 91 91 0 0 1 15.3903 133.4993";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.70: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 15.3903 133.4993 A 91 91 0 0 1 13.4539 128.1205";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.71: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 13.4539 128.1205 A 91 91 0 0 1 11.8589 122.6308";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.72: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 11.8589 122.6308 A 91 91 0 0 1 10.6119 117.0517";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.73: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 10.6119 117.0517 A 91 91 0 0 1 9.7176 111.4053";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.74: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 9.7176 111.4053 A 91 91 0 0 1 9.1796 105.7139";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.75: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 9.1796 105.7139 A 91 91 0 0 1 9.0000 100.0000";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.76: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 9.0000 100.0000 A 91 91 0 0 1 9.1796 94.2861";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.77: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 9.1796 94.2861 A 91 91 0 0 1 9.7176 88.5947";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.78: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 9.7176 88.5947 A 91 91 0 0 1 10.6119 82.9483";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.79: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 10.6119 82.9483 A 91 91 0 0 1 11.8589 77.3692";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.80: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 11.8589 77.3692 A 91 91 0 0 1 13.4539 71.8795";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.81: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 13.4539 71.8795 A 91 91 0 0 1 15.3903 66.5007";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.82: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 15.3903 66.5007 A 91 91 0 0 1 17.6607 61.2541";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.83: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 17.6607 61.2541 A 91 91 0 0 1 20.2561 56.1604";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.84: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 20.2561 56.1604 A 91 91 0 0 1 23.1662 51.2398";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.85: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 23.1662 51.2398 A 91 91 0 0 1 26.3795 46.5115";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.86: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 26.3795 46.5115 A 91 91 0 0 1 29.8833 41.9944";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.87: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 29.8833 41.9944 A 91 91 0 0 1 33.6639 37.7062";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.88: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 33.6639 37.7062 A 91 91 0 0 1 37.7062 33.6639";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.89: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 37.7062 33.6639 A 91 91 0 0 1 41.9944 29.8833";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.90: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 41.9944 29.8833 A 91 91 0 0 1 46.5115 26.3795";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.91: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 46.5115 26.3795 A 91 91 0 0 1 51.2398 23.1662";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.92: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 51.2398 23.1662 A 91 91 0 0 1 56.1604 20.2561";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.93: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 56.1604 20.2561 A 91 91 0 0 1 61.2541 17.6607";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.94: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 61.2541 17.6607 A 91 91 0 0 1 66.5007 15.3903";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.95: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 66.5007 15.3903 A 91 91 0 0 1 71.8795 13.4539";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.96: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 71.8795 13.4539 A 91 91 0 0 1 77.3692 11.8589";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.97: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 77.3692 11.8589 A 91 91 0 0 1 82.9483 10.6119";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.98: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 82.9483 10.6119 A 91 91 0 0 1 88.5947 9.7176";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 0.99: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 88.5947 9.7176 A 91 91 0 0 1 94.2861 9.1796";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        if root.progress >= 1.00: Path {
+            width: parent.width; height: parent.height;
+            viewbox-width: 200; viewbox-height: 200;
+            commands: "M 94.2861 9.1796 A 91 91 0 0 1 100.0000 9.0000";
+            fill: transparent; stroke: #17deff; stroke-width: 9px;
+        }
+        Image {
+            source: @image-url("icon-window.png");
+            x: parent.width * 0.22; y: parent.height * 0.13;
+            width: parent.width * 0.56; height: parent.height * 0.56;
+            image-fit: contain;
+            // The K artwork from our existing transparent brand asset.
+            source-clip-x: 28; source-clip-y: 12;
+            source-clip-width: 205; source-clip-height: 161;
+        }
+        Rectangle {
+            x: parent.width * 0.18; y: parent.height * 0.64;
+            width: parent.width * 0.64; height: parent.height * 0.23;
+            border-radius: self.height / 2;
+            background: #031428;
+            Text {
+                text: root.percent;
+                color: #43edff;
+                font-size: root.compact ? 22px : 38px;
+                font-weight: 800;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+        }
+        TouchArea {
+            pointer-event(ev) => {
+                if (ev.button == PointerEventButton.left && ev.kind == PointerEventKind.down) {
+                    root.start-drag();
+                }
+            }
+        }
+
+    }
+    HorizontalLayout {
+        x: (root.width - 104px) / 2; y: root.width;
+        width: 104px; height: 24px; spacing: 2px;
+        BadgeButton {
+            label: "↗";
+            hint: root.rtl ? "إظهار تفاصيل التحميل" : "Restore download details";
+            clicked => { root.restore(); }
+        }
+        BadgeButton {
+            label: root.compact ? "+" : "−";
+            hint: root.rtl ? "تغيير حجم اللوجو" : "Change logo size";
+            clicked => { root.resize-badge(); }
+        }
+        BadgeButton {
+            label: root.state == 2 || root.state == 4 ? "▶" : "Ⅱ";
+            hint: root.rtl ? "إيقاف مؤقت / استئناف" : "Pause / resume";
+            clicked => { root.toggle-pause(); }
+        }
+        BadgeButton {
+            label: "_";
+            hint: root.rtl ? "تصغير بجوار الساعة" : "Hide next to the clock";
+            clicked => { root.to-tray(); }
+        }
+    }
+}
