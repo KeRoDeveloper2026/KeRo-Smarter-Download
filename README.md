@@ -24,11 +24,12 @@
 
 | الملف | رابط التنزيل | طريقة الاستخدام |
 |---|---|---|
-| برنامج التثبيت لنظام Windows | رابط المثبّت لم يُنشر بعد | بعد توفر الحزمة: فك الضغط ثم شغّل `KeRoDownload-Setup.exe` |
-| إضافة Chrome وBrave وEdge | [تنزيل إضافة Chromium](https://raw.githubusercontent.com/KeRoDeveloper2026/KeRo-Smarter-Download/main/KeRo-Extension-Chromium.zip) | فك الضغط ثم اختر المجلد عبر Load unpacked |
-| إضافة Firefox | [تنزيل إضافة Firefox](https://raw.githubusercontent.com/KeRoDeveloper2026/KeRo-Smarter-Download/main/KeRo-Extension-Firefox.zip) | فك الضغط ثم حمّل manifest.json مؤقتًا من about:debugging |
-| حزمة الإضافتين كاملة | [تنزيل حزمة الإضافات](https://raw.githubusercontent.com/KeRoDeveloper2026/KeRo-Smarter-Download/main/KeRo-Smarter-Download.zip) | تحتوي على مجلدي extension وextension-firefox |
-| بصمات الملفات | [SHA256SUMS.txt](https://raw.githubusercontent.com/KeRoDeveloper2026/KeRo-Smarter-Download/main/SHA256SUMS.txt) | للتحقق من سلامة التنزيل |
+| مثبّت Windows مباشر | [تنزيل Setup — EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRoDownload-Setup.exe) | شغّل الملف لبدء التثبيت |
+| المثبّت داخل ملف مضغوط | [تنزيل Setup — ZIP](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRoDownload-Setup.zip) | فك الضغط ثم شغّل `KeRoDownload-Setup.exe` |
+| إضافة Chrome وBrave وEdge | [تنزيل إضافة Chromium](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Extension-Chromium.zip) | فك الضغط ثم اختر المجلد عبر Load unpacked |
+| إضافة Firefox | [تنزيل إضافة Firefox](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Extension-Firefox.zip) | فك الضغط ثم حمّل manifest.json مؤقتًا من about:debugging |
+| حزمة الإضافتين كاملة | [تنزيل حزمة الإضافات](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Smarter-Download.zip) | تحتوي على مجلدي extension وextension-firefox |
+| بصمات الملفات | [SHA256SUMS.txt](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/SHA256SUMS.txt) | للتحقق من سلامة التنزيل |
 
 **مهم:** ملف `KeRo-Smarter-Download.zip` هنا حزمة إضافات فقط. للحصول على المصدر الكامل استخدم **Code → Download ZIP**. نسخة Firefox غير موقّعة ومخصصة للتحميل المؤقت. المثبّت المرفق مقدّم من مالك المشروع ولم يُختبر تشغيله في بيئة تجهيز المستودع.
 
@@ -38,7 +39,7 @@
 
 تدعم الواجهة **العربية والإنجليزية والفرنسية والإسبانية والألمانية والبرتغالية والتركية والروسية**، مع اتجاه من اليمين إلى اليسار للعربية.
 
-> **حالة النسخة:** مصدر الإصدار **1.1.0** وحزم الإضافات المحدّثة متاحة. رابط المثبّت سيُضاف بعد رفع الحزمة المقدّمة من مالك المشروع؛ لم يُختبر تشغيلها على Windows في بيئة تجهيز المستودع.
+> **حالة النسخة:** مصدر الإصدار **1.1.0** وحزم الإضافات المحدّثة متاحة. المثبّت المقدّم من مالك المشروع متاح الآن في [الإصدار v1.1.0](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.0)؛ لم يُختبر تشغيله على Windows في بيئة تجهيز المستودع.
 
 ## المميزات
 
@@ -57,8 +58,8 @@
 
 ## البدء
 
-1. عند نشر المثبّت، نزّل **Setup — ZIP** من رابط التحميل المخصص له.
-2. فك الضغط ثم شغّل `KeRoDownload-Setup.exe`.
+1. نزّل **Setup — EXE** من جدول التحميل المباشر أعلاه، أو اختر ZIP إذا كنت تفضّل نسخة مضغوطة.
+2. شغّل `KeRoDownload-Setup.exe`؛ عند اختيار ZIP فك الضغط أولًا.
 3. افتح البرنامج وأضف رابطًا، أو نزّل إضافة متصفحك واتبع خطوات تركيبها أدناه.
 
 للحصول على إصدار تبنيه بنفسك، اتبع [البناء من المصدر](#البناء-من-المصدر). ملف المصدر الذي يوفّره GitHub عبر **Code → Download ZIP** يحتاج إلى تجميع، بعكس ملف المثبّت المرفق.
