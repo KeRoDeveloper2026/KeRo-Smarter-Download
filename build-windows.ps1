@@ -274,10 +274,22 @@ if ($iscc) {
         Copy-Item (Join-Path $out "KeRoDownload-Setup.exe") $setup -Force
         Sign-File $setup
         # version.json: the program reads it from the latest GitHub release
-        # to update itself (version + SHA-256 of the installer)
+        # to update itself. Never leave an unsigned or stale update manifest.
         $hash = (Get-FileHash $setup -Algorithm SHA256).Hash.ToLower()
-        $json = "{`n  ""version"": ""$version"",`n  ""url"": ""https://github.com/KeRo/kero-download/releases/download/v$version/KeRoDownload-Setup.exe"",`n  ""sha256"": ""$hash""`n}`n"
-        [IO.File]::WriteAllText((Join-Path $dist "version.json"), $json)
+        Remove-Item (Join-Path $dist "version.json") -Force -ErrorAction SilentlyContinue
+        if ($env:UPDATE_SIGNING_KEY) {
+            $sig = (cargo run --quiet --release -p swiftget-engine --example sign_update -- $version $hash)
+            if ($LASTEXITCODE -ne 0 -or -not $sig -or $sig.Trim().Length -ne 128) { Fail "Could not sign the update. Check UPDATE_SIGNING_KEY against UPDATE_PUBLIC_KEY." }
+            $json = [ordered]@{
+                version = $version
+                url = "https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v$version/KeRoDownload-Setup.exe"
+                sha256 = $hash
+                sig = $sig.Trim()
+            } | ConvertTo-Json
+            [IO.File]::WriteAllText((Join-Path $dist "version.json"), $json)
+        } else {
+            Write-Warning "Installer built for manual installation only. UPDATE_SIGNING_KEY is missing; no version.json was created. See docs/RELEASING.md."
+        }
     } else {
         Fail "Could not create the setup. Tip: move this folder out of Desktop/OneDrive (e.g. to C:\KeRo) and run BUILD.bat again."
     }

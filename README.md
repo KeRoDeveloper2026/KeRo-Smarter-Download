@@ -11,7 +11,7 @@
 ![Windows](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=flat-square)
 ![Rust](https://img.shields.io/badge/Rust-engine-DEA584?style=flat-square&logo=rust&logoColor=white)
 ![Slint](https://img.shields.io/badge/Slint-desktop_UI-2379F4?style=flat-square)
-![Version](https://img.shields.io/badge/source-v1.1.0-0EA5A4?style=flat-square)
+![Version](https://img.shields.io/badge/source-v1.1.1-0EA5A4?style=flat-square)
 ![Languages](https://img.shields.io/badge/UI-8_languages-6366F1?style=flat-square)
 
 [البدء](#البدء) · [المميزات](#المميزات) · [إضافات المتصفح](#إضافات-المتصفح) · [البناء](#البناء-من-المصدر) · [English](docs/README.en.md)
@@ -39,7 +39,7 @@
 
 تدعم الواجهة **العربية والإنجليزية والفرنسية والإسبانية والألمانية والبرتغالية والتركية والروسية**، مع اتجاه من اليمين إلى اليسار للعربية.
 
-> **حالة النسخة:** مصدر الإصدار **1.1.0** وحزم الإضافات المحدّثة متاحة. المثبّت المقدّم من مالك المشروع متاح الآن في [الإصدار v1.1.0](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.0)؛ لم يُختبر تشغيله على Windows في بيئة تجهيز المستودع.
+> **حالة النسخة:** مصدر الإصدار **1.1.1** يربط التحديثات بهذا المستودع؛ نشر مثبّت جديد يتطلب تجهيز مفتاح التوقيع كما في [دليل الإصدارات](docs/RELEASING.md). المثبّت المقدّم من مالك المشروع متاح الآن في [الإصدار v1.1.0](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.0)؛ لم يُختبر تشغيله على Windows في بيئة تجهيز المستودع.
 
 ## المميزات
 
@@ -142,7 +142,7 @@ node extension/test/content.sim.js --firefox
 
 يتضمن المشروع [سير عمل لبناء Windows](.github/workflows/build.yml) لبناء FFmpeg وتشغيل الاختبارات وتجميع التطبيق وتعبئته. بعد نجاحه يمكن تنزيل الناتج من **Artifacts** في صفحة [Actions](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/actions).
 
-نشر Release خطوة منفصلة في سير العمل الحالي وتحتاج إلى رسالة commit تتضمن `[release]` على فرع `main`. راجع [تجهيز الإصدارات](docs/RELEASING.md) قبل ذلك، خصوصًا التوقيع وعناوين التحديثات وسلوك الاحتفاظ بالإصدارات.
+لنشر Release موقّع، اختر `main` وفعّل `publish_release` عند تشغيل سير العمل يدويًا، أو استخدم رسالة commit تتضمن `[release]` على `main`. راجع [تجهيز الإصدارات](docs/RELEASING.md) لضبط مفتاح التوقيع. تُحفظ الإصدارات الأقدم وروابطها.
 
 ## الخصوصية والاتصالات
 

@@ -35,9 +35,9 @@ For Chromium browsers, enable Developer mode on the extensions page and load the
 
 ## Verification and release status
 
-Source version: **1.1.0**. Browser API simulations are distinct from live browser tests. Windows compilation, installation and runtime behavior require verification on Windows. See the [test report](../TEST_REPORT.md) for the original verification scope.
+Source version: **1.1.1**. The updater now targets this repository; a new signed installer must be built and published after configuring the signing secret. See [release setup](RELEASING.md). Browser API simulations are distinct from live browser tests. Windows compilation, installation and runtime behavior require verification on Windows. See the [test report](../TEST_REPORT.md) for the original verification scope.
 
-The bundled update source still points to the original repository and requires review before release from this repository. See [release preparation](RELEASING.md) for signing, update URLs and workflow behavior.
+The updater accepts signed releases from this repository. See [release preparation](RELEASING.md) for one-time signing setup, manual first installation and publishing from Actions.
 
 ## Privacy and contribution
 

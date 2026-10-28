@@ -54,11 +54,9 @@ pub fn spawn(ctx: &Ctx) {
             }
         }
     }
-    // KeRo has no update server of its own yet: the built-in updater pointed to
-    // the original project, so it stays off (it would replace KeRo by that build).
-    const AUTO_UPDATE: bool = false;
-    if !AUTO_UPDATE || !selfupdate::installed() {
-        return; // off, or a portable copy: there is no installation to update
+    // Signed releases are served by this project's own GitHub repository.
+    if !selfupdate::installed() {
+        return; // a portable copy has no installation to update
     }
     let mgr = ctx.mgr.clone();
     ctx.rt.spawn(async move {

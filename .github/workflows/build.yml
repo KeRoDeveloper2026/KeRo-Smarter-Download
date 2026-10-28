@@ -12,6 +12,14 @@ on:
       - "README.md"
       - "docs/**"
   workflow_dispatch:
+    inputs:
+      publish_release:
+        description: Publish a signed release (main only; requires UPDATE_SIGNING_KEY)
+        type: boolean
+        default: false
+
+env:
+  IS_RELEASE: ${{ github.ref == 'refs/heads/main' && ((github.event_name == 'push' && contains(github.event.head_commit.message, '[release]')) || (github.event_name == 'workflow_dispatch' && inputs.publish_release)) }}
 
 permissions:
   contents: write
@@ -78,6 +86,19 @@ jobs:
         with:
           toolchain: stable
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+      - name: Validate release signing key
+        shell: pwsh
+        env:
+          UPDATE_SIGNING_KEY: ${{ secrets.UPDATE_SIGNING_KEY }}
+        run: |
+          if (-not $env:UPDATE_SIGNING_KEY) {
+            if ($env:IS_RELEASE -eq "true") { throw "Set UPDATE_SIGNING_KEY first; see docs/RELEASING.md" }
+            Write-Host "::notice::UPDATE_SIGNING_KEY is not configured. This build produces a manual installer only."
+          } else {
+            $version = ([regex]::Match((Get-Content Cargo.toml -Raw), '(?m)^version\s*=\s*"([^"]+)"')).Groups[1].Value
+            cargo run --quiet --release -p swiftget-engine --example sign_update -- $version ('0' * 64) | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "UPDATE_SIGNING_KEY does not match the public key in selfupdate.rs" }
+          }
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: ffmpeg
@@ -148,7 +169,6 @@ jobs:
           # Ed25519 key that signs version.json; the program installs only
           # updates signed with it (selfupdate.rs has the public half)
           UPDATE_SIGNING_KEY: ${{ secrets.UPDATE_SIGNING_KEY }}
-          IS_RELEASE: ${{ github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[release]') }}
         run: |
           $version = ([regex]::Match((Get-Content Cargo.toml -Raw), '(?m)^version\s*=\s*"([^"]+)"')).Groups[1].Value
           if ("${{ github.ref_type }}" -eq "tag") {
@@ -222,10 +242,14 @@ jobs:
           } elseif ($env:IS_RELEASE -eq "true") {
             throw "UPDATE_SIGNING_KEY is not set: installed copies would refuse this update"
           }
-          $json = "{`n  ""version"": ""$version"",`n  ""url"": ""https://github.com/${{ github.repository }}/releases/download/v$version/KeRoDownload-Setup.exe"",`n  ""sha256"": ""$hash"",`n  ""sig"": ""$sig""`n}`n"
-          [IO.File]::WriteAllText("$PWD/dist/version.json", $json)
-          Get-Content dist/version.json
-          Compress-Archive -Path dist/KeRoDownload-Setup.exe, dist/version.json -DestinationPath KeRoDownload-windows.zip -Force
+          $files = @("dist/KeRoDownload-Setup.exe")
+          Remove-Item dist/version.json -Force -ErrorAction SilentlyContinue
+          if ($sig) {
+            $json = "{`n  ""version"": ""$version"",`n  ""url"": ""https://github.com/${{ github.repository }}/releases/download/v$version/KeRoDownload-Setup.exe"",`n  ""sha256"": ""$hash"",`n  ""sig"": ""$sig""`n}`n"
+            [IO.File]::WriteAllText("$PWD/dist/version.json", $json)
+            $files += "dist/version.json"
+          }
+          Compress-Archive -Path $files -DestinationPath KeRoDownload-windows.zip -Force
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: KeRoDownload-windows
@@ -233,7 +257,7 @@ jobs:
       # a release is published only when the commit message says [release]
       # (tag v<version> is created here); the same version again is skipped
       - name: Publish release
-        if: github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[release]')
+        if: env.IS_RELEASE == 'true'
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
@@ -244,11 +268,4 @@ jobs:
           if (Test-Path dist/kero-download-firefox.xpi) { $files += "dist/kero-download-firefox.xpi", "dist/firefox-updates.json" }
           gh release create "v$env:VERSION" @files --repo "${{ github.repository }}" --target "${{ github.sha }}" --title "KeRo Smarter Download $env:VERSION" --notes "KeRo Smarter Download $env:VERSION" --latest
           if ($LASTEXITCODE -ne 0) { throw "could not create the release" }
-          # only the newest release stays: older ones (and their tags) go
-          $tags = gh release list --repo "${{ github.repository }}" --limit 100 --json tagName -q '.[].tagName'
-          foreach ($t in $tags) {
-            if ($t -and $t -ne "v$env:VERSION") {
-              Write-Host "Removing old release $t"
-              gh release delete $t --repo "${{ github.repository }}" --yes --cleanup-tag
-            }
-          }
+          # Keep older releases and tags so existing download links stay valid.

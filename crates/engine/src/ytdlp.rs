@@ -935,7 +935,7 @@ mod tests {
         assert_eq!(info.title, "Cool video");
         assert_eq!(info.site, "Youtube");
         let keys: Vec<&str> = info.options.iter().map(|o| o.key.as_str()).collect();
-        assert_eq!(keys, ["1080p60|WEBM", "1080p|MP4", "1080p|WEBM", "1080p|MP4 AV1", "720p|MP4", "360p|MP4+A", "audio|M4A", "audio|MP3"]);
+        assert_eq!(keys, ["1080p60|WEBM", "1080p|MP4", "1080p|WEBM", "1080p|MP4 AV1", "720p|MP4", "360p|MP4+A", "audio|M4A", "audio|MP3:128", "audio|MP3:160", "audio|MP3", "audio|MP3:256", "audio|MP3:320"]);
         let mp4 = &info.options[1];
         assert_eq!(mp4.video_url, "https://gv/137");
         assert_eq!(mp4.audio_url.as_deref(), Some("https://gv/140"));

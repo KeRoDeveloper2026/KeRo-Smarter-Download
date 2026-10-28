@@ -19,7 +19,7 @@ use serde::Deserialize;
 use sha2::{Digest, Sha256};
 use std::path::{Path, PathBuf};
 
-pub const REPO: &str = "KeRo/kero-download";
+pub const REPO: &str = "KeRoDeveloper2026/KeRo-Smarter-Download";
 pub const SETUP_NAME: &str = "KeRoDownload-Setup.exe";
 
 pub fn version_url() -> String {
