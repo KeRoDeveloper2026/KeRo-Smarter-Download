@@ -53,15 +53,19 @@
 
 **المثبّت يتضمن البرنامج والأدوات المساعدة ومجلدي الإضافات.** بعد التثبيت، استخدم مجلد `extension` لمتصفحات Chrome وBrave وEdge، أو `extension-firefox` لمتصفح Firefox من داخل مجلد تثبيت البرنامج. [خطوات تركيب الإضافة](#إضافات-المتصفح).
 
-**لمستخدمي Windows 7:** استخدم الإضافة المرفقة مع مثبّت Win7؛ حزمة Firefox داخلها مجهزة لـ**Firefox 115 ESR**. تشغيل الإضافات على Windows 7 ما زال بحاجة إلى تجربة فعلية.
+**لمستخدمي Windows 7:** اختر حزمة **Firefox-Win7** المحدثة أدناه لإصدار **Firefox 115 ESR**. تشغيل الإضافات على Windows 7 ما زال بحاجة إلى تجربة فعلية.
 
-الروابط التالية لتنزيل الإضافات منفصلة، وهي حزم منشورة سابقًا ضمن **v1.1.0**:
+الإضافات المحدثة **v1.1.1** متاحة كتنزيلات مستقلة وتعمل مع البرنامج المثبّت 1.1.3؛ لا تحتاج إلى إعادة تثبيت البرنامج:
 
-| الإضافة | رابط التنزيل | طريقة التركيب |
+| المتصفح | الحزمة المحدثة | طريقة التركيب |
 |---|---|---|
-| Chrome / Brave / Edge | [تنزيل إضافة Chromium — ZIP](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Extension-Chromium.zip) | فك الضغط ثم اختر المجلد عبر Load unpacked |
-| Firefox | [تنزيل إضافة Firefox — ZIP](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Extension-Firefox.zip) | تحميل مؤقت من about:debugging؛ الإضافة غير موقّعة |
-| الإضافتان معًا | [تنزيل حزمة الإضافات — ZIP](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Smarter-Download.zip) | مجلدا الإضافات في حزمة واحدة |
+| Chrome / Brave / Edge / Opera / Opera GX / Vivaldi | [تنزيل إضافة Chromium — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Chromium.zip) | فك الضغط ثم Developer mode → Load unpacked → مجلد `extension` |
+| Firefox 140 أو أحدث | [تنزيل إضافة Firefox — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Firefox.zip) | تحميل `extension-firefox/manifest.json` مؤقتًا من about:debugging |
+| Firefox 115 ESR على Windows 7 — تجريبي | [تنزيل إضافة Firefox-Win7 — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Firefox-Win7.zip) | الحزمة المخصصة للمتصفح القديم؛ تحتاج اختبارًا فعليًا على Win7 |
+
+**بعد تحديث الإضافة:** أوقف أي نسخة قديمة مكررة، وشغّل البرنامج، ثم حدّث تبويبات المواقع المفتوحة بـ**Ctrl+R** مرة واحدة لتشغيل الكود الجديد.
+
+[دليل المتصفحات وحالة التحقق](docs/BROWSERS.md) · [بصمات الحزم SHA-256](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extensions-v1.1.1-SHA256SUMS.txt) · [الإضافات القديمة v1.1.0](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.0)
 
 [عرض كل ملفات الإصدار v1.1.3](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3) · [المصدر الكامل — Code → Download ZIP](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download)
 
@@ -77,7 +81,7 @@
 | Windows 7 — x64 | [version-Win7-x64.json](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/version-Win7-x64.json) |
 | Windows 7 — x86 | [version-Win7-x86.json](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/version-Win7-x86.json) |
 
-أرشيف `KeRo-Smarter-Download.zip` في جدول الإضافات يحتوي على الإضافات فقط. المصدر الكامل يُنزّل من **Code → Download ZIP** ويحتاج إلى تجميع.
+حزم الإضافات ZIP تحتوي على الإضافة ودليل تركيبها، ولا تتضمن مثبّت برنامج سطح المكتب. المصدر الكامل يُنزّل من **Code → Download ZIP** ويحتاج إلى تجميع.
 
 </details>
 
@@ -124,12 +128,12 @@
 
 ## إضافات المتصفح
 
-يجب تشغيل تطبيق سطح المكتب لكي يستقبل التنزيلات من الإضافة.
+يجب تشغيل تطبيق سطح المكتب لكي يستقبل التنزيلات من الإضافة. الحزم تستهدف متصفحات سطح المكتب على Windows؛ **Safari ومتصفحات الهاتف غير مدعومة حاليًا**. راجع [جدول المتصفحات وحدود التحقق](docs/BROWSERS.md).
 
-### Chrome وBrave وEdge
+### Chrome وBrave وEdge وOpera وVivaldi
 
-1. استخدم مجلد `extension` داخل مجلد تثبيت البرنامج، أو فك ضغط حزمة الإضافة المنفصلة.
-2. افتح `chrome://extensions` أو `brave://extensions` أو `edge://extensions`.
+1. فك ضغط حزمة Chromium المحدثة من جدول الإضافات واستخدم مجلد `extension` داخلها. قد تتضمن المثبّتات المنشورة نسخة أقدم من الإضافة.
+2. افتح صفحة الإضافات: `chrome://extensions` أو `brave://extensions` أو `edge://extensions` أو `opera://extensions` أو `vivaldi://extensions`.
 3. فعّل **Developer mode** ثم اختر **Load unpacked**.
 4. اختر مجلد [`extension`](extension)، ثم أعد تحميل صفحة الموقع.
 
@@ -139,7 +143,7 @@
 
 1. افتح `about:debugging#/runtime/this-firefox`.
 2. اختر **Load Temporary Add-on**.
-3. اختر `manifest.json` من مجلد `extension-firefox` داخل مجلد تثبيت البرنامج. لمستخدمي Windows 7، استخدم المجلد المرفق مع مثبّت Win7 لتثبيت نسخة Firefox 115 ESR.
+3. اختر `manifest.json` من مجلد `extension-firefox` بعد فك الحزمة المحدثة. لمستخدمي Firefox 115 على Windows 7، اختر حزمة **Firefox-Win7**.
 
 الإضافة المرفقة غير موقّعة، والتحميل بهذه الطريقة مؤقت ويحتاج إلى تكراره بعد إعادة تشغيل Firefox. متطلب إصدار Firefox في الحزم الحديثة هو **140 أو أحدث**؛ أما حزم Windows 7 التجريبية فتتضمن manifest مخصصًا لـ**Firefox 115 ESR**. التوزيع الدائم يحتاج إلى حزمة موقّعة من Mozilla؛ ملف XPI غير الموقّع مخصص للتطوير.
 
@@ -211,6 +215,7 @@ node extension/test/content.sim.js --firefox
 | المشكلة | الخطوة المقترحة |
 |---|---|
 | `ffmpeg.exe` غير موجود | شغّل `REPAIR-FFMPEG.bat` ثم أعد فتح التطبيق واستأنف التنزيل؛ يحتاج الإصلاح إلى الإنترنت ويتحقق من الملف المنزّل |
+| `Extension context invalidated` | ثبّت تحديث الإضافة v1.1.1، ثم حدّث صفحات المواقع المفتوحة مرة واحدة؛ الكود القديم في التبويب لا يتغير تلقائيًا |
 | الإضافة لا ترسل التنزيل | تأكد من تشغيل التطبيق والإضافة، وأعد تحميل الصفحة، وأوقف النسخ القديمة المتكررة |
 | لا تظهر كل الجودات | قد يقيّد الموقع الجودات أو يحتاج إلى جلسة دخول؛ أعد تحليل الرابط وتحقق من صلاحية الوصول |
 | تحذير SmartScreen | قد يظهر للملفات غير الموقّعة؛ تحقّق من مصدر الملف قبل تشغيله |
