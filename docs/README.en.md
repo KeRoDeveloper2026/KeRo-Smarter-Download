@@ -100,8 +100,24 @@ The extension communicates with the desktop app over loopback and may pass downl
 
 See [contribution guidance](../CONTRIBUTING.md), [security reporting](../SECURITY.md) and [third-party notices](../THIRD-PARTY-NOTICES.txt).
 
-## License
+## License and third-party components
 
-The project's original code is licensed under **[GNU GPL-3.0-only](../LICENSE)**. **Copyright (c) 2026 KeRo HaZem.** The official app is free of charge. Distributed modified versions must provide corresponding source to their recipients under the GPL; commercial use is allowed and private modifications need not be published. Third-party components retain their own terms. See [licensing details](LICENSING.md).
+**Free of charge · Open source · Developed by KeRo HaZem**
 
-Developed by **KeRo** — [KeRoDeveloper2026](https://github.com/KeRoDeveloper2026).
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](../LICENSE)
+
+The official **KeRo Smarter Download** app is free of charge. Read the source, understand how it works and contribute under **GNU GPL-3.0-only**.
+
+| Item | Documented details |
+|---|---|
+| Original code copyright | **Copyright (c) 2026 KeRo HaZem** — [copyright notice](../COPYRIGHT) |
+| Project license | [Full GPL-3.0 text](../LICENSE) · [rights and obligations](LICENSING.md) |
+| Source and releases | [Desktop source](../crates) · [extension source](../extension) · [release downloads](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases) |
+| Third-party components | [Sources, versions and license notices](../THIRD-PARTY-NOTICES.txt) for Slint, yt-dlp, FFmpeg, LAME, aria2 and Rust libraries |
+| Contribute | [Contribution guide](../CONTRIBUTING.md) · [report an issue](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/issues/new/choose) |
+
+When distributing modified versions, provide recipients with the Corresponding Source and retain copyright and license notices as required by the GPL. Commercial use is allowed; private modifications that are not distributed need not be published. Third-party components retain their own copyrights and license terms.
+
+This license applies to the current source; it does not modify previously published installers and is not a code-signing certificate or a guarantee against Windows warnings. Download only content you are entitled to access and save.
+
+Developed by **KeRo HaZem** — [KeRoDeveloper2026](https://github.com/KeRoDeveloper2026).
