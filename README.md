@@ -215,6 +215,8 @@ node extension/test/content.sim.js --firefox
 
 تعمل [فحوصات الجودة](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/actions/workflows/ci.yml) على تعديلات المصدر وطلبات الدمج. لنشر Release موقّع، جهّز رقم النسخة وملف القفل ثم ارفع وسمًا مطابقًا مثل `v1.1.5`؛ لا تنشر رسائل `[release]` أي إصدار. لا يبدأ بناء المثبّت ونشره إلا بعد نجاح فحوصات الجودة والتحقق من الوسم. راجع [تجهيز الإصدارات](docs/RELEASING.md). تُحفظ الإصدارات الأقدم وروابطها. نُشر v1.1.4 من [مخرجات المعاينة المعتمدة](docs/RELEASE-v1.1.4.md) دون إعادة بناء المثبّتات؛ عند تعطل النشر يُعاد job النشر وحده.
 
+**سياسة توقيع الكود / Code signing policy:** [CODE_SIGNING_POLICY.md](CODE_SIGNING_POLICY.md) · [قواعد السلوك والمشاركة](CODE_OF_CONDUCT.md)
+
 ## الخصوصية والاتصالات
 
 | المكوّن | السلوك في الإصدار v1.1.4 |

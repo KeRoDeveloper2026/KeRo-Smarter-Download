@@ -7,7 +7,6 @@ on:
       - extension/**
       - extension-firefox/**
       - tools/package-extensions.py
-      - tools/sync-extension-version.py
       - docs/BROWSERS.md
       - .github/workflows/extension-packages.yml
   workflow_dispatch:
@@ -49,4 +48,19 @@ jobs:
           tag="$(python -c 'import tomllib; print("v" + tomllib.load(open("Cargo.toml", "rb"))["workspace"]["package"]["version"])')"
           gh release view "$tag" --repo "$GITHUB_REPOSITORY"
           # Existing application installers and update manifests are not replaced.
-          gh release upload "$tag" dist-extensions/* --repo "$GITHUB_REPOSITORY"
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$tag" > release-assets.json
+          for file in dist-extensions/*; do
+            name="$(basename "$file")"
+            count="$(jq --arg name "$name" '[.assets[] | select(.name == $name)] | length' release-assets.json)"
+            if [ "$count" -ne 0 ]; then
+              expected="sha256:$(sha256sum "$file" | cut -d ' ' -f 1)"
+              actual="$(jq -r --arg name "$name" '.assets[] | select(.name == $name) | .digest' release-assets.json)"
+              if [ "$count" -ne 1 ] || [ "$actual" != "$expected" ]; then
+                echo "::error::Existing asset differs: $name. Bump the extension version instead of replacing it."
+                exit 1
+              fi
+              echo "Retaining existing identical asset: $name"
+              continue
+            fi
+            gh release upload "$tag" "$file" --repo "$GITHUB_REPOSITORY"
+          done

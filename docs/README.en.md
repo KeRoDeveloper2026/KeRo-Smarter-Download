@@ -92,6 +92,8 @@ Published version: **1.1.4**. The four approved preview installers were publishe
 
 The updater accepts signed releases from this repository. See [release preparation](RELEASING.md) for one-time signing setup, manual first installation and publishing from Actions.
 
+[Code signing policy](../CODE_SIGNING_POLICY.md) · [Code of Conduct](../CODE_OF_CONDUCT.md)
+
 ## Privacy and contribution
 
 If the app is useful to you, consider starring this repository and sharing its download page.

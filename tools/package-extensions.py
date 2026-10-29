@@ -1,8 +1,6 @@
 """Build reproducible desktop browser packages; no native application is rebuilt."""
 import hashlib
 import json
-import subprocess
-import sys
 from pathlib import Path
 from zipfile import ZipFile, ZipInfo, ZIP_DEFLATED
 
@@ -12,7 +10,6 @@ OUT = ROOT / 'dist-extensions'
 
 
 def main():
-    subprocess.run([sys.executable, str(ROOT / 'tools/sync-extension-version.py'), '--check'], check=True)
     chromium = json.loads((SOURCE / 'manifest.json').read_text())
     firefox = json.loads((SOURCE / 'manifest.firefox.json').read_text())
     version = chromium['version']

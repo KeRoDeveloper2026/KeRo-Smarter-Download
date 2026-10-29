@@ -56,8 +56,8 @@ The Chromium package targets desktop Chrome, Brave, Edge, Opera / Opera GX and V
 - Vivaldi: https://help.vivaldi.com/desktop/appearance-customization/extensions/
 - Safari packaging: https://developer.apple.com/documentation/safariservices/packaging-a-web-extension-for-safari
 
-## ترقيم الإصدارات المتزامن
+## ترقيم إصدارات الإضافة
 
-رقم حزم الإضافة الجديدة يطابق إصدار البرنامج في Cargo.toml. بعد تعديل رقم البرنامج شغّل `python tools/sync-extension-version.py` لتحديث ملفات manifest الثلاثة معًا. يتحقق التغليف وCI من التطابق ويرفضان نشر حزم مختلفة الرقم.
+رقم الإضافة مستقل عن رقم البرنامج؛ يمكن تحديث أحدهما دون إجبار الآخر على تغيير رقمه. تبقى ملفات manifest لنسخ Chromium وFirefox متسقة فيما بينها. أداة `python tools/sync-extension-version.py` اختيارية عند رغبة المالك في توحيد الرقمين، ولا يستدعيها التغليف أو CI تلقائيًا.
 
 حزم الإضافة المستقلة 1.1.4 تحدّث الترقيم، وتحتفظ بنفس سلوك الإضافة 1.1.1 وتوافقها. مثبّتات البرنامج v1.1.4 المنشورة سابقًا تتضمن الإضافة 1.1.1 ولم يُعد بناؤها؛ حدّث مجلد الإضافة من الحزمة المستقلة ثم أعد تحميلها والمتصفحات المفتوحة. الإضافة 1.1.4 لا تحاول الرجوع للرقم الأقدم الذي يعلنه البرنامج المثبّت. توقيع Mozilla وإصدار المتجر منفصلان عن تغيير الرقم في manifest.

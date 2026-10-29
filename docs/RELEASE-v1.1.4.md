@@ -37,4 +37,4 @@ Exit the app from the system tray before a manual upgrade. Ed25519 update signat
 
 ## Independent browser extension 1.1.4
 
-Standalone Chromium, Firefox and Firefox-Win7 packages now use version 1.1.4 to match the app. This is a version-number alignment; browser logic and permissions are unchanged. Original desktop installers remain byte-for-byte unchanged and still bundle extension 1.1.1. Update the extension using the separate ZIP package and reload it; Firefox packages remain unsigned temporary-loading packages. New source builds enforce synchronized app/extension versions.
+Standalone Chromium, Firefox and Firefox-Win7 packages now use version 1.1.4 to match the app. This is a version-number alignment; browser logic and permissions are unchanged. Original desktop installers remain byte-for-byte unchanged and still bundle extension 1.1.1. Update the extension using the separate ZIP package and reload it; Firefox packages remain unsigned temporary-loading packages. The versions were aligned for this update; current packaging allows independent app and extension versions while keeping the browser variants consistent.
