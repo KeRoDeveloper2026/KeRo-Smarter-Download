@@ -97,15 +97,25 @@ jobs:
             $legacyPackage = if ('${{ matrix.arch }}' -eq 'x86') { 'windows_i686_msvc' } else { 'windows_x86_64_msvc' }
             $legacyImportDir = (Resolve-Path "$legacyCargoRoot/registry/src/*/$legacyPackage-0.48.5/lib" | Select-Object -First 1).Path
             if (-not $legacyImportDir) { throw 'Legacy Windows import libraries are missing' }
-            # Version 0.48's build script only recognizes the pc vendor, so
-            # pass its verified Cargo package library to the final app link.
-            cargo rustc -p swiftget --release --target ${{ matrix.target }} @extra -- "-Lnative=$legacyImportDir"
-          } else {
-            cargo build --release --target ${{ matrix.target }} @extra
+            # The app and engine test binaries both use older Windows crates.
+            # Encode arguments separately so even a Cargo path with spaces is safe.
+            $env:CARGO_ENCODED_RUSTFLAGS = "-C$([char]31)target-feature=+crt-static$([char]31)-Lnative=$legacyImportDir"
           }
+          cargo build --release --target ${{ matrix.target }} @extra
           if ($LASTEXITCODE -ne 0) { throw 'Application build failed' }
+          if ('${{ matrix.legacy }}' -eq 'true') {
+            python tools/check-win7-imports.py 'target/${{ matrix.target }}/release/KeRoDownload.exe' ffmpeg-out/ffmpeg.exe
+            if ($LASTEXITCODE -ne 0) { throw 'Known post-Windows-7 API dependency found' }
+          }
           cargo test -p swiftget-engine --target ${{ matrix.target }} @extra
           if ($LASTEXITCODE -ne 0) { throw 'Engine tests failed' }
+      - name: Preserve Windows 7 candidate for diagnostics on failure
+        if: ${{ failure() && matrix.legacy }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: diagnostic-${{ matrix.platform }}
+          path: target/${{ matrix.target }}/release/KeRoDownload.exe
+          if-no-files-found: ignore
       - name: Package and verify architecture
         shell: pwsh
         env:
