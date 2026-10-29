@@ -135,21 +135,28 @@ mod os {
 static SEALED: std::sync::Mutex<Option<std::collections::HashMap<String, String>>> =
     std::sync::Mutex::new(None);
 
-/// The text as it is kept on the disk.
+fn protect_bytes(data: &[u8]) -> Option<Vec<u8>> {
+    #[cfg(test)]
+    if FAIL_PROTECTION.with(|v| v.get()) {
+        return None;
+    }
+    os::protect(data)
+}
+
+/// The text as it is kept on the disk, or an error without a plaintext fallback.
 pub fn seal(plain: &str) -> Result<String, ProtectionError> {
     if plain.is_empty() {
         return Ok(String::new());
     }
-    #[cfg(test)]
-    if FAIL_PROTECTION.with(|v| v.get()) {
-        return Err(ProtectionError);
-    }
     let mut cache = SEALED.lock().unwrap_or_else(|p| p.into_inner());
     let map = cache.get_or_insert_with(Default::default);
-    if let Some(done) = map.get(plain) {
+    let cached = map.get(plain);
+    #[cfg(test)]
+    let cached = cached.filter(|_| !FAIL_PROTECTION.with(|v| v.get()));
+    if let Some(done) = cached {
         return Ok(done.clone());
     }
-    let sealed = match os::protect(plain.as_bytes()) {
+    let sealed = match protect_bytes(plain.as_bytes()) {
         Some(enc) if !enc.is_empty() => format!("{PREFIX}{}", to_hex(&enc)),
         _ => return Err(ProtectionError),
     };
