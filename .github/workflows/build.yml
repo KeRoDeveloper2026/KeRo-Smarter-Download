@@ -108,7 +108,7 @@ jobs:
             Write-Host "::notice::UPDATE_SIGNING_KEY is not configured. This build produces a manual installer only."
           } else {
             $version = ([regex]::Match((Get-Content Cargo.toml -Raw), '(?m)^version\s*=\s*"([^"]+)"')).Groups[1].Value
-            cargo run --quiet --release -p swiftget-engine --example sign_update -- $version ('0' * 64) | Out-Null
+            cargo run --locked --quiet --release -p swiftget-engine --example sign_update -- $version ('0' * 64) | Out-Null
             if ($LASTEXITCODE -ne 0) { throw "UPDATE_SIGNING_KEY does not match the public key in selfupdate.rs" }
           }
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
@@ -153,7 +153,7 @@ jobs:
       - name: Run engine tests
         shell: pwsh
         run: |
-          cargo test -p swiftget-engine --no-fail-fast 2>&1 | Tee-Object -FilePath tests.txt
+          cargo test --locked -p swiftget-engine --no-fail-fast 2>&1 | Tee-Object -FilePath tests.txt
           $code = $LASTEXITCODE
           # failures (only real ones) show up as annotations on the run page;
           # case-sensitive, or every "0 failed" summary line looked like one
@@ -170,7 +170,7 @@ jobs:
           # fails on published vulnerabilities; "unmaintained" notices only warn
           cargo audit
       - name: Build release
-        run: cargo build --release
+        run: cargo build --locked --release
       - name: Package
         shell: pwsh
         env:
@@ -249,7 +249,7 @@ jobs:
           # the signature the program checks before it installs an update
           $sig = ""
           if ($env:UPDATE_SIGNING_KEY) {
-            $sig = (cargo run --quiet --release -p swiftget-engine --example sign_update -- $version $hash).Trim()
+            $sig = (cargo run --locked --quiet --release -p swiftget-engine --example sign_update -- $version $hash).Trim()
             if ($LASTEXITCODE -ne 0 -or $sig.Length -ne 128) { throw "could not sign the release" }
           } elseif ($env:IS_RELEASE -eq "true") {
             throw "UPDATE_SIGNING_KEY is not set: installed copies would refuse this update"

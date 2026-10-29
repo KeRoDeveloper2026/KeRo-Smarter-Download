@@ -83,7 +83,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Inno Setup failed' }
 if (-not $env:UPDATE_SIGNING_KEY) { throw 'UPDATE_SIGNING_KEY is required' }
 $hash = (Get-FileHash "dist/$name.exe" -Algorithm SHA256).Hash.ToLower()
 # The signing utility executes on the build host, independent of target architecture.
-$sig = (cargo run --quiet --release -p swiftget-engine --example sign_update -- $version $hash).Trim()
+$sig = (cargo run --locked --quiet --release -p swiftget-engine --example sign_update -- $version $hash).Trim()
 if ($LASTEXITCODE -ne 0 -or $sig.Length -ne 128) { throw 'Update signing failed' }
 $manifest = @{ version = $version; url = "https://github.com/$env:GITHUB_REPOSITORY/releases/download/v$version/$name.exe"; sha256 = $hash; sig = $sig }
 $manifest | ConvertTo-Json | Set-Content "dist/version-$Platform.json" -Encoding utf8

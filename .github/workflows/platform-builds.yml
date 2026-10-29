@@ -88,7 +88,7 @@ jobs:
           $extra = @()
           if ('${{ matrix.legacy }}' -eq 'true') { $extra = @('-Z', 'build-std=std,panic_abort', '--features', 'legacy-win7') }
           if ('${{ matrix.legacy }}' -eq 'true') {
-            cargo fetch --target ${{ matrix.target }}
+            cargo fetch --locked --target ${{ matrix.target }}
             if ($LASTEXITCODE -ne 0) { throw 'Dependency fetch failed' }
             $legacyCargoRoot = if ($env:CARGO_HOME) { $env:CARGO_HOME } else { Join-Path $env:USERPROFILE '.cargo' }
             $legacyPackage = if ('${{ matrix.arch }}' -eq 'x86') { 'windows_i686_msvc' } else { 'windows_x86_64_msvc' }
@@ -100,13 +100,13 @@ jobs:
             # Encode arguments separately so even a Cargo path with spaces is safe.
             $env:CARGO_ENCODED_RUSTFLAGS = "-C$([char]31)target-feature=+crt-static$([char]31)-Lnative=$legacyImportDir$([char]31)--cfg$([char]31)windows_slim_errors"
           }
-          cargo build --release --target ${{ matrix.target }} @extra
+          cargo build --locked --release --target ${{ matrix.target }} @extra
           if ($LASTEXITCODE -ne 0) { throw 'Application build failed' }
           if ('${{ matrix.legacy }}' -eq 'true') {
             python tools/check-win7-imports.py 'target/${{ matrix.target }}/release/KeRoDownload.exe' ffmpeg-out/ffmpeg.exe
             if ($LASTEXITCODE -ne 0) { throw 'Known post-Windows-7 API dependency found' }
           }
-          cargo test -p swiftget-engine --target ${{ matrix.target }} @extra
+          cargo test --locked -p swiftget-engine --target ${{ matrix.target }} @extra
           if ($LASTEXITCODE -ne 0) { throw 'Engine tests failed' }
       - name: Preserve Windows 7 candidate for diagnostics on failure
         if: ${{ failure() && matrix.legacy }}

@@ -186,8 +186,8 @@ cd KeRo-Smarter-Download
 بعد تجهيز Rust stable MSVC وأدوات Visual Studio C++ على Windows:
 
 ```powershell
-cargo build --release
-cargo test -p swiftget-engine --no-fail-fast
+cargo build --locked --release
+cargo test --locked -p swiftget-engine --no-fail-fast
 ```
 
 أسماء حزم Rust الداخلية ما زالت تستخدم `swiftget` في بعض المواضع. التجميع وحده لا يجهّز بالضرورة الأدوات الخارجية أو المثبّت؛ استخدم سكربت البناء للحصول على الحزمة الكاملة.

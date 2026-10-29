@@ -68,7 +68,7 @@ Write-Host "Version $version"
 # a running copy would lock the files we replace
 Get-Process KeRoDownload, SwiftGet -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
 Step "Building KeRoDownload.exe (first time: 5-15 minutes)"
-cargo build --release
+cargo build --locked --release
 if ($LASTEXITCODE -ne 0) { Fail "The build failed. Scroll up to see the first red 'error' lines." }
 
 # ---------------------------------------------------------------- 4. package
@@ -278,7 +278,7 @@ if ($iscc) {
         $hash = (Get-FileHash $setup -Algorithm SHA256).Hash.ToLower()
         Remove-Item (Join-Path $dist "version.json") -Force -ErrorAction SilentlyContinue
         if ($env:UPDATE_SIGNING_KEY) {
-            $sig = (cargo run --quiet --release -p swiftget-engine --example sign_update -- $version $hash)
+            $sig = (cargo run --locked --quiet --release -p swiftget-engine --example sign_update -- $version $hash)
             if ($LASTEXITCODE -ne 0 -or -not $sig -or $sig.Trim().Length -ne 128) { Fail "Could not sign the update. Check UPDATE_SIGNING_KEY against UPDATE_PUBLIC_KEY." }
             $json = [ordered]@{
                 version = $version

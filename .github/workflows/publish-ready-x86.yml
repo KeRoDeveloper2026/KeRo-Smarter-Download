@@ -1,101 +1,50 @@
-name: Verify pinned Cargo dependencies
+name: Publish verified Windows 10-11 x86 installer
 
 on:
   push:
     branches: [main]
     paths: [.github/workflows/publish-ready-x86.yml]
+  workflow_dispatch:
 
 permissions:
-  contents: read
+  actions: read
+  contents: write
 
 jobs:
-  resolve:
-    if: github.event.head_commit.message == 'Generate and verify Cargo lockfile against successful Windows builds'
+  publish:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
-        with:
-          toolchain: nightly-2026-10-29
-      - name: Generate lockfile and compare recorded successful Windows versions
-        shell: bash
-        run: |
-          set -euo pipefail
-          cargo generate-lockfile
-          python <<'PY'
-          import json, pathlib, tomllib
-          baseline = [["accesskit_consumer","0.38.0"],["accesskit_windows","0.34.0"],["accesskit_winit","0.33.2"],["accesskit","0.24.1"],["adler2","2.0.1"],["aes","0.8.4"],["aho-corasick","1.1.5"],["allocator-api2","0.2.21"],["annotate-snippets","0.12.17"],["anstyle","1.0.14"],["anyhow","1.0.104"],["arboard","3.7.0"],["arrayref","0.3.9"],["arrayvec","0.7.8"],["ascii","1.1.0"],["ash","0.38.0+1.3.281"],["atomic-waker","1.1.2"],["autocfg","1.5.1"],["base64","0.22.1"],["base64","0.23.1"],["bincode","2.0.1"],["bindgen","0.72.1"],["bit-set","0.10.0"],["bit-vec","0.9.1"],["bitflags","2.13.2"],["block-buffer","0.10.4"],["block-padding","0.3.3"],["borsh","1.8.1"],["by_address","1.2.1"],["bytemuck_derive","1.12.1"],["bytemuck","1.25.2"],["byteorder-lite","0.1.0"],["bytes","1.12.1"],["cbc","0.1.2"],["cc","1.10.0"],["cexpr","0.6.0"],["cfg_aliases","0.2.2"],["cfg-if","1.0.5"],["chrono","0.4.45"],["chunked_transfer","1.5.0"],["cipher","0.4.4"],["clang-sys","1.9.1"],["clipboard-win","5.4.3"],["clru","0.6.3"],["codespan-reporting","0.13.1"],["color_quant","1.1.0"],["const-field-offset-macro","0.2.1"],["const-field-offset","0.2.1"],["convert_case","0.10.0"],["core_detect","1.0.0"],["countme","3.0.1"],["cpufeatures","0.2.17"],["crc32fast","1.5.3"],["critical-section","1.2.0"],["crossbeam-channel","0.5.17"],["crossbeam-deque","0.8.8"],["crossbeam-epoch","0.9.21"],["crossbeam-utils","0.8.23"],["crypto-common","0.1.7"],["cursor-icon","1.2.0"],["data-url","0.3.2"],["derive_more-impl","2.1.1"],["derive_more","2.1.1"],["digest","0.10.7"],["directories","5.0.1"],["dirs-sys","0.4.1"],["displaydoc","0.2.7"],["document-features","0.2.12"],["dpi","0.1.2"],["either","1.19.0"],["encoding_rs","0.8.42"],["equivalent","1.0.3"],["error-code","3.4.0"],["euclid","0.22.14"],["fdeflate","0.3.7"],["femtovg","0.27.0"],["field-offset","0.3.6"],["filetime","0.2.29"],["find-msvc-tools","0.1.15"],["fixed_decimal","0.7.3"],["flate2","1.1.10"],["float-cmp","0.9.0"],["fnv","1.0.7"],["foldhash","0.2.0"],["font-types","0.12.7"],["fontdb","0.24.0"],["fontique","0.11.1"],["form_urlencoded","1.2.2"],["futures-channel","0.3.34"],["futures-core","0.3.34"],["futures-io","0.3.34"],["futures-macro","0.3.34"],["futures-sink","0.3.34"],["futures-task","0.3.34"],["futures-util","0.3.34"],["generic-array","0.14.7"],["getrandom","0.2.17"],["getrandom","0.4.3"],["gif","0.14.2"],["gl_generator","0.14.0"],["glob","0.3.4"],["glow","0.18.0"],["glutin_egl_sys","0.7.1"],["glutin_wgl_sys","0.6.1"],["glutin-winit","0.5.0"],["glutin","0.32.3"],["gpu-allocator","0.28.0"],["grid","1.0.1"],["h2","0.4.20"],["half","2.7.1"],["harfrust","0.12.0"],["hashbrown","0.14.5"],["hashbrown","0.16.1"],["hashbrown","0.17.1"],["heck","0.5.0"],["htmlparser","0.2.1"],["http-body-util","0.1.5"],["http-body","1.1.0"],["http","1.5.0"],["httparse","1.10.1"],["httpdate","1.0.3"],["hyper-rustls","0.27.10"],["hyper-tls","0.6.0"],["hyper-util","0.1.21"],["hyper","1.12.0"],["i-slint-backend-selector","1.18.1"],["i-slint-backend-testing","1.18.1"],["i-slint-backend-winit","1.18.1"],["i-slint-common","1.18.1"],["i-slint-compiler","1.18.1"],["i-slint-core-macros","1.18.1"],["i-slint-core","1.18.1"],["i-slint-renderer-femtovg","1.18.1"],["i-slint-renderer-skia","1.18.1"],["i-slint-renderer-software","1.18.1"],["icu_collections","2.4.0"],["icu_decimal_data","2.4.0"],["icu_decimal","2.4.0"],["icu_locale_core","2.4.0"],["icu_locale_fallback_data","2.4.0"],["icu_locale_fallback","2.4.0"],["icu_normalizer_data","2.4.0"],["icu_normalizer","2.4.0"],["icu_plurals_data","2.4.0"],["icu_plurals","2.4.0"],["icu_properties_data","2.4.0"],["icu_properties","2.4.0"],["icu_provider","2.4.0"],["icu_segmenter_data","2.4.0"],["icu_segmenter","2.4.0"],["idna_adapter","1.2.2"],["idna","1.1.0"],["image-webp","0.2.4"],["image","0.25.10"],["imagesize","0.15.0"],["imgref","1.12.3"],["indexmap","2.14.2"],["inout","0.1.4"],["ipnet","2.12.2"],["itertools","0.13.0"],["itertools","0.15.0"],["itoa","1.0.18"],["jobserver","0.1.35"],["keyboard-types","0.7.0"],["khronos_api","3.1.0"],["kurbo","0.13.1"],["lazy_static","1.5.1"],["libc","0.2.191"],["libloading","0.8.9"],["libm","0.2.16"],["linebender_resource_handle","0.1.1"],["litemap","0.8.3"],["litrs","1.0.1"],["lock_api","0.4.14"],["log","0.4.34"],["lyon_algorithms","1.0.22"],["lyon_extra","1.1.0"],["lyon_geom","1.0.20"],["lyon_path","1.0.19"],["memchr","2.8.3"],["memmap2","0.9.12"],["memoffset","0.9.1"],["mime","0.3.17"],["minimal-lexical","0.2.1"],["miniz_oxide","0.8.9"],["miniz_oxide","0.9.1"],["mio","1.2.4"],["moxcms","0.8.1"],["muda","0.15.3"],["muda","0.19.3"],["multiversion_no_op","1.0.0"],["naga-types","30.0.1"],["naga","30.0.1"],["native-tls","0.2.18"],["natord","1.0.9"],["nom","7.1.3"],["num_enum_derive","0.7.6"],["num_enum","0.7.6"],["num-traits","0.2.19"],["once_cell","1.21.4"],["open","5.4.5"],["option-ext","0.2.0"],["ordered-float","5.5.1"],["parking_lot_core","0.9.12"],["parking_lot","0.12.5"],["parlance","0.1.1"],["parley_data","0.11.1"],["parley","0.11.1"],["percent-encoding","2.3.2"],["pico-args","0.5.0"],["pin-project-internal","1.1.13"],["pin-project-lite","0.2.17"],["pin-project","1.1.13"],["pin-utils","0.1.1"],["pin-weak","1.1.0"],["pkg-config","0.3.34"],["png","0.18.1"],["polycool","0.4.0"],["portable-atomic","1.15.0"],["potential_utf","0.1.6"],["presser","0.3.1"],["prettyplease","0.2.37"],["proc-macro-crate","3.5.0"],["proc-macro2","1.0.107"],["profiling","1.0.18"],["pulldown-cmark","0.13.5"],["pxfm","0.1.30"],["quick-error","2.0.1"],["quote","1.0.47"],["range-alloc","0.1.5"],["raw-window-handle","0.6.2"],["rayon-core","1.13.0"],["rayon","1.12.0"],["read-fonts","0.41.0"],["regex-automata","0.4.18"],["regex-syntax","0.8.11"],["regex","1.13.1"],["renderdoc-sys","1.1.0"],["reqwest","0.12.28"],["resvg","0.48.1"],["rfd","0.15.4"],["rgb","0.8.53"],["ring","0.17.14"],["rowan","0.17.0"],["roxmltree","0.21.2"],["rspolib","0.1.2"],["rustc_version","0.4.1"],["rustc-hash","1.1.0"],["rustc-hash","2.1.3"],["rustls-pki-types","1.15.1"],["rustls-webpki","0.103.16"],["rustls","0.23.46"],["rustversion","1.0.23"],["ryu","1.0.23"],["schannel","0.1.30"],["scoped-tls-hkt","0.1.5"],["scopeguard","1.2.0"],["semver","1.0.28"],["serde_core","1.0.229"],["serde_derive","1.0.229"],["serde_json","1.0.154"],["serde_spanned","1.1.2"],["serde_urlencoded","0.7.1"],["serde","1.0.229"],["sha2","0.10.9"],["shlex","1.3.0"],["shlex","2.0.1"],["simd-adler32","0.3.10"],["simdutf8","0.1.5"],["simplecss","0.2.2"],["siphasher","1.0.4"],["skia-bindings","0.153.3"],["skia-safe","0.153.3"],["skrifa","0.44.0"],["slab","0.4.12"],["slint-build","1.18.1"],["slint-macros","1.18.1"],["slint","1.18.1"],["slotmap","1.1.1"],["smallvec","1.16.4"],["smol_str","0.2.2"],["smol_str","0.3.7"],["snafu-derive","0.8.9"],["snafu","0.8.9"],["socket2","0.6.5"],["softbuffer","0.4.8"],["spin_on","0.1.1"],["spirv","0.4.0+sdk-1.4.341.0"],["stable_deref_trait","1.2.1"],["static_assertions","1.1.0"],["strict-num","0.1.1"],["strum_macros","0.28.0"],["strum","0.28.0"],["subtle","2.6.1"],["svgtypes","0.16.1"],["swash","0.2.10"],["syn","2.0.119"],["syn","3.0.9"],["sync_wrapper","1.0.2"],["synstructure","0.14.0"],["sys-locale","0.3.2"],["taffy","0.10.1"],["tar","0.4.46"],["text-size","1.1.1"],["thiserror-impl","1.0.69"],["thiserror-impl","2.0.21"],["thiserror","1.0.69"],["thiserror","2.0.21"],["tiny_http","0.12.0"],["tiny-skia-path","0.12.0"],["tiny-skia","0.12.0"],["tinystr","0.8.5"],["tinyvec","1.13.3"],["tokio-macros","2.7.2"],["tokio-native-tls","0.3.1"],["tokio-rustls","0.26.6"],["tokio-util","0.7.20"],["tokio","1.54.1"],["toml_datetime","1.1.2+spec-1.1.0"],["toml_edit","0.25.17+spec-1.1.0"],["toml_parser","1.1.5+spec-1.1.0"],["toml_writer","1.1.3+spec-1.1.0"],["toml","1.1.8+spec-1.1.0"],["tower-http","0.6.11"],["tower-layer","0.3.3"],["tower-service","0.3.3"],["tower","0.5.3"],["tracing-attributes","0.1.31"],["tracing-core","0.1.36"],["tracing","0.1.44"],["tray-icon","0.19.3"],["try-lock","0.2.5"],["typed-index-collections","3.5.0"],["typenum","1.20.1"],["unicase","2.10.0"],["unicode-bidi","0.3.18"],["unicode-ident","1.0.27"],["unicode-linebreak","0.1.5"],["unicode-script","0.5.8"],["unicode-segmentation","1.13.3"],["unicode-vo","0.1.0"],["unicode-width","0.2.3"],["unicode-xid","0.2.6"],["untrusted","0.9.0"],["unty","0.0.4"],["url","2.5.8"],["usvg","0.48.1"],["utf8_iter","1.0.4"],["uuid","1.29.0"],["version_check","0.9.5"],["vtable-macro","0.5.0"],["vtable","0.5.0"],["want","0.3.2"],["webbrowser","1.2.5"],["weezl","0.1.12"],["wgpu-core-deps-windows-linux-android","30.0.1"],["wgpu-core","30.0.1"],["wgpu-hal","30.0.1"],["wgpu-naga-bridge","30.0.1"],["wgpu-types","30.0.1"],["wgpu","30.0.1"],["windows_i686_msvc","0.48.5"],["windows_i686_msvc","0.52.6"],["windows_x86_64_msvc","0.48.5"],["windows_x86_64_msvc","0.52.6"],["windows-collections","0.3.2"],["windows-core","0.62.2"],["windows-future","0.3.2"],["windows-implement","0.60.2"],["windows-interface","0.59.3"],["windows-link","0.2.1"],["windows-numerics","0.3.1"],["windows-registry","0.6.1"],["windows-result","0.4.1"],["windows-strings","0.5.1"],["windows-sys","0.48.0"],["windows-sys","0.52.0"],["windows-sys","0.59.0"],["windows-sys","0.61.2"],["windows-targets","0.48.5"],["windows-targets","0.52.6"],["windows-threading","0.2.1"],["windows","0.62.2"],["winit","0.30.13"],["winnow","1.0.4"],["winresource","0.1.34"],["writeable","0.6.4"],["xml-rs","0.8.29"],["xmlwriter","0.1.0"],["yazi","0.2.1"],["yoke-derive","0.8.4"],["yoke","0.8.4"],["zeno","0.3.3"],["zerocopy-derive","0.8.63"],["zerocopy","0.8.63"],["zerofrom-derive","0.1.8"],["zerofrom","0.1.8"],["zeroize","1.9.1"],["zerotrie","0.2.5"],["zerovec-derive","0.11.7"],["zerovec","0.11.9"],["zlib-rs","0.6.8"],["zmij","1.0.23"],["zune-core","0.5.3"],["zune-jpeg","0.5.15"]]
-          lock = tomllib.loads(pathlib.Path('Cargo.lock').read_text())
-          packages = {(p['name'], p['version']) for p in lock['package']}
-          missing = sorted(set(map(tuple, baseline)) - packages)
-          if missing:
-              raise RuntimeError('Successful Windows dependency versions changed: ' + repr(missing))
-          print('All', len(baseline), 'recorded Windows dependency versions retained.')
-          pathlib.Path('lock-provenance.json').write_text(json.dumps({'source_run': 40833335595, 'source_jobs': [123312372137, 123312372343], 'recorded_windows_versions_retained': len(baseline), 'total_packages': len(packages), 'note': 'Reconstructed using current manifests and compared with recorded Windows downloads. The original complete lockfile was not archived; unrecorded target-only dependencies are not asserted identical.'}, indent=2) + '\n')
-          PY
-          sha256sum Cargo.lock > Cargo.lock.sha256
-          cargo metadata --locked --format-version 1 --no-deps > workspace-metadata.json
-          sha256sum --check Cargo.lock.sha256
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: Verified-Cargo-Lock
-          path: |
-            Cargo.lock
-            Cargo.lock.sha256
-            lock-provenance.json
-          if-no-files-found: error
-
-  win7:
-    needs: resolve
-    runs-on: windows-2022
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - target: x86_64-win7-windows-msvc
-            arch: x86_64
-            platform: Win7-x64
-          - target: i686-win7-windows-msvc
-            arch: x86
-            platform: Win7-x86
-    env:
-      RUSTFLAGS: -C target-feature=+crt-static
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      # Reuse the successful package; do not rebuild the application.
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
-          name: Verified-Cargo-Lock
-      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
-        with:
-          toolchain: nightly-2026-10-29
-          components: rust-src
-      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
-        with:
-          key: platform-${{ matrix.platform }}-${{ hashFiles('tools/prepare-win7.py') }}
-          cache-on-failure: true
-      - name: Build and test Windows 7 target without changing the lockfile
-        shell: pwsh
+          name: KeRoDownload-Win10_11-x86
+          run-id: 40800403612
+          github-token: ${{ github.token }}
+          path: dist
+      - name: Verify the existing installer and signed update manifest
+        shell: bash
         run: |
-          $ErrorActionPreference = 'Stop'
-          $before = (Get-FileHash Cargo.lock -Algorithm SHA256).Hash
-          cargo fetch --locked --target ${{ matrix.target }}
-          if ($LASTEXITCODE -ne 0) { throw 'Locked dependency fetch failed' }
-          $cargoRoot = if ($env:CARGO_HOME) { $env:CARGO_HOME } else { Join-Path $env:USERPROFILE '.cargo' }
-          $package = if ('${{ matrix.arch }}' -eq 'x86') { 'windows_i686_msvc' } else { 'windows_x86_64_msvc' }
-          $imports = (Resolve-Path "$cargoRoot/registry/src/*/$package-0.48.5/lib" | Select-Object -First 1).Path
-          if (-not $imports) { throw 'Legacy import libraries missing' }
-          python tools/prepare-win7.py --cargo-root "$cargoRoot"
-          if ($LASTEXITCODE -ne 0) { throw 'Verified Windows 7 compatibility patch failed' }
-          $env:CARGO_ENCODED_RUSTFLAGS = "-C$([char]31)target-feature=+crt-static$([char]31)-Lnative=$imports$([char]31)--cfg$([char]31)windows_slim_errors"
-          cargo build --locked --release --target ${{ matrix.target }} -Z build-std=std,panic_abort --features legacy-win7
-          if ($LASTEXITCODE -ne 0) { throw 'Locked application build failed' }
-          python tools/check-win7-imports.py target/${{ matrix.target }}/release/KeRoDownload.exe
-          if ($LASTEXITCODE -ne 0) { throw 'Known post-Windows-7 import detected' }
-          cargo test --locked -p swiftget-engine --target ${{ matrix.target }} -Z build-std=std,panic_abort --features legacy-win7
-          if ($LASTEXITCODE -ne 0) { throw 'Locked engine tests failed' }
-          if ((Get-FileHash Cargo.lock -Algorithm SHA256).Hash -ne $before) { throw 'Cargo.lock changed during verification' }
-          "Locked build, import check and engine tests passed. Lock SHA256: $before" | Out-File locked-${{ matrix.platform }}.txt
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: Locked-Verification-${{ matrix.platform }}
-          path: locked-${{ matrix.platform }}.txt
+          node <<'JS'
+          const fs = require('node:fs');
+          const crypto = require('node:crypto');
+          const assert = require('node:assert/strict');
+          const m = JSON.parse(fs.readFileSync('dist/version-Win10_11-x86.json', 'utf8').replace(/^\uFEFF/, ''));
+          const file = 'KeRoDownload-v1.1.3-Win10_11-x86.exe';
+          assert.equal(m.version, '1.1.3');
+          assert.equal(m.url, `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/download/v1.1.3/${file}`);
+          const digest = crypto.createHash('sha256').update(fs.readFileSync(`dist/${file}`)).digest('hex');
+          assert.equal(digest, m.sha256.toLowerCase());
+          const key = crypto.createPublicKey({format: 'der', type: 'spki', key: Buffer.from('302a300506032b6570032100' + '075015a13e692aee5ef27f6129b767f116029728146c0fb7091200d4e05c11fd', 'hex')});
+          assert(crypto.verify(null, Buffer.from(`kero-download-update\n${m.version.trim()}\n${m.sha256.trim().toLowerCase()}\n`), key, Buffer.from(m.sig, 'hex')));
+          const ff = 'ffmpeg-Win10_11-x86.zip';
+          const expected = fs.readFileSync(`dist/${ff}.sha256`, 'utf8').trim().split(/\s+/)[0];
+          assert.equal(crypto.createHash('sha256').update(fs.readFileSync(`dist/${ff}`)).digest('hex'), expected);
+          console.log('Existing installer, Ed25519 signature and helper archive verified.');
+          JS
+      - name: Append x86 files to the existing release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view v1.1.3 --repo "$GITHUB_REPOSITORY"
+          gh release upload v1.1.3 dist/* --repo "$GITHUB_REPOSITORY"

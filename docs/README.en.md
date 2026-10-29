@@ -121,3 +121,7 @@ When distributing modified versions, provide recipients with the Corresponding S
 This license applies to the current source; it does not modify previously published installers and is not a code-signing certificate or a guarantee against Windows warnings. Download only content you are entitled to access and save.
 
 Developed by **KeRo HaZem** — [KeRoDeveloper2026](https://github.com/KeRoDeveloper2026).
+
+## Dependency locking
+
+The source includes `Cargo.lock`; build and test commands use `--locked` to prevent automatic dependency changes. See [dependency versions, verification and update policy](DEPENDENCIES.md). Published installers are unchanged.
