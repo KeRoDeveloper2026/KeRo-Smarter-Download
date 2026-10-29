@@ -13,20 +13,20 @@
 
 **Rust** ve **Slint** ile geliştirilen; tarayıcı uzantıları ve yüzen indirme göstergesi sunan bir Windows indirme yöneticisi.
 
-[![Release](https://img.shields.io/badge/release-v1.1.3-0EA5A4?style=flat-square)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3)
+[![Release](https://img.shields.io/badge/release-v1.1.4-0EA5A4?style=flat-square)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.4)
 
 </div>
 
-## İndirmeler — v1.1.3
+## İndirmeler — v1.1.4
 
 **Kullanımı tamamen ücretsizdir.** Windows sürümünüze ve sistem mimarinize uygun yükleyiciyi seçin.
 
 | Sistem | Mimari | İndir | Durum |
 |---|---|---|---|
-| Windows 10 / Windows 11 | 64-bit · x64 | [EXE indir](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-Setup.exe) | Kullanılabilir |
-| Windows 10 / Windows 11 | 32-bit · x86 | [EXE indir](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win10_11-x86.exe) | Kullanılabilir |
-| Windows 7 SP1 | 64-bit · x64 | [EXE indir](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win7-Experimental-x64.exe) | Deneysel |
-| Windows 7 SP1 | 32-bit · x86 | [EXE indir](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win7-Experimental-x86.exe) | Deneysel |
+| Windows 10 / Windows 11 | 64-bit · x64 | [EXE indir](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRoDownload-v1.1.4-Win10_11-x64.exe) | Kullanılabilir |
+| Windows 10 / Windows 11 | 32-bit · x86 | [EXE indir](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRoDownload-v1.1.4-Win10_11-x86.exe) | Kullanılabilir |
+| Windows 7 SP1 | 64-bit · x64 | [EXE indir](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRoDownload-v1.1.4-Win7-Experimental-x64.exe) | Deneysel |
+| Windows 7 SP1 | 32-bit · x86 | [EXE indir](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRoDownload-v1.1.4-Win7-Experimental-x86.exe) | Deneysel |
 
 32 bit Windows 10 için x86 seçin. 64 bit Windows 10 veya Windows 11 için x64 önerilir; x86 uygulaması da kullanılabilir. Windows 7 SP1 için sisteminize uygun mimariyi seçin. Kontrol etmek için **Denetim Masası → Sistem → Sistem türü** yolunu izleyin.
 
@@ -34,11 +34,11 @@
 
 ## Uzantı güncellemesi — v1.1.1
 
-Programı yeniden kurmadan uygun paketi indirin. Yayımlanmış yükleyiciler daha eski bir uzantı içerebilir. Yeni paketi açıp klasörünü yükleyin, yinelenen eski kopyaları devre dışı bırakın ve açık sayfaları yenileyin. Chromium paketi Windows üzerinde Chrome, Brave, Edge, Opera / Opera GX ve Vivaldi için hazırlanmıştır. Safari ve mobil tarayıcılar dahil değildir.
+Programı yeniden kurmadan uygun paketi indirin. v1.1.4 yükleyicileri 1.1.1 uzantısını içerir; daha eski yükleyiciler önceki sürümleri içerebilir. Yeni paketi açıp klasörünü yükleyin, yinelenen eski kopyaları devre dışı bırakın ve açık sayfaları yenileyin. Chromium paketi Windows üzerinde Chrome, Brave, Edge, Opera / Opera GX ve Vivaldi için hazırlanmıştır. Safari ve mobil tarayıcılar dahil değildir.
 
-- [Chromium — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Chromium.zip)
-- [Firefox 140+ — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Firefox.zip)
-- [Firefox 115 ESR / Win7 — v1.1.1 (Deneysel)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Firefox-Win7.zip)
+- [Chromium — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Chromium.zip)
+- [Firefox 140+ — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Firefox.zip)
+- [Firefox 115 ESR / Win7 — v1.1.1 (Deneysel)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Firefox-Win7.zip)
 
 [Uyumluluk ve test kapsamı (Arapça / İngilizce)](BROWSERS.md)
 
@@ -70,7 +70,7 @@ Kaynak kodunun tamamı için **Code → Download ZIP** yolunu kullanın. Windows
 
 Uzantı uygulamayla yerel olarak iletişim kurar ve indirme için gereken çerezleri ve sayfa bağlamını aktarabilir. Çerezleri, hassas ayarları veya özel bağlantıları paylaşmayın. Yalnızca erişmeye ve kaydetmeye yetkili olduğunuz içerikleri indirin.
 
-[Sürümün tüm dosyaları](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3) · [Teknik kılavuz ve lisans durumu (İngilizce)](README.en.md) · [Sorun bildir](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/issues)
+[Sürümün tüm dosyaları](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.4) · [Teknik kılavuz ve lisans durumu (İngilizce)](README.en.md) · [Sorun bildir](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/issues)
 
 Geliştirici: **KeRo HaZem**.
 

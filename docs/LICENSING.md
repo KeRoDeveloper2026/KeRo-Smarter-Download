@@ -38,3 +38,9 @@ See [THIRD-PARTY-NOTICES.txt](../THIRD-PARTY-NOTICES.txt) for component sources,
 Before a new binary release, record exact dependency versions and helper sources, retain required license texts/notices, and provide the corresponding source and build instructions required for the actual distributed binaries. Review the resolved dependency tree again when dependencies change.
 
 Official references: [GNU GPLv3](https://www.gnu.org/licenses/gpl-3.0.html), [GNU GPL FAQ](https://www.gnu.org/licenses/gpl-faq.html), [Slint 1.18.1 licensing](https://github.com/slint-ui/slint/blob/v1.18.1/LICENSE.md).
+
+## الإصدار v1.1.4 / v1.1.4 release
+
+تتضمن مثبّتات v1.1.4 ملفات LICENSE وCOPYRIGHT وTHIRD-PARTY-NOTICES.txt، ويُتاح المصدر المقابل في وسم v1.1.4. إعلانات المكوّنات الخارجية وتراخيصها تبقى مستقلة. لا تُعدّل الحزم التاريخية أو أذوناتها السابقة.
+
+The v1.1.4 installers include LICENSE, COPYRIGHT and THIRD-PARTY-NOTICES.txt, with the corresponding project source available at tag v1.1.4. Third-party license terms remain separate; historical packages and previously granted permissions are unchanged.

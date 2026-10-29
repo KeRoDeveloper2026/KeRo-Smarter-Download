@@ -18,7 +18,7 @@ Commit `Cargo.lock` with intentional dependency changes. Project build, test, fe
 
 The lock was generated with `nightly-2026-10-29` from the current manifests and checked against all 405 distinct package versions recorded in the successful Windows 7 x86/x64 download logs. The original complete lockfile was not archived, so historical identity of unrecorded platform-specific dependencies is not asserted. The lock contains 699 registry packages plus the two workspace packages.
 
-The linked verification run builds both Windows 7 targets, runs their engine tests and the known unsupported-import check, and confirms that the lockfile hash stays unchanged. Its Windows Server 2022 checks do not establish Windows 7 runtime support. Existing published installers are unaffected.
+The linked verification run builds both Windows 7 targets, runs their engine tests and the known unsupported-import check, and confirms that the lockfile hash stays unchanged. Its Windows Server 2022 checks do not establish Windows 7 runtime support. Historical installer files are unchanged. The v1.1.4 installers use the committed lockfile; only the two workspace package versions changed from 1.1.3 to 1.1.4, with all 699 registry packages retained.
 
 Use Cargo to update selected dependencies intentionally, review the lock diff, and rerun compatibility checks. Do not edit checksums manually or delete the lock to bypass a failure. This file does not pin the Rust compiler, Windows SDK or external helper executables, and does not by itself guarantee bit-for-bit reproducible binaries.
 

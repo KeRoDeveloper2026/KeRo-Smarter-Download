@@ -19,7 +19,7 @@ A Windows desktop app with Chromium and Firefox integration.
 [![Choose a Windows installer](https://img.shields.io/badge/DOWNLOAD-WINDOWS_APP-0078D4?style=for-the-badge&logo=windows&logoColor=white)](#downloads--v113)
 [![Download browser extensions](https://img.shields.io/badge/DOWNLOAD-BROWSER_EXTENSIONS-6D28D9?style=for-the-badge)](#browser-extension-downloads)
 
-[![Release v1.1.3](https://img.shields.io/badge/APP-v1.1.3-0EA5A4?style=flat-square)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3)
+[![Release v1.1.4](https://img.shields.io/badge/APP-v1.1.4-0EA5A4?style=flat-square)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.4)
 ![Windows 10 and 11](https://img.shields.io/badge/WINDOWS-10_%7C_11-0078D4?style=flat-square)
 ![8 interface languages](https://img.shields.io/badge/APP_UI-8_LANGUAGES-6366F1?style=flat-square)
 [![12 documentation languages](https://img.shields.io/badge/DOCS-12_LANGUAGES-0EA5A4?style=flat-square)](LANGUAGES.md)
@@ -47,16 +47,16 @@ Documentation is available in **12 languages**. The app interface supports **8 l
 
 Download speed, available formats and resume support depend on the source and network. Download only content you are authorized to access and save.
 
-## Downloads — v1.1.3
+## Downloads — v1.1.4
 
 **Free to use.** Choose the installer for your Windows version and system architecture.
 
 | Windows version | Architecture | Direct download | Status |
 |---|---|---|---|
-| Windows 10 / Windows 11 | 64-bit · x64 | [Download EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-Setup.exe) | Available |
-| Windows 10 / Windows 11 | 32-bit · x86 | [Download EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win10_11-x86.exe) | Available |
-| Windows 7 SP1 | 64-bit · x64 | [Download EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win7-Experimental-x64.exe) | Experimental |
-| Windows 7 SP1 | 32-bit · x86 | [Download EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win7-Experimental-x86.exe) | Experimental |
+| Windows 10 / Windows 11 | 64-bit · x64 | [Download EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRoDownload-v1.1.4-Win10_11-x64.exe) | Available |
+| Windows 10 / Windows 11 | 32-bit · x86 | [Download EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRoDownload-v1.1.4-Win10_11-x86.exe) | Available |
+| Windows 7 SP1 | 64-bit · x64 | [Download EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRoDownload-v1.1.4-Win7-Experimental-x64.exe) | Experimental |
+| Windows 7 SP1 | 32-bit · x86 | [Download EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRoDownload-v1.1.4-Win7-Experimental-x86.exe) | Experimental |
 
 On 32-bit Windows 10, choose Win10/11 x86. On 64-bit Windows 10 or Windows 11, choose Win10/11 x64; the x86 app is also available. On Windows 7 SP1, choose the matching experimental x86 or x64 package. Check **Control Panel → System → System type** if unsure.
 
@@ -68,19 +68,19 @@ Run your selected EXE installer, open the app and add a download link. Installer
 
 ### Browser extension downloads
 
-Standalone extension update **v1.1.1** works with the installed desktop app 1.1.3; no desktop reinstallation is needed:
+Standalone extension update **v1.1.1** works with desktop apps 1.1.3 and 1.1.4; v1.1.4 installers already bundle extension 1.1.1:
 
 | Desktop browser on Windows | Updated extension |
 |---|---|
-| Chrome, Brave, Edge, Opera / Opera GX, Vivaldi | [Chromium v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Chromium.zip) |
-| Firefox 140+ | [Firefox v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Firefox.zip) |
-| Firefox 115 ESR on Windows 7 (experimental) | [Firefox-Win7 v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Firefox-Win7.zip) |
+| Chrome, Brave, Edge, Opera / Opera GX, Vivaldi | [Chromium v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Chromium.zip) |
+| Firefox 140+ | [Firefox v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Firefox.zip) |
+| Firefox 115 ESR on Windows 7 (experimental) | [Firefox-Win7 v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Firefox-Win7.zip) |
 
-Extract to a permanent folder, load the updated extension folder and disable any duplicate old copy. Refresh existing website tabs once after the update. The published desktop installers can still contain an older extension version.
+Extract to a permanent folder, load the updated extension folder and disable any duplicate old copy. Refresh existing website tabs once after the update. The v1.1.4 installers include extension 1.1.1; older installers may contain earlier extension versions.
 
-[Package SHA-256 checksums](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extensions-v1.1.1-SHA256SUMS.txt) · [Browser compatibility and validation details](BROWSERS.md). API simulations passed; live testing on every listed browser and Windows 7 is still required. Safari and mobile browser packages are not included.
+[Package SHA-256 checksums](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extensions-v1.1.1-SHA256SUMS.txt) · [Browser compatibility and validation details](BROWSERS.md). API simulations passed; live testing on every listed browser and Windows 7 is still required. Safari and mobile browser packages are not included.
 
-Extension ZIP files contain the extension and installation instructions, not the desktop installer. For full source, use **Code → Download ZIP**. Each installer has a separate signed update manifest in [release v1.1.3](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3). Checksums for the older v1.1.0 assets are available in [that release's SHA256SUMS.txt](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/SHA256SUMS.txt). Generated ZIP/XPI packages are published in Releases rather than tracked in Git.
+Extension ZIP files contain the extension and installation instructions, not the desktop installer. For full source, use **Code → Download ZIP**. Each installer has a separate signed update manifest in [release v1.1.4](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.4). Checksums for the older v1.1.0 assets are available in [that release's SHA256SUMS.txt](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/SHA256SUMS.txt). Generated ZIP/XPI packages are published in Releases rather than tracked in Git.
 
 To build on Windows, run `BUILD.bat`. It uses winget to install missing development tools, downloads helper tools and creates `dist/KeRoDownload-Setup.exe` after successful packaging. Tool installation may require administrator permission.
 
@@ -88,7 +88,7 @@ For Chromium browsers, enable Developer mode on the extensions page and load the
 
 ## Verification and release status
 
-Source version: **1.1.3**. Each platform package has its own signed update manifest. Builds and engine/helper checks passed on Windows Server 2022; these checks do not establish Windows 7 runtime support. See [Windows build details](WINDOWS-BUILDS.md), [release setup](RELEASING.md) and the [original test report](../TEST_REPORT.md). Browser API simulations are distinct from live browser tests.
+Published version: **1.1.4**. The four approved preview installers were published without rebuilding; each passed 73 engine tests and installation over v1.1.3 while preserving CI settings/history and partial-download canaries. See [release notes](RELEASE-v1.1.4.md). Each platform package has its own signed update manifest. Builds and engine/helper checks passed on Windows Server 2022; these checks do not establish Windows 7 runtime support. See [Windows build details](WINDOWS-BUILDS.md), [release setup](RELEASING.md) and the [original test report](../TEST_REPORT.md). Browser API simulations are distinct from live browser tests.
 
 The updater accepts signed releases from this repository. See [release preparation](RELEASING.md) for one-time signing setup, manual first installation and publishing from Actions.
 
@@ -96,7 +96,7 @@ The updater accepts signed releases from this repository. See [release preparati
 
 If the app is useful to you, consider starring this repository and sharing its download page.
 
-The extension communicates with the desktop app over loopback and may pass download-related cookies and page context. The current source uses Windows DPAPI for designated sensitive fields and aborts a save if protection fails, keeping the previous file and notifying the user. Legacy plaintext fields are read for compatibility and protected on a successful subsequent save. Do not share settings, cookies or private download lists. Published installers are unchanged until a new release is built.
+The extension communicates with the desktop app over loopback and may pass download-related cookies and page context. The current source uses Windows DPAPI for designated sensitive fields and aborts a save if protection fails, keeping the previous file and notifying the user. Legacy plaintext fields are read for compatibility and protected on a successful subsequent save. Do not share settings, cookies or private download lists. This fail-safe storage behavior is included in v1.1.4 installers; older installer files remain unchanged.
 
 See [contribution guidance](../CONTRIBUTING.md), [security reporting](../SECURITY.md) and [third-party notices](../THIRD-PARTY-NOTICES.txt).
 
@@ -124,10 +124,12 @@ Developed by **KeRo HaZem** — [KeRoDeveloper2026](https://github.com/KeRoDevel
 
 ## Dependency locking
 
-The source includes `Cargo.lock`; build and test commands use `--locked` to prevent automatic dependency changes. See [dependency versions, verification and update policy](DEPENDENCIES.md). Published installers are unchanged.
+The source includes `Cargo.lock`; build and test commands use `--locked` to prevent automatic dependency changes. See [dependency versions, verification and update policy](DEPENDENCIES.md). The v1.1.4 installers were built with this lockfile; registry dependency versions were not upgraded.
 
 ## Quality checks and releases
 
 Source changes and pull requests run formatting, strict Clippy, engine tests, Chromium/Firefox simulations, dependency auditing and a Windows 7 compatibility-source check. Rust quality tools are pinned to 1.99.1. Dependabot proposes weekly Cargo and GitHub Actions updates without auto-merge.
 
-Publish a new stable release by pushing a reviewed version tag matching Cargo.toml, such as `v1.1.4`. The Windows x64 workflow validates the tag, requires successful checks, signs its update manifest and generates release notes. Commit messages containing `[release]` no longer publish. Manual workflow runs produce a test artifact only. Additional architectures remain separately managed; current downloads are unchanged. See [release preparation](RELEASING.md).
+Publish a new stable release by pushing a reviewed version tag matching Cargo.toml, such as `v1.1.5`. The Windows x64 workflow validates the tag, requires successful checks, signs its update manifest and generates release notes. Commit messages containing `[release]` no longer publish. Manual workflow runs produce a test artifact only. The normal tag build supports future releases. v1.1.4 instead promotes the four approved preview installers, with separate signed manifests, without rebuilding them. See [release preparation](RELEASING.md).
+
+The approved v1.1.4 installers were promoted from retained preview artifacts. If publication fails, retry only the publication job; do not rebuild successful installers. See [promotion and signing procedures](RELEASING.md).

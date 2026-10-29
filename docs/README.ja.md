@@ -13,20 +13,20 @@
 
 **Rust** と **Slint** で開発された Windows 向けダウンロードマネージャーです。ブラウザー拡張機能とフローティング進捗表示を備えています。
 
-[![Release](https://img.shields.io/badge/release-v1.1.3-0EA5A4?style=flat-square)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3)
+[![Release](https://img.shields.io/badge/release-v1.1.4-0EA5A4?style=flat-square)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.4)
 
 </div>
 
-## ダウンロード — v1.1.3
+## ダウンロード — v1.1.4
 
 **無料で利用できます。** Windows のバージョンとシステムのアーキテクチャに合うインストーラーを選んでください。
 
 | システム | アーキテクチャ | ダウンロード | 状態 |
 |---|---|---|---|
-| Windows 10 / Windows 11 | 64-bit · x64 | [EXE をダウンロード](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-Setup.exe) | ダウンロード可能 |
-| Windows 10 / Windows 11 | 32-bit · x86 | [EXE をダウンロード](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win10_11-x86.exe) | ダウンロード可能 |
-| Windows 7 SP1 | 64-bit · x64 | [EXE をダウンロード](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win7-Experimental-x64.exe) | 実験版 |
-| Windows 7 SP1 | 32-bit · x86 | [EXE をダウンロード](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win7-Experimental-x86.exe) | 実験版 |
+| Windows 10 / Windows 11 | 64-bit · x64 | [EXE をダウンロード](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRoDownload-v1.1.4-Win10_11-x64.exe) | ダウンロード可能 |
+| Windows 10 / Windows 11 | 32-bit · x86 | [EXE をダウンロード](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRoDownload-v1.1.4-Win10_11-x86.exe) | ダウンロード可能 |
+| Windows 7 SP1 | 64-bit · x64 | [EXE をダウンロード](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRoDownload-v1.1.4-Win7-Experimental-x64.exe) | 実験版 |
+| Windows 7 SP1 | 32-bit · x86 | [EXE をダウンロード](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRoDownload-v1.1.4-Win7-Experimental-x86.exe) | 実験版 |
 
 32 ビット版 Windows 10 では x86 を選んでください。64 ビット版 Windows 10 または Windows 11 では x64 を推奨します。x86 アプリも利用できます。Windows 7 SP1 ではシステムに合う実験版を選んでください。**コントロール パネル → システム → システムの種類** で確認できます。
 
@@ -34,11 +34,11 @@
 
 ## 拡張機能の更新 — v1.1.1
 
-下の対応するパッケージをダウンロードしてください。アプリの再インストールは不要です。公開済みのインストーラーには古い拡張機能が含まれる場合があります。新しいフォルダーを展開して読み込み、重複する古い拡張機能を無効にしてから、開いているページを更新してください。Chromium パッケージは Windows の Chrome、Brave、Edge、Opera / Opera GX、Vivaldi 向けです。Safari とモバイルブラウザーは含まれていません。
+下の対応するパッケージをダウンロードしてください。アプリの再インストールは不要です。v1.1.4 のインストーラーには拡張機能 1.1.1 が含まれます。それ以前のインストーラーには古い拡張機能が含まれる場合があります。新しいフォルダーを展開して読み込み、重複する古い拡張機能を無効にしてから、開いているページを更新してください。Chromium パッケージは Windows の Chrome、Brave、Edge、Opera / Opera GX、Vivaldi 向けです。Safari とモバイルブラウザーは含まれていません。
 
-- [Chromium — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Chromium.zip)
-- [Firefox 140+ — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Firefox.zip)
-- [Firefox 115 ESR / Win7 — v1.1.1 (実験版)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Firefox-Win7.zip)
+- [Chromium — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Chromium.zip)
+- [Firefox 140+ — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Firefox.zip)
+- [Firefox 115 ESR / Win7 — v1.1.1 (実験版)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Firefox-Win7.zip)
 
 [互換性とテスト範囲（アラビア語／英語）](BROWSERS.md)
 
@@ -70,7 +70,7 @@
 
 拡張機能はローカル接続でアプリと通信し、ダウンロードに必要な Cookie やページ情報を渡す場合があります。Cookie、機密設定、非公開リンクを共有しないでください。アクセスと保存が許可されたコンテンツのみをダウンロードしてください。
 
-[リリースの全ファイル](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3) · [技術ガイドとライセンスの状況（英語）](README.en.md) · [問題を報告](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/issues)
+[リリースの全ファイル](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.4) · [技術ガイドとライセンスの状況（英語）](README.en.md) · [問題を報告](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/issues)
 
 開発：**KeRo HaZem**。
 

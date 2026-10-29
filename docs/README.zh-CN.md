@@ -13,20 +13,20 @@
 
 使用 **Rust** 和 **Slint** 开发的 Windows 下载管理器，提供浏览器扩展和悬浮下载进度窗口。
 
-[![Release](https://img.shields.io/badge/release-v1.1.3-0EA5A4?style=flat-square)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3)
+[![Release](https://img.shields.io/badge/release-v1.1.4-0EA5A4?style=flat-square)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.4)
 
 </div>
 
-## 下载 — v1.1.3
+## 下载 — v1.1.4
 
 **完全免费使用。** 请根据 Windows 版本和系统架构选择安装程序。
 
 | 系统 | 架构 | 直接下载 | 状态 |
 |---|---|---|---|
-| Windows 10 / Windows 11 | 64-bit · x64 | [下载 EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-Setup.exe) | 可下载 |
-| Windows 10 / Windows 11 | 32-bit · x86 | [下载 EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win10_11-x86.exe) | 可下载 |
-| Windows 7 SP1 | 64-bit · x64 | [下载 EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win7-Experimental-x64.exe) | 实验版 |
-| Windows 7 SP1 | 32-bit · x86 | [下载 EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win7-Experimental-x86.exe) | 实验版 |
+| Windows 10 / Windows 11 | 64-bit · x64 | [下载 EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRoDownload-v1.1.4-Win10_11-x64.exe) | 可下载 |
+| Windows 10 / Windows 11 | 32-bit · x86 | [下载 EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRoDownload-v1.1.4-Win10_11-x86.exe) | 可下载 |
+| Windows 7 SP1 | 64-bit · x64 | [下载 EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRoDownload-v1.1.4-Win7-Experimental-x64.exe) | 实验版 |
+| Windows 7 SP1 | 32-bit · x86 | [下载 EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRoDownload-v1.1.4-Win7-Experimental-x86.exe) | 实验版 |
 
 32 位 Windows 10 请选择 x86。64 位 Windows 10 或 Windows 11 建议选择 x64，也可使用 x86 应用。Windows 7 SP1 请选择与系统架构相符的实验版。可在 **控制面板 → 系统 → 系统类型** 中查看架构。
 
@@ -34,11 +34,11 @@
 
 ## 扩展更新 — v1.1.1
 
-下载下方对应安装包即可，无需重新安装桌面程序。已发布的桌面安装程序可能仍附带旧版扩展。解压并加载新文件夹，禁用重复的旧扩展，然后刷新已打开的网页。Chromium 包适用于 Windows 上的 Chrome、Brave、Edge、Opera / Opera GX 和 Vivaldi。不包含 Safari 或移动浏览器版本。
+下载下方对应安装包即可，无需重新安装桌面程序。v1.1.4 安装程序已包含 1.1.1 扩展；更早的安装程序可能包含旧版扩展。解压并加载新文件夹，禁用重复的旧扩展，然后刷新已打开的网页。Chromium 包适用于 Windows 上的 Chrome、Brave、Edge、Opera / Opera GX 和 Vivaldi。不包含 Safari 或移动浏览器版本。
 
-- [Chromium — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Chromium.zip)
-- [Firefox 140+ — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Firefox.zip)
-- [Firefox 115 ESR / Win7 — v1.1.1 (实验版)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Firefox-Win7.zip)
+- [Chromium — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Chromium.zip)
+- [Firefox 140+ — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Firefox.zip)
+- [Firefox 115 ESR / Win7 — v1.1.1 (实验版)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Firefox-Win7.zip)
 
 [兼容性与测试范围（阿拉伯文／英文）](BROWSERS.md)
 
@@ -70,7 +70,7 @@
 
 扩展通过本机连接与应用通信，并可能传递下载所需的 Cookie 和页面上下文。请勿分享 Cookie、敏感设置或私人链接。仅下载您有权访问并保存的内容。
 
-[查看全部发行文件](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3) · [技术指南与许可证状态（英文）](README.en.md) · [报告问题](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/issues)
+[查看全部发行文件](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.4) · [技术指南与许可证状态（英文）](README.en.md) · [报告问题](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/issues)
 
 开发者：**KeRo HaZem**。
 

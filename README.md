@@ -19,7 +19,7 @@
 [![اختيار نسخة Windows وتنزيل البرنامج](https://img.shields.io/badge/DOWNLOAD-WINDOWS_APP-0078D4?style=for-the-badge&logo=windows&logoColor=white)](#التحميل-المباشر)
 [![تنزيل إضافات المتصفح](https://img.shields.io/badge/DOWNLOAD-BROWSER_EXTENSIONS-6D28D9?style=for-the-badge)](#تحميل-إضافات-المتصفح)
 
-[![Release v1.1.3](https://img.shields.io/badge/APP-v1.1.3-0EA5A4?style=flat-square)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3)
+[![Release v1.1.4](https://img.shields.io/badge/APP-v1.1.4-0EA5A4?style=flat-square)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.4)
 ![Windows 10 and 11](https://img.shields.io/badge/WINDOWS-10_%7C_11-0078D4?style=flat-square)
 ![8 interface languages](https://img.shields.io/badge/APP_UI-8_LANGUAGES-6366F1?style=flat-square)
 [![12 documentation languages](https://img.shields.io/badge/DOCS-12_LANGUAGES-0EA5A4?style=flat-square)](docs/LANGUAGES.md)
@@ -47,16 +47,16 @@
 
 ## التحميل المباشر
 
-**الإصدار الحالي: v1.1.3 · البرنامج مجاني تمامًا**
+**الإصدار الحالي: v1.1.4 · البرنامج مجاني تمامًا**
 
 اختر المثبّت المناسب لنظام جهازك ونوعه. اضغط زر التحميل في الصف المطلوب لتنزيل ملف **EXE** مباشرة.
 
 | نظام التشغيل | نوع النسخة | التحميل المباشر | الحالة |
 |---|---|---|---|
-| **Windows 10 / Windows 11** | 64-bit · x64 | [![تحميل Windows 10 / Windows 11 64-bit · x64](https://img.shields.io/badge/Download-Win10%2F11%20x64-0078D4?style=for-the-badge)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-Setup.exe) | النسخة الأساسية |
-| **Windows 10 / Windows 11** | 32-bit · x86 | [![تحميل Windows 10 / Windows 11 32-bit · x86](https://img.shields.io/badge/Download-Win10%2F11%20x86-0078D4?style=for-the-badge)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win10_11-x86.exe) | تطبيق 32-bit |
-| **Windows 7 SP1** | 64-bit · x64 | [![تحميل Windows 7 SP1 64-bit · x64](https://img.shields.io/badge/Download-Win7%20x64%20Experimental-B7791F?style=for-the-badge)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win7-Experimental-x64.exe) | تجريبي |
-| **Windows 7 SP1** | 32-bit · x86 | [![تحميل Windows 7 SP1 32-bit · x86](https://img.shields.io/badge/Download-Win7%20x86%20Experimental-B7791F?style=for-the-badge)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win7-Experimental-x86.exe) | تجريبي |
+| **Windows 10 / Windows 11** | 64-bit · x64 | [![تحميل Windows 10 / Windows 11 64-bit · x64](https://img.shields.io/badge/Download-Win10%2F11%20x64-0078D4?style=for-the-badge)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRoDownload-v1.1.4-Win10_11-x64.exe) | النسخة الأساسية |
+| **Windows 10 / Windows 11** | 32-bit · x86 | [![تحميل Windows 10 / Windows 11 32-bit · x86](https://img.shields.io/badge/Download-Win10%2F11%20x86-0078D4?style=for-the-badge)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRoDownload-v1.1.4-Win10_11-x86.exe) | تطبيق 32-bit |
+| **Windows 7 SP1** | 64-bit · x64 | [![تحميل Windows 7 SP1 64-bit · x64](https://img.shields.io/badge/Download-Win7%20x64%20Experimental-B7791F?style=for-the-badge)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRoDownload-v1.1.4-Win7-Experimental-x64.exe) | تجريبي |
+| **Windows 7 SP1** | 32-bit · x86 | [![تحميل Windows 7 SP1 32-bit · x86](https://img.shields.io/badge/Download-Win7%20x86%20Experimental-B7791F?style=for-the-badge)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRoDownload-v1.1.4-Win7-Experimental-x86.exe) | تجريبي |
 
 **كيف تختار نسختك؟**
 
@@ -74,19 +74,19 @@
 
 **لمستخدمي Windows 7:** اختر حزمة **Firefox-Win7** المحدثة أدناه لإصدار **Firefox 115 ESR**. تشغيل الإضافات على Windows 7 ما زال بحاجة إلى تجربة فعلية.
 
-الإضافات المحدثة **v1.1.1** متاحة كتنزيلات مستقلة وتعمل مع البرنامج المثبّت 1.1.3؛ لا تحتاج إلى إعادة تثبيت البرنامج:
+الإضافات المحدثة **v1.1.1** متاحة كتنزيلات مستقلة وتعمل مع البرنامج المثبّت 1.1.3 و1.1.4؛ تتضمن مثبّتات v1.1.4 الإضافة 1.1.1 بالفعل:
 
 | المتصفح | الحزمة المحدثة | طريقة التركيب |
 |---|---|---|
-| Chrome / Brave / Edge / Opera / Opera GX / Vivaldi | [تنزيل إضافة Chromium — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Chromium.zip) | فك الضغط ثم Developer mode → Load unpacked → مجلد `extension` |
-| Firefox 140 أو أحدث | [تنزيل إضافة Firefox — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Firefox.zip) | تحميل `extension-firefox/manifest.json` مؤقتًا من about:debugging |
-| Firefox 115 ESR على Windows 7 — تجريبي | [تنزيل إضافة Firefox-Win7 — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Firefox-Win7.zip) | الحزمة المخصصة للمتصفح القديم؛ تحتاج اختبارًا فعليًا على Win7 |
+| Chrome / Brave / Edge / Opera / Opera GX / Vivaldi | [تنزيل إضافة Chromium — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Chromium.zip) | فك الضغط ثم Developer mode → Load unpacked → مجلد `extension` |
+| Firefox 140 أو أحدث | [تنزيل إضافة Firefox — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Firefox.zip) | تحميل `extension-firefox/manifest.json` مؤقتًا من about:debugging |
+| Firefox 115 ESR على Windows 7 — تجريبي | [تنزيل إضافة Firefox-Win7 — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Firefox-Win7.zip) | الحزمة المخصصة للمتصفح القديم؛ تحتاج اختبارًا فعليًا على Win7 |
 
 **بعد تحديث الإضافة:** أوقف أي نسخة قديمة مكررة، وشغّل البرنامج، ثم حدّث تبويبات المواقع المفتوحة بـ**Ctrl+R** مرة واحدة لتشغيل الكود الجديد.
 
-[دليل المتصفحات وحالة التحقق](docs/BROWSERS.md) · [بصمات الحزم SHA-256](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extensions-v1.1.1-SHA256SUMS.txt) · [الإضافات القديمة v1.1.0](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.0)
+[دليل المتصفحات وحالة التحقق](docs/BROWSERS.md) · [بصمات الحزم SHA-256](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extensions-v1.1.1-SHA256SUMS.txt) · [الإضافات القديمة v1.1.0](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.0)
 
-[عرض كل ملفات الإصدار v1.1.3](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3) · [المصدر الكامل — Code → Download ZIP](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download)
+[عرض كل ملفات الإصدار v1.1.4](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.4) · [المصدر الكامل — Code → Download ZIP](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download)
 
 <details>
 <summary>التحقق من الملفات وبيانات التحديث</summary>
@@ -95,10 +95,10 @@
 
 | النسخة | ملف التحديث |
 |---|---|
-| Windows 10/11 — x64 | [version.json](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/version.json) |
-| Windows 10/11 — x86 | [version-Win10_11-x86.json](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/version-Win10_11-x86.json) |
-| Windows 7 — x64 | [version-Win7-x64.json](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/version-Win7-x64.json) |
-| Windows 7 — x86 | [version-Win7-x86.json](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/version-Win7-x86.json) |
+| Windows 10/11 — x64 | [version.json](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/version.json) |
+| Windows 10/11 — x86 | [version-Win10_11-x86.json](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/version-Win10_11-x86.json) |
+| Windows 7 — x64 | [version-Win7-x64.json](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/version-Win7-x64.json) |
+| Windows 7 — x86 | [version-Win7-x86.json](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/version-Win7-x86.json) |
 
 حزم الإضافات ZIP تحتوي على الإضافة ودليل تركيبها، ولا تتضمن مثبّت برنامج سطح المكتب. المصدر الكامل يُنزّل من **Code → Download ZIP** ويحتاج إلى تجميع.
 
@@ -110,7 +110,7 @@
 
 تدعم الواجهة **العربية والإنجليزية والفرنسية والإسبانية والألمانية والبرتغالية والتركية والروسية**، مع اتجاه من اليمين إلى اليسار للعربية.
 
-> **حالة النسخة:** الإصدار **1.1.3** يربط التحديثات بهذا المستودع ويُرفق المثبّت مع `version.json` الموقّع في [الإصدار v1.1.3](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3). ثبّت هذه النسخة يدويًا مرة واحدة بدل النسخة القديمة لتفعيل التحديثات التالية. اختبارات البناء نجحت؛ تجربة التثبيت والتشغيل الفعلي تحتاج إلى Windows.
+> **حالة النسخة:** الإصدار **1.1.4** منشور بالملفات الأربعة نفسها التي اجتازت الاختبارات واعتمدها المالك؛ لم تُعد تجميعها للنشر. نجح 73 اختبارًا للمحرك لكل معمارية واختبار التثبيت فوق v1.1.3 مع الحفاظ على بيانات بيئة الاختبار. لكل نسخة ملف تحديث موقّع مستقل. اختبارات التشغيل كانت على Windows Server 2022؛ نسخ Windows 7 ما زالت تجريبية. راجع [ملاحظات الإصدار](docs/RELEASE-v1.1.4.md).
 
 ## المميزات
 
@@ -151,7 +151,7 @@
 
 ### Chrome وBrave وEdge وOpera وVivaldi
 
-1. فك ضغط حزمة Chromium المحدثة من جدول الإضافات واستخدم مجلد `extension` داخلها. قد تتضمن المثبّتات المنشورة نسخة أقدم من الإضافة.
+1. فك ضغط حزمة Chromium المحدثة من جدول الإضافات واستخدم مجلد `extension` داخلها. تتضمن مثبّتات v1.1.4 الإضافة 1.1.1؛ قد تتضمن الإصدارات الأقدم نسخة سابقة.
 2. افتح صفحة الإضافات: `chrome://extensions` أو `brave://extensions` أو `edge://extensions` أو `opera://extensions` أو `vivaldi://extensions`.
 3. فعّل **Developer mode** ثم اختر **Load unpacked**.
 4. اختر مجلد [`extension`](extension)، ثم أعد تحميل صفحة الموقع.
@@ -213,16 +213,16 @@ node extension/test/content.sim.js --firefox
 
 يتضمن المشروع [سير عمل لبناء Windows](.github/workflows/build.yml) لبناء FFmpeg وتشغيل الاختبارات وتجميع التطبيق وتعبئته. بعد نجاحه يمكن تنزيل الناتج من **Artifacts** في صفحة [Actions](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/actions).
 
-تعمل [فحوصات الجودة](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/actions/workflows/ci.yml) على تعديلات المصدر وطلبات الدمج. لنشر Release موقّع، جهّز رقم النسخة وملف القفل ثم ارفع وسمًا مطابقًا مثل `v1.1.4`؛ لا تنشر رسائل `[release]` أي إصدار. لا يبدأ بناء المثبّت ونشره إلا بعد نجاح فحوصات الجودة والتحقق من الوسم. راجع [تجهيز الإصدارات](docs/RELEASING.md). تُحفظ الإصدارات الأقدم وروابطها.
+تعمل [فحوصات الجودة](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/actions/workflows/ci.yml) على تعديلات المصدر وطلبات الدمج. لنشر Release موقّع، جهّز رقم النسخة وملف القفل ثم ارفع وسمًا مطابقًا مثل `v1.1.5`؛ لا تنشر رسائل `[release]` أي إصدار. لا يبدأ بناء المثبّت ونشره إلا بعد نجاح فحوصات الجودة والتحقق من الوسم. راجع [تجهيز الإصدارات](docs/RELEASING.md). تُحفظ الإصدارات الأقدم وروابطها. نُشر v1.1.4 من [مخرجات المعاينة المعتمدة](docs/RELEASE-v1.1.4.md) دون إعادة بناء المثبّتات؛ عند تعطل النشر يُعاد job النشر وحده.
 
 ## الخصوصية والاتصالات
 
-| المكوّن | السلوك في المصدر الحالي |
+| المكوّن | السلوك في الإصدار v1.1.4 |
 |---|---|
 | اتصال الإضافة | اتصال محلي عبر `127.0.0.1`؛ المنفذ الافتراضي `9614` |
 | صلاحيات المتصفح | صلاحيات للتنزيلات والصفحات وCookies لالتقاط الروابط ونقل سياق التنزيل؛ راجع ملفات manifest قبل التثبيت |
 | بيانات جلسة الموقع | قد تُمرّر Cookies وعنوان الصفحة إلى التطبيق المحلي لطلب المحتوى المصرّح للمستخدم بالوصول إليه |
-| حفظ البيانات الحساسة | يستخدم Windows DPAPI للحقول المخصصة لكلمات المرور وCookies. يفشل الحفظ بأمان عند تعذّر الحماية، مع تنبيه وحفظ الملف السابق. هذا تعديل للمصدر يحتاج إصدار مثبّت جديد لتطبيقه على المستخدمين؛ لا تشارك الإعدادات أو قوائم التنزيل |
+| حفظ البيانات الحساسة | يستخدم Windows DPAPI للحقول المخصصة لكلمات المرور وCookies. يفشل الحفظ بأمان عند تعذّر الحماية، مع تنبيه وحفظ الملف السابق. هذه الحماية مضمنة في مثبّتات v1.1.4؛ لا تشارك الإعدادات أو قوائم التنزيل |
 | تحديث التطبيق | يتحقق دوريًا من بيانات الإصدار؛ يفحص التحديث المقبول بتوقيع Ed25519 وبصمة SHA-256، ويمكن تثبيته بصمت مع إعادة تشغيل التطبيق |
 | الأدوات المساعدة | يستخدم yt-dlp وFFmpeg وaria2 لبعض الوظائف، وقد ينزّل الأدوات أو يحدّثها بحسب مسار التشغيل |
 | الحافظة والتشغيل التلقائي | توجد خيارات في الإعدادات لمراقبة الحافظة والتشغيل مع Windows |

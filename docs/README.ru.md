@@ -13,20 +13,20 @@
 
 Менеджер загрузок для Windows на **Rust** и **Slint** с расширениями для браузеров и плавающим индикатором загрузки.
 
-[![Release](https://img.shields.io/badge/release-v1.1.3-0EA5A4?style=flat-square)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3)
+[![Release](https://img.shields.io/badge/release-v1.1.4-0EA5A4?style=flat-square)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.4)
 
 </div>
 
-## Скачать — v1.1.3
+## Скачать — v1.1.4
 
 **Программа полностью бесплатна для использования.** Выберите версию Windows и разрядность системы.
 
 | Система | Архитектура | Скачать | Статус |
 |---|---|---|---|
-| Windows 10 / Windows 11 | 64-bit · x64 | [Скачать EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-Setup.exe) | Доступно |
-| Windows 10 / Windows 11 | 32-bit · x86 | [Скачать EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win10_11-x86.exe) | Доступно |
-| Windows 7 SP1 | 64-bit · x64 | [Скачать EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win7-Experimental-x64.exe) | Экспериментальная |
-| Windows 7 SP1 | 32-bit · x86 | [Скачать EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win7-Experimental-x86.exe) | Экспериментальная |
+| Windows 10 / Windows 11 | 64-bit · x64 | [Скачать EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRoDownload-v1.1.4-Win10_11-x64.exe) | Доступно |
+| Windows 10 / Windows 11 | 32-bit · x86 | [Скачать EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRoDownload-v1.1.4-Win10_11-x86.exe) | Доступно |
+| Windows 7 SP1 | 64-bit · x64 | [Скачать EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRoDownload-v1.1.4-Win7-Experimental-x64.exe) | Экспериментальная |
+| Windows 7 SP1 | 32-bit · x86 | [Скачать EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRoDownload-v1.1.4-Win7-Experimental-x86.exe) | Экспериментальная |
 
 Для 32-разрядной Windows 10 выберите x86. Для 64-разрядной Windows 10 или Windows 11 рекомендуется x64; приложение x86 также доступно. Для Windows 7 SP1 выберите соответствующую архитектуру. Проверить её можно в разделе **Панель управления → Система → Тип системы**.
 
@@ -34,11 +34,11 @@
 
 ## Обновление расширения — v1.1.1
 
-Скачайте нужный пакет без переустановки программы. Опубликованные установщики могут содержать более старое расширение. Распакуйте и загрузите новую папку, отключите дублирующие старые копии и обновите открытые страницы. Пакет Chromium предназначен для Chrome, Brave, Edge, Opera / Opera GX и Vivaldi в Windows. Safari и мобильные браузеры не включены.
+Скачайте нужный пакет без переустановки программы. Установщики v1.1.4 включают расширение 1.1.1; более ранние установщики могут содержать старые версии. Распакуйте и загрузите новую папку, отключите дублирующие старые копии и обновите открытые страницы. Пакет Chromium предназначен для Chrome, Brave, Edge, Opera / Opera GX и Vivaldi в Windows. Safari и мобильные браузеры не включены.
 
-- [Chromium — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Chromium.zip)
-- [Firefox 140+ — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Firefox.zip)
-- [Firefox 115 ESR / Win7 — v1.1.1 (Экспериментальная)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Firefox-Win7.zip)
+- [Chromium — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Chromium.zip)
+- [Firefox 140+ — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Firefox.zip)
+- [Firefox 115 ESR / Win7 — v1.1.1 (Экспериментальная)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Firefox-Win7.zip)
 
 [Совместимость и границы тестирования (арабский / английский)](BROWSERS.md)
 
@@ -70,7 +70,7 @@
 
 Расширение обменивается данными с приложением локально и может передавать необходимые для загрузки cookies и контекст страницы. Не публикуйте cookies, конфиденциальные настройки или приватные ссылки. Скачивайте только материалы, доступ к которым и сохранение которых вам разрешены.
 
-[Все файлы выпуска](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3) · [Техническое руководство и статус лицензии (на английском)](README.en.md) · [Сообщить о проблеме](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/issues)
+[Все файлы выпуска](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.4) · [Техническое руководство и статус лицензии (на английском)](README.en.md) · [Сообщить о проблеме](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/issues)
 
 Разработчик — **KeRo HaZem**.
 

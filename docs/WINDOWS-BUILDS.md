@@ -1,14 +1,15 @@
 # Additional Windows builds
 
-The current release remains available as `KeRoDownload-Setup.exe` (Windows 10/11 x64).
+The current v1.1.4 release includes four clearly named installers. `KeRoDownload-Setup.exe` is an identical compatibility alias for `KeRoDownload-v1.1.4-Win10_11-x64.exe`. All four approved preview installers were promoted without rebuilding.
 The **Additional Windows architectures** workflow supplements the existing release;
 it never replaces its installer or `version.json`.
 
 | Package | Rust target | Status |
 | --- | --- | --- |
-| `KeRoDownload-v1.1.3-Win10_11-x86.exe` | `i686-pc-windows-msvc` | 32-bit app for Windows 10; Windows 11 runs x86 apps through compatibility support |
-| `KeRoDownload-v1.1.3-Win7-Experimental-x64.exe` | `x86_64-win7-windows-msvc` | Experimental, requires testing on Windows 7 SP1 |
-| `KeRoDownload-v1.1.3-Win7-Experimental-x86.exe` | `i686-win7-windows-msvc` | Experimental, requires testing on Windows 7 SP1 |
+| `KeRoDownload-v1.1.4-Win10_11-x64.exe` | `x86_64-pc-windows-msvc` | Windows 10/11 x64 |
+| `KeRoDownload-v1.1.4-Win10_11-x86.exe` | `i686-pc-windows-msvc` | 32-bit app for Windows 10; Windows 11 runs x86 apps through compatibility support |
+| `KeRoDownload-v1.1.4-Win7-Experimental-x64.exe` | `x86_64-win7-windows-msvc` | Experimental, requires testing on Windows 7 SP1 |
+| `KeRoDownload-v1.1.4-Win7-Experimental-x86.exe` | `i686-win7-windows-msvc` | Experimental, requires testing on Windows 7 SP1 |
 
 Windows 7 builds compile their own Rust standard library with nightly `build-std`.
 They use the community `nicolaasjan/yt-dlp` Windows 7 builds, pinned to
@@ -52,3 +53,7 @@ Import preflight rejects Combase, Shcore and WinRT error API-set dependencies.
 Only Windows 7 packages adapt the temporary Firefox extension manifest for Firefox 115 ESR,
 removing the newer unsupported data-collection manifest field. Browser behavior still needs
 validation on the actual legacy browser. Modern extension packages retain their existing manifest.
+
+## v1.1.4 validation
+
+Each architecture passed 73 engine tests and installer upgrade preservation checks on Windows Server 2022. Installer hashes and the exact candidate source are recorded in the release PROVENANCE.json and SHA256SUMS.txt. Successful installer artifacts are retained before upgrade checks, and publication has a separate signed-payload checkpoint. Retry the failed publication job rather than rebuilding approved packages. See [release notes](RELEASE-v1.1.4.md).
