@@ -21,3 +21,11 @@ The lock was generated with `nightly-2026-10-29` from the current manifests and 
 The linked verification run builds both Windows 7 targets, runs their engine tests and the known unsupported-import check, and confirms that the lockfile hash stays unchanged. Its Windows Server 2022 checks do not establish Windows 7 runtime support. Existing published installers are unaffected.
 
 Use Cargo to update selected dependencies intentionally, review the lock diff, and rerun compatibility checks. Do not edit checksums manually or delete the lock to bypass a failure. This file does not pin the Rust compiler, Windows SDK or external helper executables, and does not by itself guarantee bit-for-bit reproducible binaries.
+
+## Quality checks and advisory follow-up / متابعة فحوصات الجودة
+
+The [quality-check run](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/actions/runs/40906542546) checks formatting, strict Clippy, engine tests, browser simulations, Windows 7 compatibility-source hashes and Cargo advisories. Rust quality tools and the main Windows build use 1.99.1; the legacy build uses the previously verified nightly-2026-10-29. Dependencies were not upgraded during CI setup.
+
+Cargo audit completed under its default policy with seven advisory warnings: six unmaintained-package notices (`bincode`, `proc-macro-error`, `ttf-parser`, `zbus_names`, `zvariant`, `zvariant_derive`) and an unsoundness advisory for `glib` ([RUSTSEC-2024-0429](https://rustsec.org/advisories/RUSTSEC-2024-0429.html)). These findings are visible in the logs; no advisory ignore list was added. The audited lockfile includes dependencies for multiple operating systems. The observed Windows compilation did not include `glib`; this observation does not resolve the advisory for other targets or configurations.
+
+نجاح فحص audit لا يعني غياب كل المشكلات: توجد تنبيهات صيانة وتنبيه سلامة ذاكرة في شجرة المكتبات الكاملة تحتاج متابعة. لم نغيّر المكتبات تلقائيًا لإزالة التنبيهات. تُراجع التحديثات المقترحة عبر Dependabot، مع مراجعة التراخيص واختبارات التوافق قبل الدمج والنشر. فحص مصادر Windows 7 ليس بديلًا عن بناء النسخ وتجربة تشغيلها على Windows 7 نفسه.
