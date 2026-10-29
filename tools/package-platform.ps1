@@ -53,6 +53,10 @@ Expand-Archive aria2.zip aria2-tmp
 Copy-Item (Get-ChildItem aria2-tmp -Recurse -Filter aria2c.exe | Select-Object -First 1).FullName "$stage/tools/"
 Copy-Item (Get-ChildItem aria2-tmp -Recurse -Filter COPYING | Select-Object -First 1).FullName "$stage/tools/aria2-COPYING.txt"
 foreach ($exe in @("$stage/KeRoDownload.exe", "$stage/tools/ffmpeg.exe", "$stage/tools/yt-dlp.exe", "$stage/tools/aria2c.exe")) { Check-PE $exe $machine }
+if ($Legacy) {
+    python tools/check-win7-imports.py "$stage/KeRoDownload.exe" "$stage/tools/ffmpeg.exe" "$stage/tools/aria2c.exe" "$stage/tools/yt-dlp.exe" | Out-File "dist/IMPORTS-$Platform.json" -Encoding utf8
+    if ($LASTEXITCODE -ne 0) { throw 'Known post-Windows-7 API dependency found' }
+}
 foreach ($tool in @('ffmpeg', 'yt-dlp', 'aria2c')) {
     $arg = if ($tool -eq 'ffmpeg') { '-version' } else { '--version' }
     & "$stage/tools/$tool.exe" $arg

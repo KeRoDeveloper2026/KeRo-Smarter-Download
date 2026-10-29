@@ -6,6 +6,7 @@ on:
     paths:
       - .github/workflows/platform-builds.yml
       - tools/package-platform.ps1
+      - crates/app/src/winfx.rs
   workflow_dispatch:
 
 permissions:

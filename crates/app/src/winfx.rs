@@ -33,26 +33,26 @@ pub(crate) fn set_opacity(w: &slint::Window, pct: u32) {
     #[cfg(windows)]
     {
         use windows_sys::Win32::UI::WindowsAndMessaging::{
-            GetWindowLongPtrW, SetLayeredWindowAttributes, SetWindowLongPtrW, GWL_EXSTYLE, LWA_ALPHA, WS_EX_LAYERED,
+            GetWindowLongW, SetLayeredWindowAttributes, SetWindowLongW, GWL_EXSTYLE, LWA_ALPHA, WS_EX_LAYERED,
         };
         let Some(id) = hwnd_of(w) else { return };
         let hwnd = id as windows_sys::Win32::Foundation::HWND;
         // SAFETY: hwnd is the live window of `w`; only its extended style and
         // its alpha are changed
         unsafe {
-            let ex = GetWindowLongPtrW(hwnd, GWL_EXSTYLE);
-            let layered = ex & WS_EX_LAYERED as isize != 0;
+            let ex = GetWindowLongW(hwnd, GWL_EXSTYLE);
+            let layered = ex & WS_EX_LAYERED as i32 != 0;
             // the window may have got its style back from the toolkit
             if APPLIED.with(|a| a.get()) == (id, pct) && layered == (pct < 100) {
                 return;
             }
             if pct >= 100 {
                 if layered {
-                    SetWindowLongPtrW(hwnd, GWL_EXSTYLE, ex & !(WS_EX_LAYERED as isize));
+                    SetWindowLongW(hwnd, GWL_EXSTYLE, ex & !(WS_EX_LAYERED as i32));
                 }
             } else {
                 if !layered {
-                    SetWindowLongPtrW(hwnd, GWL_EXSTYLE, ex | WS_EX_LAYERED as isize);
+                    SetWindowLongW(hwnd, GWL_EXSTYLE, ex | WS_EX_LAYERED as i32);
                 }
                 SetLayeredWindowAttributes(hwnd, 0, (pct * 255 / 100) as u8, LWA_ALPHA);
             }
