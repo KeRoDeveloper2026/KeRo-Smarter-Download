@@ -26,6 +26,8 @@
 |---|---|---|
 | Windows 10/11 — 64-bit | [تنزيل Setup — x64](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-Setup.exe) | مثبّت النسخة 64-bit |
 | Windows 10/11 — 32-bit (x86) | [تنزيل Setup — x86](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win10_11-x86.exe) | برنامج 32-bit؛ يعمل أيضًا على Windows 11 عبر توافق x86 |
+| Windows 7 SP1 — 64-bit (تجريبي) | [تنزيل Setup — Win7 x64](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win7-Experimental-x64.exe) | اجتاز فحوص البناء؛ يحتاج اختبار تشغيل على Windows 7 فعلي |
+| Windows 7 SP1 — 32-bit (x86، تجريبي) | [تنزيل Setup — Win7 x86](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win7-Experimental-x86.exe) | اجتاز فحوص البناء؛ يحتاج اختبار تشغيل على Windows 7 فعلي |
 | إضافة Chrome وBrave وEdge | [تنزيل إضافة Chromium](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Extension-Chromium.zip) | فك الضغط ثم اختر المجلد عبر Load unpacked |
 | إضافة Firefox | [تنزيل إضافة Firefox](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Extension-Firefox.zip) | فك الضغط ثم حمّل manifest.json مؤقتًا من about:debugging |
 | حزمة الإضافتين كاملة | [تنزيل حزمة الإضافات](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Smarter-Download.zip) | تحتوي على مجلدي extension وextension-firefox |
@@ -64,7 +66,7 @@
 
 للحصول على إصدار تبنيه بنفسك، اتبع [البناء من المصدر](#البناء-من-المصدر). ملف المصدر الذي يوفّره GitHub عبر **Code → Download ZIP** يحتاج إلى تجميع، بعكس ملف المثبّت المرفق.
 
-**متطلبات التشغيل:** Windows 10 بنواة 32-bit أو 64-bit، أو Windows 11 بنواة 64-bit مع دعم تطبيقات x86، واتصال بالإنترنت. يجري تجهيز نسختين تجريبيتين مستقلتين لـWindows 7 SP1؛ راجع [حالة بناء Windows](docs/WINDOWS-BUILDS.md). التثبيت مخصص للمستخدم الحالي؛ أما تثبيت أدوات التطوير أثناء البناء فقد يطلب صلاحيات المسؤول.
+**متطلبات التشغيل:** Windows 10 بنواة 32-bit أو 64-bit، أو Windows 11 بنواة 64-bit مع دعم تطبيقات x86، واتصال بالإنترنت. تتوفر نسختان تجريبيتان مستقلتان لـWindows 7 SP1 بنواتي x86 وx64 في الجدول أعلاه. اجتازتا فحوص البناء على Windows Server 2022، ولم يُختبر تشغيلهما بعد على جهاز Windows 7 فعلي؛ راجع [حالة بناء Windows](docs/WINDOWS-BUILDS.md). التثبيت مخصص للمستخدم الحالي؛ أما تثبيت أدوات التطوير أثناء البناء فقد يطلب صلاحيات المسؤول.
 
 ### متابعة التنزيل باللوجو العائم
 
@@ -93,7 +95,7 @@
 2. اختر **Load Temporary Add-on**.
 3. اختر [`extension-firefox/manifest.json`](extension-firefox/manifest.json).
 
-الإضافة المرفقة غير موقّعة، والتحميل بهذه الطريقة مؤقت ويحتاج إلى تكراره بعد إعادة تشغيل Firefox. متطلب إصدار Firefox في manifest هو **140 أو أحدث**. التوزيع الدائم يحتاج إلى حزمة موقّعة من Mozilla؛ ملف XPI غير الموقّع مخصص للتطوير.
+الإضافة المرفقة غير موقّعة، والتحميل بهذه الطريقة مؤقت ويحتاج إلى تكراره بعد إعادة تشغيل Firefox. متطلب إصدار Firefox في الحزم الحديثة هو **140 أو أحدث**؛ أما حزم Windows 7 التجريبية فتتضمن manifest مخصصًا لـ**Firefox 115 ESR**. التوزيع الدائم يحتاج إلى حزمة موقّعة من Mozilla؛ ملف XPI غير الموقّع مخصص للتطوير.
 
 ## البناء من المصدر
 
