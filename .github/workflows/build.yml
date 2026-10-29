@@ -1,44 +1,54 @@
 name: Build KeRo Smarter Download for Windows
 
-# Every push: build and keep the result as an artifact.
-# A push to main whose commit message contains [release] also publishes a
-# GitHub release v<version> with the setup and version.json; installed
-# copies of the program read version.json of the latest release
-# (Help > Check for updates, or by themselves when they start).
-
+# Source changes run ci.yml. A matching vMAJOR.MINOR.PATCH tag publishes
+# a signed release only after the reusable quality checks succeed.
 on:
   push:
-    paths-ignore:
-      - "README.md"
-      - "docs/**"
-      - "extension/**"
-      - "extension-firefox/**"
-      - ".github/workflows/extension-packages.yml"
-      - "tools/package-extensions.py"
-      - ".github/workflows/platform-builds.yml"
-      - ".github/workflows/publish-ready-x86.yml"
-      - ".github/workflows/publish-ready-win7.yml"
-      - "tools/prepare-win7.py"
-      - "tools/check-win7-imports.py"
-      - "tools/package-platform.ps1"
+    tags: ['v[0-9]*.[0-9]*.[0-9]*']
   workflow_dispatch:
-    inputs:
-      publish_release:
-        description: Publish a signed release (main only; requires UPDATE_SIGNING_KEY)
-        type: boolean
-        default: false
 
 env:
-  IS_RELEASE: ${{ github.ref == 'refs/heads/main' && ((github.event_name == 'push' && contains(github.event.head_commit.message, '[release]')) || (github.event_name == 'workflow_dispatch' && inputs.publish_release)) }}
+  IS_RELEASE: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
 
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: windows-release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - name: Validate a release tag before building
+        if: github.ref_type == 'tag'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python tools/check-release-tag.py "$GITHUB_REF_NAME"
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "::error::This version is already released; existing assets will not be replaced."
+            exit 1
+          fi
+
+  checks:
+    needs: validate
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
+
   # KeRo Smarter Download's own small ffmpeg (tools/ffmpeg/build.sh): built from the
   # official sources, both checked (exact commit / SHA-256), kept in the cache
   # until the script or a version changes
   ffmpeg:
+    needs: [validate, checks]
     runs-on: ubuntu-24.04
     env:
       FFMPEG_TAG: n8.0.3
@@ -87,14 +97,16 @@ jobs:
           retention-days: 3
 
   windows:
-    needs: ffmpeg
-    runs-on: windows-latest
+    needs: [ffmpeg, checks]
+    permissions:
+      contents: write
+    runs-on: windows-2022
     steps:
       # actions pinned to exact commits (a moved tag can't change the build)
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
         with:
-          toolchain: stable
+          toolchain: 1.99.1
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           cache-on-failure: true
@@ -266,8 +278,7 @@ jobs:
         with:
           name: KeRoDownload-windows
           path: KeRoDownload-windows.zip
-      # a release is published only when the commit message says [release]
-      # (tag v<version> is created here); the same version again is skipped
+      # Publish only an existing, validated tag; never replace an existing release.
       - name: Publish release
         if: env.IS_RELEASE == 'true'
         shell: pwsh
@@ -275,9 +286,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release view "v$env:VERSION" --repo "${{ github.repository }}" *> $null
-          if ($LASTEXITCODE -eq 0) { Write-Host "v$env:VERSION is already released"; exit 0 }
+          if ($LASTEXITCODE -eq 0) { throw "This version is already released; choose a new version." }
+          $tagCommit = (gh api "repos/$env:GITHUB_REPOSITORY/commits/v$env:VERSION" --jq .sha).Trim()
+          if ($LASTEXITCODE -ne 0 -or $tagCommit -ne $env:GITHUB_SHA) { throw "The release tag moved after validation" }
           $files = @("dist/KeRoDownload-Setup.exe", "dist/version.json")
           if (Test-Path dist/kero-download-firefox.xpi) { $files += "dist/kero-download-firefox.xpi", "dist/firefox-updates.json" }
-          gh release create "v$env:VERSION" @files --repo "${{ github.repository }}" --target "${{ github.sha }}" --title "KeRo Smarter Download $env:VERSION" --notes "KeRo Smarter Download $env:VERSION" --latest
+          gh release create "v$env:VERSION" @files --repo "${{ github.repository }}" --verify-tag --title "KeRo Smarter Download $env:VERSION" --generate-notes --notes "KeRo Smarter Download $env:VERSION — official Windows package. See the README download table for architecture availability." --latest
           if ($LASTEXITCODE -ne 0) { throw "could not create the release" }
           # Keep older releases and tags so existing download links stay valid.

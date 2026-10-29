@@ -48,7 +48,11 @@ pub fn download_icon(progress: Option<f32>) -> Vec<u8> {
     px.resize(N * N * 4, 0);
     if let Some(p) = progress {
         let pct = (p.clamp(0.0, 1.0) * 100.0).round() as u32;
-        let mut glyphs: Vec<usize> = pct.to_string().bytes().map(|b| (b - b'0') as usize).collect();
+        let mut glyphs: Vec<usize> = pct
+            .to_string()
+            .bytes()
+            .map(|b| (b - b'0') as usize)
+            .collect();
         glyphs.push(10);
         let width = glyphs.len() * 4 - 1;
         let x0 = (N - width) / 2;
@@ -91,7 +95,9 @@ mod imp {
     use super::{DownloadAction, TrayAction};
     use std::collections::HashMap;
     use tray_icon::menu::{CheckMenuItem, Menu, MenuEvent, MenuId, MenuItem, PredefinedMenuItem};
-    use tray_icon::{Icon, MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent};
+    use tray_icon::{
+        Icon, MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent,
+    };
 
     const MAIN_ID: &str = "kero-main";
     const DL_PREFIX: &str = "kero-dl-";
@@ -126,7 +132,9 @@ mod imp {
         if menu.append(&show).is_err() || menu.append(&pause).is_err() {
             return false;
         }
-        let Some(icon) = icon_for(progress) else { return false };
+        let Some(icon) = icon_for(progress) else {
+            return false;
+        };
         let built = TrayIconBuilder::new()
             .with_id(format!("{DL_PREFIX}{id}"))
             .with_tooltip(super::short_tip(tip))
@@ -203,7 +211,8 @@ mod imp {
             menu.append(&PredefinedMenuItem::separator()).ok()?;
             menu.append(&about).ok()?;
             menu.append(&exit).ok()?;
-            let icon = Icon::from_rgba(include_bytes!("../ui/tray32.rgba").to_vec(), 32, 32).ok()?;
+            let icon =
+                Icon::from_rgba(include_bytes!("../ui/tray32.rgba").to_vec(), 32, 32).ok()?;
             let tray = TrayIconBuilder::new()
                 .with_id(MAIN_ID)
                 .with_tooltip("KeRo Smarter Download")
@@ -224,7 +233,11 @@ mod imp {
                 (about.id().clone(), || TrayAction::About),
                 (exit.id().clone(), || TrayAction::Exit),
             ];
-            Some(Tray { _icon: tray, limiter, ids })
+            Some(Tray {
+                _icon: tray,
+                limiter,
+                ids,
+            })
         }
 
         /// Clicks since the last call (those on hidden downloads go to
@@ -233,15 +246,27 @@ mod imp {
             let mut out = Vec::new();
             while let Ok(ev) = TrayIconEvent::receiver().try_recv() {
                 let id = ev.id().0.clone();
-                if let Some(dl) = id.strip_prefix(DL_PREFIX).and_then(|n| n.parse::<u64>().ok()) {
+                if let Some(dl) = id
+                    .strip_prefix(DL_PREFIX)
+                    .and_then(|n| n.parse::<u64>().ok())
+                {
                     // one click on a hidden download's icon: its window
-                    if let TrayIconEvent::Click { button: MouseButton::Left, button_state: MouseButtonState::Up, .. } = ev {
+                    if let TrayIconEvent::Click {
+                        button: MouseButton::Left,
+                        button_state: MouseButtonState::Up,
+                        ..
+                    } = ev
+                    {
                         PENDING.with(|p| p.borrow_mut().push((dl, DownloadAction::Show)));
                     }
                     continue;
                 }
                 // left double click: the window (the menu is on the right button)
-                if let TrayIconEvent::DoubleClick { button: MouseButton::Left, .. } = ev {
+                if let TrayIconEvent::DoubleClick {
+                    button: MouseButton::Left,
+                    ..
+                } = ev
+                {
                     out.push(TrayAction::Show);
                 }
             }
@@ -280,7 +305,12 @@ mod imp {
 #[cfg(not(windows))]
 mod imp {
     use super::{DownloadAction, TrayAction};
-    pub fn show_download(_id: u64, _tip: &str, _progress: Option<f32>, _labels: (&str, &str)) -> bool {
+    pub fn show_download(
+        _id: u64,
+        _tip: &str,
+        _progress: Option<f32>,
+        _labels: (&str, &str),
+    ) -> bool {
         false
     }
     pub fn update_download(_id: u64, _tip: &str, _progress: Option<f32>) {}

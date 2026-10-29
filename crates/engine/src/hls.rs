@@ -6,10 +6,10 @@
 
 use crate::http::{request, ConnGuard, Progress, Shared};
 use crate::http_download::Cancelled;
+use crate::m3u8::{best_variant, parse_media};
 use crate::model::RequestHeaders;
 use anyhow::{anyhow, bail, Context};
 use std::collections::HashMap;
-use crate::m3u8::{best_variant, parse_media};
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -72,7 +72,9 @@ pub async fn run(
     let job = Arc::new(job);
     // 1. playlist (follow a master playlist to its best quality)
     let mut url = job.url.clone();
-    let mut text = fetch_text(&shared, &job, &url).await.context("could not load playlist")?;
+    let mut text = fetch_text(&shared, &job, &url)
+        .await
+        .context("could not load playlist")?;
     if !text.trim_start().starts_with("#EXTM3U") {
         bail!("not a valid HLS playlist");
     }
@@ -94,7 +96,9 @@ pub async fn run(
     for p in &playlist.parts {
         if let Some(k) = &p.key {
             if !keys.contains_key(&k.uri) {
-                let bytes = fetch_bytes(&shared, &job, &k.uri).await.context("could not load key")?;
+                let bytes = fetch_bytes(&shared, &job, &k.uri)
+                    .await
+                    .context("could not load key")?;
                 keys.insert(k.uri.clone(), bytes);
             }
         }
@@ -148,9 +152,8 @@ pub async fn run(
                         job.limiter.acquire(data.len()).await;
                         if let Some(k) = &parts[i].key {
                             let key = keys.get(&k.uri).ok_or_else(|| anyhow!("missing key"))?;
-                            let iv = k
-                                .iv
-                                .unwrap_or_else(|| (parts[i].sequence as u128).to_be_bytes());
+                            let iv =
+                                k.iv.unwrap_or_else(|| (parts[i].sequence as u128).to_be_bytes());
                             decrypt(key, &iv, &mut data)?;
                         }
                         let tmp = path.with_extension("tmp");
@@ -173,7 +176,8 @@ pub async fn run(
                             if attempt > job.retries {
                                 return Err(e);
                             }
-                            tokio::time::sleep(Duration::from_secs((attempt as u64 * 2).min(20))).await;
+                            tokio::time::sleep(Duration::from_secs((attempt as u64 * 2).min(20)))
+                                .await;
                         }
                     }
                 }
@@ -182,7 +186,9 @@ pub async fn run(
     }
     let mut first_error = None;
     while let Some(r) = set.join_next().await {
-        let r = r.map_err(|e| anyhow!("worker crashed: {e}")).and_then(|r| r);
+        let r = r
+            .map_err(|e| anyhow!("worker crashed: {e}"))
+            .and_then(|r| r);
         if let Err(e) = r {
             if first_error.is_none() && !cancel.is_cancelled() {
                 first_error = Some(e);

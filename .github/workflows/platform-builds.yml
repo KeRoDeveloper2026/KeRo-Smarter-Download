@@ -1,15 +1,7 @@
 name: Additional Windows architectures
 
+# Run explicitly for a reviewed new version after its main release exists.
 on:
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/platform-builds.yml
-      - tools/package-platform.ps1
-      - tools/prepare-win7.py
-      - tools/check-win7-imports.py
-      - crates/app/src/winfx.rs
-      - crates/engine/Cargo.toml
   workflow_dispatch:
 
 permissions:
@@ -55,12 +47,12 @@ jobs:
         include:
           - platform: Win7-x64
             target: x86_64-win7-windows-msvc
-            toolchain: nightly
+            toolchain: nightly-2026-10-29
             arch: x86_64
             legacy: true
           - platform: Win7-x86
             target: i686-win7-windows-msvc
-            toolchain: nightly
+            toolchain: nightly-2026-10-29
             arch: x86
             legacy: true
     env:

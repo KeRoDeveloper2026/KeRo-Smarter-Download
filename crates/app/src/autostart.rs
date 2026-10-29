@@ -25,12 +25,19 @@ mod imp {
 
     /// Installed with the setup program (which asked about autostart itself).
     pub fn installed_by_setup() -> bool {
-        reg(&["query", r"HKCU\Software\KeRo\KeRoDownload", "/v", "Installed"])
+        reg(&[
+            "query",
+            r"HKCU\Software\KeRo\KeRoDownload",
+            "/v",
+            "Installed",
+        ])
     }
 
     pub fn set(enabled: bool) -> bool {
         if enabled {
-            let Ok(exe) = std::env::current_exe() else { return false };
+            let Ok(exe) = std::env::current_exe() else {
+                return false;
+            };
             let value = format!("\"{}\" --background", exe.display());
             reg(&["add", KEY, "/v", NAME, "/t", "REG_SZ", "/d", &value, "/f"])
         } else {

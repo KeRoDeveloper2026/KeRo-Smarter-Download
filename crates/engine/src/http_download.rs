@@ -6,7 +6,10 @@
 //! biggest remaining segment, so all connections stay busy until the end.
 
 use crate::fileio::{make_sparse, write_at};
-use crate::http::{http_status_of, is_network_error, reconnect_delay, request, ConnGuard, HttpStatus, NetDrop, Progress, Shared};
+use crate::http::{
+    http_status_of, is_network_error, reconnect_delay, request, ConnGuard, HttpStatus, NetDrop,
+    Progress, Shared,
+};
 use crate::model::RequestHeaders;
 use crate::segments::{self, Segment};
 use anyhow::{anyhow, bail};
@@ -88,7 +91,8 @@ pub async fn run(
         let mut table = segs.lock().unwrap();
         if segmented {
             let total = job.total_size.unwrap_or(0);
-            let fresh = table.is_empty() || file.metadata()?.len() == 0 && segments::downloaded(&table) > 0;
+            let fresh =
+                table.is_empty() || file.metadata()?.len() == 0 && segments::downloaded(&table) > 0;
             if fresh {
                 *table = segments::plan(total, job.connections, job.min_split);
                 file.set_len(0)?;
@@ -105,9 +109,10 @@ pub async fn run(
         for s in table.iter_mut() {
             s.active = false;
         }
-        progress
-            .bytes
-            .store(job.progress_base + segments::downloaded(&table), Ordering::Relaxed);
+        progress.bytes.store(
+            job.progress_base + segments::downloaded(&table),
+            Ordering::Relaxed,
+        );
     }
 
     let file = Arc::new(file);
@@ -115,8 +120,12 @@ pub async fn run(
     // A small file cannot use more workers than its minimum-size segments.
     // Retain up to 32 connections for large, range-capable files.
     let workers = if segmented {
-        job.connections.clamp(1, 32).min(segs.lock().unwrap().len().max(1) as u32)
-    } else { 1 };
+        job.connections
+            .clamp(1, 32)
+            .min(segs.lock().unwrap().len().max(1) as u32)
+    } else {
+        1
+    };
     let mut set = JoinSet::new();
     for _ in 0..workers {
         let ctx = Worker {
@@ -133,7 +142,9 @@ pub async fn run(
 
     let mut first_error: Option<anyhow::Error> = None;
     while let Some(res) = set.join_next().await {
-        let res = res.map_err(|e| anyhow!("worker crashed: {e}")).and_then(|r| r);
+        let res = res
+            .map_err(|e| anyhow!("worker crashed: {e}"))
+            .and_then(|r| r);
         if let Err(e) = res {
             if first_error.is_none() && !cancel.is_cancelled() {
                 first_error = Some(e);
@@ -233,7 +244,11 @@ impl Worker {
                         attempt += 1;
                         // an expired or removed link won't come back by itself
                         let gone = matches!(status, Some(401 | 403 | 404 | 410));
-                        let limit = if gone { self.job.retries.min(2) } else { self.job.retries };
+                        let limit = if gone {
+                            self.job.retries.min(2)
+                        } else {
+                            self.job.retries
+                        };
                         if attempt > limit {
                             if gone {
                                 return Err(e.context(
@@ -280,7 +295,12 @@ impl Worker {
             Some(limit) if self.segmented => end.min(pos + limit.max(1)),
             _ => end,
         };
-        let mut rb = request(&self.shared.client(), &self.job.url, &self.job.headers, &self.job.user_agent);
+        let mut rb = request(
+            &self.shared.client(),
+            &self.job.url,
+            &self.job.headers,
+            &self.job.user_agent,
+        );
         if self.segmented {
             rb = rb.header(RANGE, format!("bytes={}-{}", pos, req_end - 1));
         }
@@ -291,7 +311,10 @@ impl Worker {
                 if status.is_client_error() || status.is_server_error() {
                     return Err(HttpStatus(status.as_u16()).into());
                 }
-                bail!("server did not accept the byte range (HTTP {})", status.as_u16());
+                bail!(
+                    "server did not accept the byte range (HTTP {})",
+                    status.as_u16()
+                );
             }
         } else if !status.is_success() {
             return Err(HttpStatus(status.as_u16()).into());
@@ -316,7 +339,9 @@ impl Worker {
                 if take > 0 {
                     write_at(&self.file, &chunk[..take], s.pos)?;
                     s.pos += take as u64;
-                    self.progress.bytes.fetch_add(take as u64, Ordering::Relaxed);
+                    self.progress
+                        .bytes
+                        .fetch_add(take as u64, Ordering::Relaxed);
                     self.progress.online();
                 }
                 s.pos >= stop

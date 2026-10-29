@@ -25,9 +25,12 @@ fn update_dir() -> PathBuf {
 }
 
 fn downloading(mgr: &Manager) -> bool {
-    mgr.snapshot()
-        .iter()
-        .any(|v| matches!(v.status, Status::Connecting | Status::Downloading | Status::Assembling))
+    mgr.snapshot().iter().any(|v| {
+        matches!(
+            v.status,
+            Status::Connecting | Status::Downloading | Status::Assembling
+        )
+    })
 }
 
 /// Start the installer and close the program (downloads resume next time).
@@ -40,7 +43,10 @@ fn apply_as(setup: PathBuf, sha256: String, visible: bool) {
         Ok(()) => {
             let _ = slint::quit_event_loop();
         }
-        Err(e) => message(&tf("Could not start the update:\n\n{}", &[&format!("{e:#}")])),
+        Err(e) => message(&tf(
+            "Could not start the update:\n\n{}",
+            &[&format!("{e:#}")],
+        )),
     }
 }
 
@@ -49,7 +55,8 @@ pub fn spawn(ctx: &Ctx) {
     if let Ok(rd) = std::fs::read_dir(update_dir()) {
         for e in rd.flatten() {
             let name = e.file_name().to_string_lossy().to_string();
-            if name.contains(&format!("-{}.", selfupdate::current())) || name.ends_with(".download") {
+            if name.contains(&format!("-{}.", selfupdate::current())) || name.ends_with(".download")
+            {
                 let _ = std::fs::remove_file(e.path());
             }
         }
@@ -123,7 +130,9 @@ fn size_text(n: u64) -> String {
 /// Help > Check for updates: look now instead of waiting for the next check,
 /// in the update window.
 pub fn check_now(ui: &Ui) {
-    let Some(d) = ui.updater.upgrade() else { return };
+    let Some(d) = ui.updater.upgrade() else {
+        return;
+    };
     open_window!(d);
     let set = |state: i32, heading: String, detail: String| {
         d.set_state(state);
@@ -132,35 +141,55 @@ pub fn check_now(ui: &Ui) {
         d.set_progress(-1.0);
     };
     if BUSY.swap(true, Ordering::SeqCst) {
-        set(0, t("A new version is being prepared. It is installed by itself when it is ready."), String::new());
+        set(
+            0,
+            t("A new version is being prepared. It is installed by itself when it is ready."),
+            String::new(),
+        );
         return;
     }
-    set(0, t("Checking for updates…"), tf("This is version {}.", &[&selfupdate::current()]));
-    let shared = Arc::new(std::sync::Mutex::new(Shown { state: 0, progress: -1.0, ..Default::default() }));
+    set(
+        0,
+        t("Checking for updates…"),
+        tf("This is version {}.", &[&selfupdate::current()]),
+    );
+    let shared = Arc::new(std::sync::Mutex::new(Shown {
+        state: 0,
+        progress: -1.0,
+        ..Default::default()
+    }));
     {
         // UI thread: show what the async side wrote
         let (shared, weak) = (shared.clone(), d.as_weak());
         WINDOW_TIMER.with(|timer| {
-            timer.start(slint::TimerMode::Repeated, Duration::from_millis(100), move || {
-                let now = shared.lock().unwrap().clone();
-                if let Some(d) = weak.upgrade() {
-                    if now.state != 0 || !now.heading.is_empty() {
-                        d.set_state(now.state);
-                        d.set_heading(now.heading.clone().into());
-                        d.set_detail(now.detail.clone().into());
-                        d.set_progress(now.progress);
+            timer.start(
+                slint::TimerMode::Repeated,
+                Duration::from_millis(100),
+                move || {
+                    let now = shared.lock().unwrap().clone();
+                    if let Some(d) = weak.upgrade() {
+                        if now.state != 0 || !now.heading.is_empty() {
+                            d.set_state(now.state);
+                            d.set_heading(now.heading.clone().into());
+                            d.set_detail(now.detail.clone().into());
+                            d.set_progress(now.progress);
+                        }
                     }
-                }
-                if let Some((setup, sha)) = shared.lock().unwrap().install.take() {
-                    apply_as(setup, sha, true);
-                }
-                if now.done {
-                    WINDOW_TIMER.with(|t| t.stop());
-                }
-            });
+                    if let Some((setup, sha)) = shared.lock().unwrap().install.take() {
+                        apply_as(setup, sha, true);
+                    }
+                    if now.done {
+                        WINDOW_TIMER.with(|t| t.stop());
+                    }
+                },
+            );
         });
     }
-    let tell = move |shared: &std::sync::Mutex<Shown>, state: i32, heading: String, detail: String, progress: f32| {
+    let tell = move |shared: &std::sync::Mutex<Shown>,
+                     state: i32,
+                     heading: String,
+                     detail: String,
+                     progress: f32| {
         let mut s = shared.lock().unwrap();
         s.state = state;
         s.heading = heading;
@@ -175,11 +204,26 @@ pub fn check_now(ui: &Ui) {
         };
         let rel = match selfupdate::check(&client).await {
             Err(e) => {
-                tell(&shared, 4, t("Could not check for updates"), format!("{e:#}"), -1.0);
+                tell(
+                    &shared,
+                    4,
+                    t("Could not check for updates"),
+                    format!("{e:#}"),
+                    -1.0,
+                );
                 return finish(&shared);
             }
             Ok(None) => {
-                tell(&shared, 1, t("KeRo Smarter Download is up to date"), tf("Version {} is the newest version.", &[&selfupdate::current()]), -1.0);
+                tell(
+                    &shared,
+                    1,
+                    t("KeRo Smarter Download is up to date"),
+                    tf(
+                        "Version {} is the newest version.",
+                        &[&selfupdate::current()],
+                    ),
+                    -1.0,
+                );
                 return finish(&shared);
             }
             Ok(Some(rel)) => rel,
@@ -199,7 +243,10 @@ pub fn check_now(ui: &Ui) {
         let (s2, h2) = (shared.clone(), heading.clone());
         let progress = move |done: u64, total: Option<u64>| {
             let (detail, p) = match total {
-                Some(t) if t > 0 => (format!("{} / {}", size_text(done), size_text(t)), done as f32 / t as f32),
+                Some(t) if t > 0 => (
+                    format!("{} / {}", size_text(done), size_text(t)),
+                    done as f32 / t as f32,
+                ),
                 _ => (size_text(done), -1.0),
             };
             tell(&s2, 2, h2.clone(), detail, p);
@@ -219,7 +266,13 @@ pub fn check_now(ui: &Ui) {
                 finish(&shared);
             }
             Err(e) => {
-                tell(&shared, 4, t("Could not get the update"), format!("{e:#}"), -1.0);
+                tell(
+                    &shared,
+                    4,
+                    t("Could not get the update"),
+                    format!("{e:#}"),
+                    -1.0,
+                );
                 finish(&shared);
             }
         }

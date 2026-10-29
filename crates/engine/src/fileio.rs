@@ -17,7 +17,10 @@ pub fn write_at(file: &File, buf: &[u8], mut offset: u64) -> io::Result<()> {
         while !rest.is_empty() {
             let n = file.seek_write(rest, offset)?;
             if n == 0 {
-                return Err(io::Error::new(io::ErrorKind::WriteZero, "failed to write data"));
+                return Err(io::Error::new(
+                    io::ErrorKind::WriteZero,
+                    "failed to write data",
+                ));
             }
             rest = &rest[n..];
             offset += n as u64;

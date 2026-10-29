@@ -20,7 +20,10 @@ pub enum Status {
 
 impl Status {
     pub fn is_running(self) -> bool {
-        matches!(self, Status::Connecting | Status::Downloading | Status::Assembling)
+        matches!(
+            self,
+            Status::Connecting | Status::Downloading | Status::Assembling
+        )
     }
     pub fn label(self) -> &'static str {
         match self {
@@ -84,7 +87,11 @@ pub struct ProbeResult {
 impl ProbeResult {
     /// The address opens a web page, not a file.
     pub fn is_web_page(&self) -> bool {
-        let ct = self.content_type.as_deref().unwrap_or("").to_ascii_lowercase();
+        let ct = self
+            .content_type
+            .as_deref()
+            .unwrap_or("")
+            .to_ascii_lowercase();
         let ext = crate::filename::extension(&self.file_name);
         ct.starts_with("text/html") && !matches!(ext.as_str(), "htm" | "html" | "mht" | "mhtml")
     }
@@ -218,7 +225,9 @@ impl DownloadRecord {
     }
     pub fn part_path(&self) -> PathBuf {
         if let Some(stem) = &self.work_stem {
-            return self.work_dir().join(format!("{stem}.{}", crate::filename::PART_EXT));
+            return self
+                .work_dir()
+                .join(format!("{stem}.{}", crate::filename::PART_EXT));
         }
         match &self.temp_dir {
             // ids keep same-named files from different folders apart
@@ -240,21 +249,31 @@ impl DownloadRecord {
         }
     }
     pub fn hls_temp_dir(&self) -> PathBuf {
-        self.work_dir().join(format!(".{}.sgparts", self.temp_stem()))
+        self.work_dir()
+            .join(format!(".{}.sgparts", self.temp_stem()))
     }
     pub fn video_part_path(&self) -> PathBuf {
-        self.work_dir().join(format!(".{}.video.sgpart", self.temp_stem()))
+        self.work_dir()
+            .join(format!(".{}.video.sgpart", self.temp_stem()))
     }
     pub fn audio_part_path(&self) -> PathBuf {
-        self.work_dir().join(format!(".{}.audio.sgpart", self.temp_stem()))
+        self.work_dir()
+            .join(format!(".{}.audio.sgpart", self.temp_stem()))
     }
     /// Torrents: every file it writes (only those: the torrent's folder may
     /// have the name of a folder that was there before).
     pub fn torrent_data_paths(&self) -> Vec<PathBuf> {
         if !self.torrent_files.is_empty() {
-            return self.torrent_files.iter().map(|f| self.save_dir.join(f)).collect();
+            return self
+                .torrent_files
+                .iter()
+                .map(|f| self.save_dir.join(f))
+                .collect();
         }
-        let Some(info) = std::fs::read(&self.url).ok().and_then(|d| crate::torrent::parse_torrent(&d).ok()) else {
+        let Some(info) = std::fs::read(&self.url)
+            .ok()
+            .and_then(|d| crate::torrent::parse_torrent(&d).ok())
+        else {
             return Vec::new();
         };
         let single = info.files.len() == 1 && info.files[0].path == info.name;
@@ -277,7 +296,12 @@ impl DownloadRecord {
             // aria2's notes of what it has
             return vec![self.save_dir.join(format!("{}.aria2", self.file_name))];
         }
-        vec![self.part_path(), self.hls_temp_dir(), self.video_part_path(), self.audio_part_path()]
+        vec![
+            self.part_path(),
+            self.hls_temp_dir(),
+            self.video_part_path(),
+            self.audio_part_path(),
+        ]
     }
     pub fn request_url(&self) -> &str {
         self.final_url.as_deref().unwrap_or(&self.url)

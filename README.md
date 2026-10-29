@@ -24,6 +24,8 @@
 ![8 interface languages](https://img.shields.io/badge/APP_UI-8_LANGUAGES-6366F1?style=flat-square)
 [![12 documentation languages](https://img.shields.io/badge/DOCS-12_LANGUAGES-0EA5A4?style=flat-square)](docs/LANGUAGES.md)
 
+[![Quality checks](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/actions/workflows/ci.yml)
+
 **مجاني تمامًا · تطوير KeRo HaZem**
 
 [المميزات](#المميزات) · [طريقة التثبيت](#البدء) · [دعم المتصفحات](docs/BROWSERS.md) · [الإبلاغ عن مشكلة](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/issues/new/choose)
@@ -211,7 +213,7 @@ node extension/test/content.sim.js --firefox
 
 يتضمن المشروع [سير عمل لبناء Windows](.github/workflows/build.yml) لبناء FFmpeg وتشغيل الاختبارات وتجميع التطبيق وتعبئته. بعد نجاحه يمكن تنزيل الناتج من **Artifacts** في صفحة [Actions](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/actions).
 
-لنشر Release موقّع، اختر `main` وفعّل `publish_release` عند تشغيل سير العمل يدويًا، أو استخدم رسالة commit تتضمن `[release]` على `main`. راجع [تجهيز الإصدارات](docs/RELEASING.md) لضبط مفتاح التوقيع. تُحفظ الإصدارات الأقدم وروابطها.
+تعمل [فحوصات الجودة](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/actions/workflows/ci.yml) على تعديلات المصدر وطلبات الدمج. لنشر Release موقّع، جهّز رقم النسخة وملف القفل ثم ارفع وسمًا مطابقًا مثل `v1.1.4`؛ لا تنشر رسائل `[release]` أي إصدار. لا يبدأ بناء المثبّت ونشره إلا بعد نجاح فحوصات الجودة والتحقق من الوسم. راجع [تجهيز الإصدارات](docs/RELEASING.md). تُحفظ الإصدارات الأقدم وروابطها.
 
 ## الخصوصية والاتصالات
 

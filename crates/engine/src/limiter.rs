@@ -67,6 +67,9 @@ mod tests {
         assert!(start.elapsed() < Duration::from_secs(4));
         let t = Instant::now();
         l.acquire(1).await;
-        assert!(t.elapsed() < Duration::from_millis(1100), "one more small piece waits at most about a second");
+        assert!(
+            t.elapsed() < Duration::from_millis(1100),
+            "one more small piece waits at most about a second"
+        );
     }
 }

@@ -1,0 +1,10 @@
+changelog:
+  exclude:
+    labels: [skip-changelog]
+  categories:
+    - title: 'إصلاحات وتحسينات / Fixes and improvements'
+      labels: [bug, enhancement]
+    - title: 'تحديثات المكتبات / Dependencies'
+      labels: [dependencies]
+    - title: 'تغييرات أخرى / Other changes'
+      labels: ['*']

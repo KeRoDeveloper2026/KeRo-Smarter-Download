@@ -13,7 +13,9 @@ pub fn from_content_disposition(value: &str) -> Option<String> {
     let mut extended: Option<String> = None;
     for part in value.split(';') {
         let part = part.trim();
-        let Some((key, val)) = part.split_once('=') else { continue };
+        let Some((key, val)) = part.split_once('=') else {
+            continue;
+        };
         let key = key.trim().to_ascii_lowercase();
         let val = val.trim().trim_matches('"');
         if key == "filename*" {
@@ -65,14 +67,10 @@ pub fn sanitize(name: &str) -> String {
     if out.is_empty() {
         return "download".into();
     }
-    let stem_upper = out
-        .split('.')
-        .next()
-        .unwrap_or("")
-        .to_ascii_uppercase();
+    let stem_upper = out.split('.').next().unwrap_or("").to_ascii_uppercase();
     const RESERVED: [&str; 22] = [
-        "CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7",
-        "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
+        "CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8",
+        "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
     ];
     let out = if RESERVED.contains(&stem_upper.as_str()) {
         format!("_{out}")
@@ -112,7 +110,11 @@ pub fn extension(name: &str) -> String {
 pub fn with_reference_extension(name: &str, reference: &str) -> String {
     let clean = sanitize(name);
     let ext = split_ext(reference).1;
-    if split_ext(&clean).1.is_empty() && !ext.is_empty() { format!("{clean}.{ext}") } else { clean }
+    if split_ext(&clean).1.is_empty() && !ext.is_empty() {
+        format!("{clean}.{ext}")
+    } else {
+        clean
+    }
 }
 
 /// Add an extension guessed from the MIME type when the name has none.
@@ -159,9 +161,7 @@ pub fn ensure_extension(name: String, content_type: Option<&str>) -> String {
 /// Pick a path in `dir` that is not taken yet by a finished file or a
 /// partial download: "file.zip", "file (1).zip", "file (2).zip", ...
 pub fn unique_name(dir: &Path, name: &str) -> String {
-    let taken = |n: &str| {
-        dir.join(n).exists() || dir.join(format!("{n}.{PART_EXT}")).exists()
-    };
+    let taken = |n: &str| dir.join(n).exists() || dir.join(format!("{n}.{PART_EXT}")).exists();
     if !taken(name) {
         return name.to_string();
     }
@@ -194,8 +194,10 @@ mod tests {
             Some("report.pdf")
         );
         assert_eq!(
-            from_content_disposition("attachment; filename=a.zip; filename*=UTF-8''%D9%85%D9%84%D9%81.zip")
-                .as_deref(),
+            from_content_disposition(
+                "attachment; filename=a.zip; filename*=UTF-8''%D9%85%D9%84%D9%81.zip"
+            )
+            .as_deref(),
             Some("ملف.zip")
         );
         assert_eq!(from_content_disposition("inline"), None);
@@ -222,15 +224,26 @@ mod tests {
     fn extensions() {
         assert_eq!(split_ext("a.tar.gz"), ("a.tar", "gz"));
         assert_eq!(split_ext(".hidden"), (".hidden", ""));
-        assert_eq!(ensure_extension("video".into(), Some("video/mp4; x=y")), "video.mp4");
+        assert_eq!(
+            ensure_extension("video".into(), Some("video/mp4; x=y")),
+            "video.mp4"
+        );
         assert_eq!(ensure_extension("a.bin".into(), Some("video/mp4")), "a.bin");
     }
     #[test]
     fn typed_names_keep_or_inherit_the_extension() {
         assert_eq!(with_reference_extension("تقرير", "server.pdf"), "تقرير.pdf");
-        assert_eq!(with_reference_extension("my clip", "720p MP4 - clip.mp4"), "my clip.mp4");
-        assert_eq!(with_reference_extension("report.txt", "server.pdf"), "report.txt");
-        assert_eq!(with_reference_extension("archive", "backup.tar.gz"), "archive.gz");
+        assert_eq!(
+            with_reference_extension("my clip", "720p MP4 - clip.mp4"),
+            "my clip.mp4"
+        );
+        assert_eq!(
+            with_reference_extension("report.txt", "server.pdf"),
+            "report.txt"
+        );
+        assert_eq!(
+            with_reference_extension("archive", "backup.tar.gz"),
+            "archive.gz"
+        );
     }
-
 }

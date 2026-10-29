@@ -2,9 +2,9 @@
 //! (its store page once the extension is published there, otherwise its
 //! extensions page with the folder path ready in the clipboard).
 
+use crate::i18n::{t, tf};
 use crate::open_window;
 use crate::*;
-use crate::i18n::{t, tf};
 
 /// Store pages of the published extension. Empty = not published yet:
 /// then the extension is added from its folder (developer mode).
@@ -54,7 +54,10 @@ fn detect() -> Vec<Browser> {
         Browser {
             name: "Edge",
             exe: first_existing(vec![
-                env_path("ProgramFiles(x86)", r"Microsoft\Edge\Application\msedge.exe"),
+                env_path(
+                    "ProgramFiles(x86)",
+                    r"Microsoft\Edge\Application\msedge.exe",
+                ),
                 env_path("ProgramFiles", r"Microsoft\Edge\Application\msedge.exe"),
             ]),
             extensions_page: "edge://extensions/",
@@ -89,9 +92,18 @@ fn detect() -> Vec<Browser> {
         Browser {
             name: "Brave",
             exe: first_existing(vec![
-                env_path("ProgramFiles", r"BraveSoftware\Brave-Browser\Application\brave.exe"),
-                env_path("ProgramFiles(x86)", r"BraveSoftware\Brave-Browser\Application\brave.exe"),
-                env_path("LOCALAPPDATA", r"BraveSoftware\Brave-Browser\Application\brave.exe"),
+                env_path(
+                    "ProgramFiles",
+                    r"BraveSoftware\Brave-Browser\Application\brave.exe",
+                ),
+                env_path(
+                    "ProgramFiles(x86)",
+                    r"BraveSoftware\Brave-Browser\Application\brave.exe",
+                ),
+                env_path(
+                    "LOCALAPPDATA",
+                    r"BraveSoftware\Brave-Browser\Application\brave.exe",
+                ),
             ]),
             extensions_page: "brave://extensions/",
             store: STORE_BRAVE,
@@ -104,8 +116,14 @@ fn detect() -> Vec<Browser> {
 /// The extension's folder next to the program (Firefox has its own copy).
 fn extension_dir(firefox: bool) -> Option<PathBuf> {
     let dir = std::env::current_exe().ok()?.parent()?.to_path_buf();
-    let name = if firefox { "extension-firefox" } else { "extension" };
-    [dir.join(name), dir.join("..").join(name)].into_iter().find(|p| p.exists())
+    let name = if firefox {
+        "extension-firefox"
+    } else {
+        "extension"
+    };
+    [dir.join(name), dir.join("..").join(name)]
+        .into_iter()
+        .find(|p| p.exists())
 }
 
 /// The signed Firefox add-on next to the program, when the release has one.
@@ -115,7 +133,9 @@ fn firefox_xpi() -> Option<PathBuf> {
 }
 
 pub(crate) fn open(ui: &Ui) {
-    let Some(d) = ui.browsers.upgrade() else { return };
+    let Some(d) = ui.browsers.upgrade() else {
+        return;
+    };
     let list = detect();
     let rows: Vec<BrowserRow> = list
         .iter()
@@ -123,13 +143,23 @@ pub(crate) fn open(ui: &Ui) {
             name: b.name.into(),
             tint: b.tint,
             installed: b.exe.is_some(),
-            action: t(if b.store.is_empty() { "Click to add" } else { "Click to add from the store" }).into(),
+            action: t(if b.store.is_empty() {
+                "Click to add"
+            } else {
+                "Click to add from the store"
+            })
+            .into(),
         })
         .collect();
     *ui.browser_list.borrow_mut() = list;
     d.set_browsers(ModelRc::new(VecModel::from(rows)));
     d.set_steps(SharedString::new());
-    d.set_folder(extension_dir(false).map(|p| p.display().to_string()).unwrap_or_default().into());
+    d.set_folder(
+        extension_dir(false)
+            .map(|p| p.display().to_string())
+            .unwrap_or_default()
+            .into(),
+    );
     open_window!(d);
     d.window().set_minimized(false);
 }
@@ -139,15 +169,25 @@ fn launch(exe: &Path, url: &str) {
 }
 
 fn add(ui: &Ui, i: usize) {
-    let Some(d) = ui.browsers.upgrade() else { return };
-    let Some(b) = ui.browser_list.borrow().get(i).cloned() else { return };
+    let Some(d) = ui.browsers.upgrade() else {
+        return;
+    };
+    let Some(b) = ui.browser_list.borrow().get(i).cloned() else {
+        return;
+    };
     let Some(exe) = b.exe.clone() else {
         d.set_steps(tf("{} is not installed on this computer.", &[&b.name]).into());
         return;
     };
     if !b.store.is_empty() {
         launch(&exe, b.store);
-        d.set_steps(tf("{} opened the store page: click \"Add\" / \"Get\" there.", &[&b.name]).into());
+        d.set_steps(
+            tf(
+                "{} opened the store page: click \"Add\" / \"Get\" there.",
+                &[&b.name],
+            )
+            .into(),
+        );
         return;
     }
     if b.firefox {
@@ -178,7 +218,9 @@ fn add(ui: &Ui, i: usize) {
 }
 
 pub(crate) fn wire(ui: &Ui) {
-    let Some(d) = ui.browsers.upgrade() else { return };
+    let Some(d) = ui.browsers.upgrade() else {
+        return;
+    };
     {
         let ui = ui.clone();
         d.on_add(move |i| add(&ui, i.max(0) as usize));

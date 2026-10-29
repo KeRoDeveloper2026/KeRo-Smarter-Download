@@ -125,3 +125,9 @@ Developed by **KeRo HaZem** — [KeRoDeveloper2026](https://github.com/KeRoDevel
 ## Dependency locking
 
 The source includes `Cargo.lock`; build and test commands use `--locked` to prevent automatic dependency changes. See [dependency versions, verification and update policy](DEPENDENCIES.md). Published installers are unchanged.
+
+## Quality checks and releases
+
+Source changes and pull requests run formatting, strict Clippy, engine tests, Chromium/Firefox simulations, dependency auditing and a Windows 7 compatibility-source check. Rust quality tools are pinned to 1.99.1. Dependabot proposes weekly Cargo and GitHub Actions updates without auto-merge.
+
+Publish a new stable release by pushing a reviewed version tag matching Cargo.toml, such as `v1.1.4`. The Windows x64 workflow validates the tag, requires successful checks, signs its update manifest and generates release notes. Commit messages containing `[release]` no longer publish. Manual workflow runs produce a test artifact only. Additional architectures remain separately managed; current downloads are unchanged. See [release preparation](RELEASING.md).

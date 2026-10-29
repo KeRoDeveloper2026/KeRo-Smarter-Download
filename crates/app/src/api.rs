@@ -14,7 +14,8 @@ use tiny_http::{Header, Method, Request, Response, Server};
 
 /// Addresses the user chose to download with the browser itself (the server
 /// refused KeRo Smarter Download): the extension leaves them to the browser once.
-static FOR_BROWSER: std::sync::Mutex<Vec<(String, std::time::Instant)>> = std::sync::Mutex::new(Vec::new());
+static FOR_BROWSER: std::sync::Mutex<Vec<(String, std::time::Instant)>> =
+    std::sync::Mutex::new(Vec::new());
 
 /// Version of the browser add-in that ships with this program.
 pub fn bundled_extension_version() -> String {
@@ -108,7 +109,11 @@ pub enum ApiEvent {
     Add(AddRequest),
     Links(LinksRequest),
     Show,
-    Import { path: std::path::PathBuf, name: String, source: String },
+    Import {
+        path: std::path::PathBuf,
+        name: String,
+        source: String,
+    },
     /// "Download all" on a playlist page: open the playlist window with it
     Playlist(String),
 }
@@ -116,7 +121,11 @@ pub enum ApiEvent {
 /// What the extension needs to know from Options (file types to take,
 /// sites to leave alone, keys, the video panel).
 pub fn config_json(s: &swiftget_engine::Settings) -> String {
-    let split = |t: &str| t.split_whitespace().map(|x| x.to_string()).collect::<Vec<_>>();
+    let split = |t: &str| {
+        t.split_whitespace()
+            .map(|x| x.to_string())
+            .collect::<Vec<_>>()
+    };
     serde_json::json!({
         "ok": true,
         "captureExts": split(&s.capture_exts.to_ascii_lowercase()),
@@ -140,7 +149,9 @@ pub fn bind(port: u16) -> Result<Server, String> {
 
 /// Another SwiftGet is already running on this port: ask it to show itself.
 pub fn notify_existing(port: u16) -> bool {
-    let Ok(mut s) = TcpStream::connect_timeout(&([127, 0, 0, 1], port).into(), Duration::from_millis(800)) else {
+    let Ok(mut s) =
+        TcpStream::connect_timeout(&([127, 0, 0, 1], port).into(), Duration::from_millis(800))
+    else {
         return false;
     };
     let _ = s.set_read_timeout(Some(Duration::from_secs(2)));
@@ -204,7 +215,9 @@ fn origin_allowed(origin: Option<&str>) -> bool {
     match origin {
         None => true,
         Some(o) => {
-            o.starts_with("chrome-extension://") || o.starts_with("moz-extension://") || o.starts_with("extension://")
+            o.starts_with("chrome-extension://")
+                || o.starts_with("moz-extension://")
+                || o.starts_with("extension://")
         }
     }
 }
@@ -230,7 +243,9 @@ fn handle(mut req: Request, config: &impl Fn() -> String, on_event: &impl Fn(Api
 
     let path = req.url().split('?').next().unwrap_or("").to_string();
     match (req.method().clone(), path.as_str()) {
-        (Method::Post, p) if p.starts_with("/import/") => crate::media_import::handle(req, on_event),
+        (Method::Post, p) if p.starts_with("/import/") => {
+            crate::media_import::handle(req, on_event)
+        }
         (Method::Get, "/ping") => {
             // "ext": the add-in version that came with this program; an older
             // add-in loaded from the program's folder reloads itself
@@ -244,7 +259,12 @@ fn handle(mut req: Request, config: &impl Fn() -> String, on_event: &impl Fn(Api
         (Method::Get, "/config") => reply(req, 200, &config()),
         (Method::Post, "/links") => {
             let mut body = String::new();
-            if req.as_reader().take(16 << 20).read_to_string(&mut body).is_err() {
+            if req
+                .as_reader()
+                .take(16 << 20)
+                .read_to_string(&mut body)
+                .is_err()
+            {
                 return reply(req, 400, r#"{"error":"bad body"}"#);
             }
             match serde_json::from_str::<LinksRequest>(&body) {
@@ -259,11 +279,26 @@ fn handle(mut req: Request, config: &impl Fn() -> String, on_event: &impl Fn(Api
         (Method::Post, "/browser") => {
             // should the browser keep this download? (see leave_to_browser)
             let mut body = String::new();
-            if req.as_reader().take(1 << 16).read_to_string(&mut body).is_err() {
+            if req
+                .as_reader()
+                .take(1 << 16)
+                .read_to_string(&mut body)
+                .is_err()
+            {
                 return reply(req, 400, r#"{"error":"bad body"}"#);
             }
-            let keep = serde_json::from_str::<BrowserQuery>(&body).map(|q| take_for_browser(&q.urls)).unwrap_or(false);
-            reply(req, 200, if keep { r#"{"browser":true}"# } else { r#"{"browser":false}"# })
+            let keep = serde_json::from_str::<BrowserQuery>(&body)
+                .map(|q| take_for_browser(&q.urls))
+                .unwrap_or(false);
+            reply(
+                req,
+                200,
+                if keep {
+                    r#"{"browser":true}"#
+                } else {
+                    r#"{"browser":false}"#
+                },
+            )
         }
         (Method::Post, "/show") => {
             on_event(ApiEvent::Show);
@@ -271,10 +306,18 @@ fn handle(mut req: Request, config: &impl Fn() -> String, on_event: &impl Fn(Api
         }
         (Method::Post, "/playlist") => {
             let mut body = String::new();
-            if req.as_reader().take(1 << 16).read_to_string(&mut body).is_err() {
+            if req
+                .as_reader()
+                .take(1 << 16)
+                .read_to_string(&mut body)
+                .is_err()
+            {
                 return reply(req, 400, r#"{"error":"bad body"}"#);
             }
-            match serde_json::from_str::<serde_json::Value>(&body).ok().and_then(|v| v["url"].as_str().map(String::from)) {
+            match serde_json::from_str::<serde_json::Value>(&body)
+                .ok()
+                .and_then(|v| v["url"].as_str().map(String::from))
+            {
                 Some(url) if is_http(&url) => {
                     on_event(ApiEvent::Playlist(url));
                     reply(req, 200, r#"{"ok":true}"#)
@@ -284,7 +327,12 @@ fn handle(mut req: Request, config: &impl Fn() -> String, on_event: &impl Fn(Api
         }
         (Method::Post, "/add") => {
             let mut body = String::new();
-            if req.as_reader().take(1 << 20).read_to_string(&mut body).is_err() {
+            if req
+                .as_reader()
+                .take(1 << 20)
+                .read_to_string(&mut body)
+                .is_err()
+            {
                 return reply(req, 400, r#"{"error":"bad body"}"#);
             }
             match serde_json::from_str::<AddRequest>(&body) {
@@ -302,7 +350,12 @@ fn handle(mut req: Request, config: &impl Fn() -> String, on_event: &impl Fn(Api
             // download choices for any page with a video (yt-dlp, a few
             // seconds), answered from its own thread so nothing else waits
             let mut body = String::new();
-            if req.as_reader().take(4 << 20).read_to_string(&mut body).is_err() {
+            if req
+                .as_reader()
+                .take(4 << 20)
+                .read_to_string(&mut body)
+                .is_err()
+            {
                 return reply(req, 400, r#"{"error":"bad body"}"#);
             }
             let Ok(r) = serde_json::from_str::<ResolveRequest>(&body) else {
@@ -313,7 +366,11 @@ fn handle(mut req: Request, config: &impl Fn() -> String, on_event: &impl Fn(Api
             }
             if RESOLVING.fetch_add(1, Ordering::SeqCst) >= MAX_RESOLVING {
                 RESOLVING.fetch_sub(1, Ordering::SeqCst);
-                return reply(req, 429, r#"{"ok":false,"error":"busy, try again in a moment"}"#);
+                return reply(
+                    req,
+                    429,
+                    r#"{"ok":false,"error":"busy, try again in a moment"}"#,
+                );
             }
             std::thread::spawn(move || {
                 struct Done;
@@ -329,7 +386,9 @@ fn handle(mut req: Request, config: &impl Fn() -> String, on_event: &impl Fn(Api
                     Ok(info) => serde_json::json!({
                         "ok": true, "title": info.title, "site": info.site, "options": info.options, "subtitles": info.subtitles
                     }),
-                    Err(e) => serde_json::json!({ "ok": false, "error": crate::err_text(&format!("{e:#}")) }),
+                    Err(e) => {
+                        serde_json::json!({ "ok": false, "error": crate::err_text(&format!("{e:#}")) })
+                    }
                 };
                 reply(req, 200, &body.to_string());
             });
@@ -344,11 +403,22 @@ mod tests {
 
     #[test]
     fn only_this_computer_by_its_own_name() {
-        for ok in [None, Some("127.0.0.1:9614"), Some("localhost:9614"), Some("127.0.0.1"), Some("[::1]:9614")] {
+        for ok in [
+            None,
+            Some("127.0.0.1:9614"),
+            Some("localhost:9614"),
+            Some("127.0.0.1"),
+            Some("[::1]:9614"),
+        ] {
             assert!(host_allowed(ok), "{ok:?}");
         }
         // DNS rebinding: the attacker's own name pointed at 127.0.0.1
-        for bad in [Some("evil.example:9614"), Some("127.0.0.1.evil.example"), Some("localhost.evil:9614"), Some("")] {
+        for bad in [
+            Some("evil.example:9614"),
+            Some("127.0.0.1.evil.example"),
+            Some("localhost.evil:9614"),
+            Some(""),
+        ] {
             assert!(!host_allowed(bad), "{bad:?}");
         }
     }
