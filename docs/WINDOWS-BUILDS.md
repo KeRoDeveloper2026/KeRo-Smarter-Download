@@ -43,7 +43,7 @@ References:
 ## Windows 7 compatibility preparation
 
 `tools/prepare-win7.py` checks the exact upstream source hashes of windows-core 0.62.2
-before redirecting three classic COM bindings from Combase to Ole32. Microsoft documents
+and windows 0.62.2 before redirecting six generated bindings for three classic COM functions from Combase to Ole32. Microsoft documents
 these functions in Ole32 on Windows 2000 and newer. No substitute system DLL is shipped.
 The build uses Microsoft's documented `windows_slim_errors` cfg: HRESULT error codes
 remain available, while extended COM/WinRT error information is omitted on legacy builds.
