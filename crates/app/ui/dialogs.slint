@@ -3715,112 +3715,93 @@ component PaymentCard inherits Rectangle {
     in property <color> brand-color;
     in property <color> detail-color;
     callback activate();
-    height: 270px;
+    width: 216px;
+    height: 218px;
     background: Theme.input-bg;
-    border-radius: 14px;
+    border-radius: 12px;
     border-width: 1px;
     border-color: Theme.line;
-    VerticalLayout {
-        padding: 10px;
-        spacing: 10px;
-        Rectangle {
-            background: #ffffff;
-            border-radius: 8px;
-            height: 198px;
-            Image { source: root.qr; image-fit: contain; }
-            TouchArea { clicked => { root.activate(); } }
+    Rectangle {
+        x: 32px; y: 10px; width: 152px; height: 152px;
+        background: #ffffff;
+        border-radius: 4px;
+        Image {
+            x: 4px; y: 4px; width: 144px; height: 144px;
+            source: root.qr; image-fit: contain;
         }
-        Rectangle {
-            height: 42px;
-            background: hit.has-hover ? root.detail-color : root.brand-color;
-            border-radius: 9px;
-            Rectangle { x: 10px; y: 10px; width: 5px; height: 22px; border-radius: 2px; background: root.detail-color; }
-            Text { text: root.brand; color: #ffffff; font-weight: 800; font-size: 20px; horizontal-alignment: center; vertical-alignment: center; }
-            hit := TouchArea { clicked => { root.activate(); } }
+        TouchArea { width: 152px; height: 152px; clicked => { root.activate(); } }
+    }
+    Rectangle {
+        x: 10px; y: 172px; width: 196px; height: 36px;
+        background: hit.has-hover ? root.detail-color : root.brand-color;
+        border-radius: 8px;
+        Rectangle { x: 9px; y: 9px; width: 4px; height: 18px; border-radius: 2px; background: root.detail-color; }
+        Text {
+            width: 196px; height: 36px;
+            text: root.brand; color: #ffffff; font-weight: 800; font-size: 18px;
+            horizontal-alignment: center; vertical-alignment: center;
         }
+        hit := TouchArea { width: 196px; height: 36px; clicked => { root.activate(); } }
     }
 }
 
 export component AboutDialog inherits ThemedWindow {
-    // set for a moment so the window comes in front of the browser
     in property <bool> front;
     always-on-top: root.front;
     title: @tr("About KeRo Smarter Download");
-    preferred-width: 560px;
-    preferred-height: 700px;
+    preferred-width: 520px;
     min-width: 500px;
-    min-height: 440px;
+    preferred-height: 600px;
+    min-height: 590px;
     in property <string> version;
     callback open-link(string);
     callback close-window();
-    ScrollView {
     VerticalLayout {
-        padding: 22px;
-        spacing: 10px;
+        padding: 16px;
+        spacing: 6px;
+        alignment: start;
         HRow {
+            height: 64px;
             alignment: center;
-            Image {
-                source: @image-url("kero-logo.png");
-                width: 96px;
-                height: 96px;
-            }
+            Image { width: 64px; height: 64px; source: @image-url("kero-logo.png"); image-fit: contain; }
         }
         Text {
-            text: "KeRo Smarter Download";
-            horizontal-alignment: center;
-            font-size: 20px * Theme.font-scale;
-            font-weight: 700;
-            color: Theme.text;
+            height: 28px; text: "KeRo Smarter Download";
+            horizontal-alignment: center; vertical-alignment: center;
+            font-size: 22px; font-weight: 700; color: Theme.text;
         }
-        Text {
-            text: @tr("Version {}", root.version);
-            horizontal-alignment: center;
-            color: Theme.muted;
-        }
-        Text {
-            text: @tr("Like KeRo Smarter Download? You can support its development:");
-            horizontal-alignment: center;
-            font-size: 12px * Theme.font-scale;
-            color: Theme.muted;
-            wrap: word-wrap;
-        }
-        HorizontalLayout {
-            spacing: 12px;
+        Text { height: 20px; text: @tr("Version {}", root.version); horizontal-alignment: center; color: Theme.muted; font-size: 12px; }
+        Text { height: 24px; text: "شكرًا لدعمك تطوير البرنامج"; horizontal-alignment: center; color: Theme.text; font-size: 15px; }
+        HRow {
+            height: 218px;
+            spacing: 16px;
+            alignment: center;
             PaymentCard {
-                qr: @image-url("instapay-qr.jpg");
-                brand: "inesta pay";
-                brand-color: #522065;
-                detail-color: #e87924;
+                qr: @image-url("instapay-qr.jpg"); brand: "InstaPay";
+                brand-color: #522065; detail-color: #e87924;
                 activate => { root.open-link("https://ipn.eg/S/kerohaz/instapay/1bOc4O"); }
             }
             PaymentCard {
-                qr: @image-url("etisalat-cash-qr.jpg");
-                brand: "e& cash";
-                brand-color: #c8102e;
-                detail-color: #222222;
+                qr: @image-url("etisalat-cash-qr.jpg"); brand: "e& cash";
+                brand-color: #c8102e; detail-color: #222222;
                 activate => { root.open-link("https://app.etisalat.eg/?appScreens=cash&appScreen=cash&extra=screenId:send_money;dial:01140797535"); }
             }
         }
+        Text { height: 22px; text: "امسح الرمز أو اضغط على وسيلة الدفع"; horizontal-alignment: center; color: Theme.muted; font-size: 12px; }
+        Text { height: 26px; text: "البرنامج مجاني تماماً"; horizontal-alignment: center; color: Theme.text; font-weight: 700; font-size: 17px; }
+        Text { height: 24px; text: "مع تحياتي المطور KeRo HaZem"; horizontal-alignment: center; color: Theme.text; font-size: 14px; }
+        Rectangle { height: 1px; background: Theme.line; }
         Rectangle {
-            height: 6px;
-        }
-        AboutSlint {
-            preferred-height: 90px;
+            height: 24px;
+            Text { width: 100%; height: 24px; text: "Made with Slint"; color: Theme.muted; horizontal-alignment: center; font-size: 11px; }
+            TouchArea { width: 100%; height: 24px; clicked => { root.open-link("https://slint.dev"); } }
         }
         HRow {
-            alignment: end;
-            Button {
-                text: @tr("Close");
-                primary: true;
-                clicked => {
-                    root.close-window();
-                }
-            }
+            height: 36px; alignment: end;
+            Button { text: @tr("Close"); primary: true; clicked => { root.close-window(); } }
         }
     }
-    }
 }
-
 
 // After an update: what is new, right to left in Arabic.
 export component WhatsNewDialog inherits ThemedWindow {
