@@ -11,7 +11,7 @@
 ![Windows](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=flat-square)
 ![Rust](https://img.shields.io/badge/Rust-engine-DEA584?style=flat-square&logo=rust&logoColor=white)
 ![Slint](https://img.shields.io/badge/Slint-desktop_UI-2379F4?style=flat-square)
-![Version](https://img.shields.io/badge/source-v1.1.1-0EA5A4?style=flat-square)
+![Version](https://img.shields.io/badge/source-v1.1.3-0EA5A4?style=flat-square)
 ![Languages](https://img.shields.io/badge/UI-8_languages-6366F1?style=flat-square)
 
 [البدء](#البدء) · [المميزات](#المميزات) · [إضافات المتصفح](#إضافات-المتصفح) · [البناء](#البناء-من-المصدر) · [English](docs/README.en.md)
@@ -24,13 +24,14 @@
 
 | الملف | رابط التنزيل | طريقة الاستخدام |
 |---|---|---|
-| مثبّت Windows مباشر | [تنزيل Setup — EXE](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.1/KeRoDownload-Setup.exe) | شغّل الملف لبدء التثبيت |
+| Windows 10/11 — 64-bit | [تنزيل Setup — x64](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-Setup.exe) | مثبّت النسخة 64-bit |
+| Windows 10/11 — 32-bit (x86) | [تنزيل Setup — x86](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win10_11-x86.exe) | برنامج 32-bit؛ يعمل أيضًا على Windows 11 عبر توافق x86 |
 | إضافة Chrome وBrave وEdge | [تنزيل إضافة Chromium](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Extension-Chromium.zip) | فك الضغط ثم اختر المجلد عبر Load unpacked |
 | إضافة Firefox | [تنزيل إضافة Firefox](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Extension-Firefox.zip) | فك الضغط ثم حمّل manifest.json مؤقتًا من about:debugging |
 | حزمة الإضافتين كاملة | [تنزيل حزمة الإضافات](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Smarter-Download.zip) | تحتوي على مجلدي extension وextension-firefox |
-| بصمة المثبّت وتوقيع التحديث | [version.json](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.1/version.json) | SHA-256 وتوقيع Ed25519 للمثبّت الجديد |
+| بصمة المثبّت وتوقيع التحديث | [version.json](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/version.json) | SHA-256 وتوقيع Ed25519 للمثبّت الجديد |
 
-**مهم:** ملف `KeRo-Smarter-Download.zip` هنا حزمة إضافات فقط. للحصول على المصدر الكامل استخدم **Code → Download ZIP**. نسخة Firefox غير موقّعة ومخصصة للتحميل المؤقت. مثبّت التطبيق 1.1.1 مبني عبر GitHub Actions؛ نجاح البناء لا يغني عن تجربة التثبيت والتشغيل الفعلي على Windows.
+**مهم:** ملف `KeRo-Smarter-Download.zip` هنا حزمة إضافات فقط. للحصول على المصدر الكامل استخدم **Code → Download ZIP**. نسخة Firefox غير موقّعة ومخصصة للتحميل المؤقت. مثبّت التطبيق 1.1.3 مبني عبر GitHub Actions؛ نجاح البناء لا يغني عن تجربة التثبيت والتشغيل الفعلي على Windows.
 
 ## عن المشروع
 
@@ -38,7 +39,7 @@
 
 تدعم الواجهة **العربية والإنجليزية والفرنسية والإسبانية والألمانية والبرتغالية والتركية والروسية**، مع اتجاه من اليمين إلى اليسار للعربية.
 
-> **حالة النسخة:** الإصدار **1.1.1** يربط التحديثات بهذا المستودع ويُرفق المثبّت مع `version.json` الموقّع في [الإصدار v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.1). ثبّت هذه النسخة يدويًا مرة واحدة بدل النسخة القديمة لتفعيل التحديثات التالية. اختبارات البناء نجحت؛ تجربة التثبيت والتشغيل الفعلي تحتاج إلى Windows.
+> **حالة النسخة:** الإصدار **1.1.3** يربط التحديثات بهذا المستودع ويُرفق المثبّت مع `version.json` الموقّع في [الإصدار v1.1.3](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3). ثبّت هذه النسخة يدويًا مرة واحدة بدل النسخة القديمة لتفعيل التحديثات التالية. اختبارات البناء نجحت؛ تجربة التثبيت والتشغيل الفعلي تحتاج إلى Windows.
 
 ## المميزات
 
@@ -57,13 +58,13 @@
 
 ## البدء
 
-1. نزّل **Setup — EXE** من جدول التحميل المباشر أعلاه.
-2. شغّل `KeRoDownload-Setup.exe` لتثبيت النسخة الجديدة.
+1. نزّل **Setup** المطابق لمعمارية جهازك من جدول التحميل المباشر أعلاه.
+2. شغّل ملف المثبّت الذي نزّلته لتثبيت النسخة الجديدة.
 3. افتح البرنامج وأضف رابطًا، أو نزّل إضافة متصفحك واتبع خطوات تركيبها أدناه.
 
 للحصول على إصدار تبنيه بنفسك، اتبع [البناء من المصدر](#البناء-من-المصدر). ملف المصدر الذي يوفّره GitHub عبر **Code → Download ZIP** يحتاج إلى تجميع، بعكس ملف المثبّت المرفق.
 
-**متطلبات التشغيل:** Windows 10 أو Windows 11 بنواة 64-bit، واتصال بالإنترنت. التثبيت مخصص للمستخدم الحالي؛ أما تثبيت أدوات التطوير أثناء البناء فقد يطلب صلاحيات المسؤول.
+**متطلبات التشغيل:** Windows 10 بنواة 32-bit أو 64-bit، أو Windows 11 بنواة 64-bit مع دعم تطبيقات x86، واتصال بالإنترنت. يجري تجهيز نسختين تجريبيتين مستقلتين لـWindows 7 SP1؛ راجع [حالة بناء Windows](docs/WINDOWS-BUILDS.md). التثبيت مخصص للمستخدم الحالي؛ أما تثبيت أدوات التطوير أثناء البناء فقد يطلب صلاحيات المسؤول.
 
 ### متابعة التنزيل باللوجو العائم
 
