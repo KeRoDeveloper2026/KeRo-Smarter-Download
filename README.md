@@ -11,10 +11,11 @@
 ![Windows](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=flat-square)
 ![Rust](https://img.shields.io/badge/Rust-engine-DEA584?style=flat-square&logo=rust&logoColor=white)
 ![Slint](https://img.shields.io/badge/Slint-desktop_UI-2379F4?style=flat-square)
-![Version](https://img.shields.io/badge/source-v1.1.3-0EA5A4?style=flat-square)
+[![Version](https://img.shields.io/badge/release-v1.1.3-0EA5A4?style=flat-square)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3)
+![Windows 7 Experimental](https://img.shields.io/badge/Windows_7-SP1_Experimental-B7791F?style=flat-square)
 ![Languages](https://img.shields.io/badge/UI-8_languages-6366F1?style=flat-square)
 
-[البدء](#البدء) · [المميزات](#المميزات) · [إضافات المتصفح](#إضافات-المتصفح) · [البناء](#البناء-من-المصدر) · [English](docs/README.en.md)
+[تحميل البرنامج](#التحميل-المباشر) · [البدء](#البدء) · [المميزات](#المميزات) · [إضافات المتصفح](#إضافات-المتصفح) · [البناء](#البناء-من-المصدر) · [English](docs/README.en.md)
 
 </div>
 
@@ -22,18 +23,57 @@
 
 ## التحميل المباشر
 
-| الملف | رابط التنزيل | طريقة الاستخدام |
-|---|---|---|
-| Windows 10/11 — 64-bit | [تنزيل Setup — x64](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-Setup.exe) | مثبّت النسخة 64-bit |
-| Windows 10/11 — 32-bit (x86) | [تنزيل Setup — x86](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win10_11-x86.exe) | برنامج 32-bit؛ يعمل أيضًا على Windows 11 عبر توافق x86 |
-| Windows 7 SP1 — 64-bit (تجريبي) | [تنزيل Setup — Win7 x64](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win7-Experimental-x64.exe) | اجتاز فحوص البناء؛ يحتاج اختبار تشغيل على Windows 7 فعلي |
-| Windows 7 SP1 — 32-bit (x86، تجريبي) | [تنزيل Setup — Win7 x86](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win7-Experimental-x86.exe) | اجتاز فحوص البناء؛ يحتاج اختبار تشغيل على Windows 7 فعلي |
-| إضافة Chrome وBrave وEdge | [تنزيل إضافة Chromium](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Extension-Chromium.zip) | فك الضغط ثم اختر المجلد عبر Load unpacked |
-| إضافة Firefox | [تنزيل إضافة Firefox](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Extension-Firefox.zip) | فك الضغط ثم حمّل manifest.json مؤقتًا من about:debugging |
-| حزمة الإضافتين كاملة | [تنزيل حزمة الإضافات](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Smarter-Download.zip) | تحتوي على مجلدي extension وextension-firefox |
-| بصمة المثبّت وتوقيع التحديث | [version.json](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/version.json) | SHA-256 وتوقيع Ed25519 للمثبّت الجديد |
+**الإصدار الحالي: v1.1.3 · البرنامج مجاني تمامًا**
 
-**مهم:** ملف `KeRo-Smarter-Download.zip` هنا حزمة إضافات فقط. للحصول على المصدر الكامل استخدم **Code → Download ZIP**. نسخة Firefox غير موقّعة ومخصصة للتحميل المؤقت. مثبّت التطبيق 1.1.3 مبني عبر GitHub Actions؛ نجاح البناء لا يغني عن تجربة التثبيت والتشغيل الفعلي على Windows.
+اختر المثبّت المناسب لنظام جهازك ونوعه. اضغط زر التحميل في الصف المطلوب لتنزيل ملف **EXE** مباشرة.
+
+| نظام التشغيل | نوع النسخة | التحميل المباشر | الحالة |
+|---|---|---|---|
+| **Windows 10 / Windows 11** | 64-bit · x64 | [![تحميل Windows 10 / Windows 11 64-bit · x64](https://img.shields.io/badge/Download-Win10%2F11%20x64-0078D4?style=for-the-badge)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-Setup.exe) | النسخة الأساسية |
+| **Windows 10 / Windows 11** | 32-bit · x86 | [![تحميل Windows 10 / Windows 11 32-bit · x86](https://img.shields.io/badge/Download-Win10%2F11%20x86-0078D4?style=for-the-badge)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win10_11-x86.exe) | تطبيق 32-bit |
+| **Windows 7 SP1** | 64-bit · x64 | [![تحميل Windows 7 SP1 64-bit · x64](https://img.shields.io/badge/Download-Win7%20x64%20Experimental-B7791F?style=for-the-badge)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win7-Experimental-x64.exe) | تجريبي |
+| **Windows 7 SP1** | 32-bit · x86 | [![تحميل Windows 7 SP1 32-bit · x86](https://img.shields.io/badge/Download-Win7%20x86%20Experimental-B7791F?style=for-the-badge)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win7-Experimental-x86.exe) | تجريبي |
+
+**كيف تختار نسختك؟**
+- **Windows 10 بنواة 32-bit:** اختر Win10/11 x86.
+- **Windows 10 أو Windows 11 بنواة 64-bit:** اختر Win10/11 x64. نسخة x86 متاحة أيضًا كتطبيق 32-bit.
+- **Windows 7 SP1:** اختر Win7 x64 أو Win7 x86 وفق نوع نظامك.
+
+لمعرفة نوع النظام، افتح **لوحة التحكم → النظام → نوع النظام (System type)**. تسميتا x86 و32-bit تعنيان النسخة نفسها.
+
+> **نسختا Windows 7 تجريبيتان:** نجحت اختبارات المحرك وفحوص ملفات البرنامج والأدوات على Windows Server 2022. لم يُختبر التثبيت والتشغيل أو تكامل المتصفح على جهاز Windows 7 فعلي بعد. [تفاصيل التوافق والفحوص](docs/WINDOWS-BUILDS.md).
+
+### الإضافات المرفقة والتحميل المنفصل
+
+**المثبّت يتضمن البرنامج والأدوات المساعدة ومجلدي الإضافات.** بعد التثبيت، استخدم مجلد `extension` لمتصفحات Chrome وBrave وEdge، أو `extension-firefox` لمتصفح Firefox من داخل مجلد تثبيت البرنامج. [خطوات تركيب الإضافة](#إضافات-المتصفح).
+
+**لمستخدمي Windows 7:** استخدم الإضافة المرفقة مع مثبّت Win7؛ حزمة Firefox داخلها مجهزة لـ**Firefox 115 ESR**. تشغيل الإضافات على Windows 7 ما زال بحاجة إلى تجربة فعلية.
+
+الروابط التالية لتنزيل الإضافات منفصلة، وهي حزم منشورة سابقًا ضمن **v1.1.0**:
+
+| الإضافة | رابط التنزيل | طريقة التركيب |
+|---|---|---|
+| Chrome / Brave / Edge | [تنزيل إضافة Chromium — ZIP](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Extension-Chromium.zip) | فك الضغط ثم اختر المجلد عبر Load unpacked |
+| Firefox | [تنزيل إضافة Firefox — ZIP](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Extension-Firefox.zip) | تحميل مؤقت من about:debugging؛ الإضافة غير موقّعة |
+| الإضافتان معًا | [تنزيل حزمة الإضافات — ZIP](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Smarter-Download.zip) | مجلدا الإضافات في حزمة واحدة |
+
+[عرض كل ملفات الإصدار v1.1.3](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3) · [المصدر الكامل — Code → Download ZIP](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download)
+
+<details>
+<summary>التحقق من الملفات وبيانات التحديث</summary>
+
+كل نسخة لها ملف تحديث مستقل يتضمن بصمة SHA-256 وتوقيع Ed25519. هذه ملفات بيانات وليست ملفات تثبيت.
+
+| النسخة | ملف التحديث |
+|---|---|
+| Windows 10/11 — x64 | [version.json](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/version.json) |
+| Windows 10/11 — x86 | [version-Win10_11-x86.json](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/version-Win10_11-x86.json) |
+| Windows 7 — x64 | [version-Win7-x64.json](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/version-Win7-x64.json) |
+| Windows 7 — x86 | [version-Win7-x86.json](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/version-Win7-x86.json) |
+
+أرشيف `KeRo-Smarter-Download.zip` في جدول الإضافات يحتوي على الإضافات فقط. المصدر الكامل يُنزّل من **Code → Download ZIP** ويحتاج إلى تجميع.
+
+</details>
 
 ## عن المشروع
 
@@ -62,7 +102,7 @@
 
 1. نزّل **Setup** المطابق لمعمارية جهازك من جدول التحميل المباشر أعلاه.
 2. شغّل ملف المثبّت الذي نزّلته لتثبيت النسخة الجديدة.
-3. افتح البرنامج وأضف رابطًا، أو نزّل إضافة متصفحك واتبع خطوات تركيبها أدناه.
+3. افتح البرنامج وأضف رابطًا، أو ركّب إضافة متصفحك المرفقة مع المثبّت واتبع خطوات تركيبها أدناه.
 
 للحصول على إصدار تبنيه بنفسك، اتبع [البناء من المصدر](#البناء-من-المصدر). ملف المصدر الذي يوفّره GitHub عبر **Code → Download ZIP** يحتاج إلى تجميع، بعكس ملف المثبّت المرفق.
 
@@ -82,7 +122,7 @@
 
 ### Chrome وBrave وEdge
 
-1. فك ضغط المصدر أو انسخ المستودع إلى جهازك.
+1. استخدم مجلد `extension` داخل مجلد تثبيت البرنامج، أو فك ضغط حزمة الإضافة المنفصلة.
 2. افتح `chrome://extensions` أو `brave://extensions` أو `edge://extensions`.
 3. فعّل **Developer mode** ثم اختر **Load unpacked**.
 4. اختر مجلد [`extension`](extension)، ثم أعد تحميل صفحة الموقع.
@@ -93,7 +133,7 @@
 
 1. افتح `about:debugging#/runtime/this-firefox`.
 2. اختر **Load Temporary Add-on**.
-3. اختر [`extension-firefox/manifest.json`](extension-firefox/manifest.json).
+3. اختر `manifest.json` من مجلد `extension-firefox` داخل مجلد تثبيت البرنامج. لمستخدمي Windows 7، استخدم المجلد المرفق مع مثبّت Win7 لتثبيت نسخة Firefox 115 ESR.
 
 الإضافة المرفقة غير موقّعة، والتحميل بهذه الطريقة مؤقت ويحتاج إلى تكراره بعد إعادة تشغيل Firefox. متطلب إصدار Firefox في الحزم الحديثة هو **140 أو أحدث**؛ أما حزم Windows 7 التجريبية فتتضمن manifest مخصصًا لـ**Firefox 115 ESR**. التوزيع الدائم يحتاج إلى حزمة موقّعة من Mozilla؛ ملف XPI غير الموقّع مخصص للتطوير.
 
