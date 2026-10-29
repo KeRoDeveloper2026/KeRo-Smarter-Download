@@ -17,7 +17,7 @@ Valid Authenticode signing can identify the certificate publisher, but does not 
 - Project owner: KeRo HaZem ([KeRoDeveloper2026](https://github.com/KeRoDeveloper2026))
 - [Source repository](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download)
 - [Release downloads](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases)
-- Contact supplied by the owner: [tazemcom22@gmail.com](mailto:tazemcom22@gmail.com)
+- Contact supplied by the owner: [centerinformation2030@gmail.com](mailto:centerinformation2030@gmail.com)
 - Security reports: follow [SECURITY.md](SECURITY.md). Do not publish cookies, passwords, private links or exploitation details in public issues.
 
 ## Two separate kinds of signing

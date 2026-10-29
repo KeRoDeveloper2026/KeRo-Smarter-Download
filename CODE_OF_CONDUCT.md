@@ -28,7 +28,7 @@ The project owner is responsible for clarifying these standards and may remove, 
 
 ## Reporting
 
-Report violations to the project owner at [tazemcom22@gmail.com](mailto:tazemcom22@gmail.com). Use private GitHub vulnerability reporting only if it is enabled and the report concerns a security vulnerability; see [SECURITY.md](SECURITY.md). Reports will be reviewed fairly, with the reporter’s privacy respected and details shared only as needed to address the incident. Absolute confidentiality cannot be guaranteed.
+Report violations to the project owner at [centerinformation2030@gmail.com](mailto:centerinformation2030@gmail.com). Use private GitHub vulnerability reporting only if it is enabled and the report concerns a security vulnerability; see [SECURITY.md](SECURITY.md). Reports will be reviewed fairly, with the reporter’s privacy respected and details shared only as needed to address the incident. Absolute confidentiality cannot be guaranteed.
 
 ## Attribution
 
