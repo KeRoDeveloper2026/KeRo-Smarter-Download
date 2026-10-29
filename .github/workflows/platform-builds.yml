@@ -90,7 +90,19 @@ jobs:
         run: |
           $extra = @()
           if ('${{ matrix.legacy }}' -eq 'true') { $extra = @('-Z', 'build-std=std,panic_abort', '--features', 'legacy-win7') }
-          cargo build --release --target ${{ matrix.target }} @extra
+          if ('${{ matrix.legacy }}' -eq 'true') {
+            cargo fetch --target ${{ matrix.target }}
+            if ($LASTEXITCODE -ne 0) { throw 'Dependency fetch failed' }
+            $legacyCargoRoot = if ($env:CARGO_HOME) { $env:CARGO_HOME } else { Join-Path $env:USERPROFILE '.cargo' }
+            $legacyPackage = if ('${{ matrix.arch }}' -eq 'x86') { 'windows_i686_msvc' } else { 'windows_x86_64_msvc' }
+            $legacyImportDir = (Resolve-Path "$legacyCargoRoot/registry/src/*/$legacyPackage-0.48.5/lib" | Select-Object -First 1).Path
+            if (-not $legacyImportDir) { throw 'Legacy Windows import libraries are missing' }
+            # Version 0.48's build script only recognizes the pc vendor, so
+            # pass its verified Cargo package library to the final app link.
+            cargo rustc -p swiftget --release --target ${{ matrix.target }} @extra -- "-Lnative=$legacyImportDir"
+          } else {
+            cargo build --release --target ${{ matrix.target }} @extra
+          }
           if ($LASTEXITCODE -ne 0) { throw 'Application build failed' }
           cargo test -p swiftget-engine --target ${{ matrix.target }} @extra
           if ($LASTEXITCODE -ne 0) { throw 'Engine tests failed' }
