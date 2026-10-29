@@ -32,13 +32,13 @@
 
 > **Windows 7 के संस्करण प्रयोगात्मक हैं।** Windows Server 2022 पर बिल्ड, डाउनलोड इंजन के परीक्षण, सहायक टूल और निर्भरता की जाँच सफल रही। वास्तविक Windows 7 डिवाइस पर इंस्टॉलेशन, इंटरफ़ेस और ब्राउज़र इंटीग्रेशन का परीक्षण अभी नहीं हुआ है। [अनुकूलता की जानकारी (अंग्रेज़ी)](WINDOWS-BUILDS.md).
 
-## एक्सटेंशन अपडेट — v1.1.1
+## एक्सटेंशन अपडेट — v1.1.4
 
 नीचे से सही पैकेज डाउनलोड करें; डेस्कटॉप प्रोग्राम दोबारा इंस्टॉल करने की ज़रूरत नहीं है। v1.1.4 इंस्टॉलर में एक्सटेंशन 1.1.1 शामिल है; पुराने इंस्टॉलर में पहले का संस्करण हो सकता है। नया पैकेज निकालकर उसका फ़ोल्डर लोड करें, पुराने डुप्लिकेट एक्सटेंशन बंद करें और खुले पेज रीफ़्रेश करें। Chromium पैकेज Windows पर Chrome, Brave, Edge, Opera / Opera GX और Vivaldi के लिए है। Safari और मोबाइल ब्राउज़र शामिल नहीं हैं।
 
-- [Chromium — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Chromium.zip)
-- [Firefox 140+ — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Firefox.zip)
-- [Firefox 115 ESR / Win7 — v1.1.1 (प्रयोगात्मक)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Firefox-Win7.zip)
+- [Chromium — v1.1.4](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.4-Chromium.zip)
+- [Firefox 140+ — v1.1.4](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.4-Firefox.zip)
+- [Firefox 115 ESR / Win7 — v1.1.4 (प्रयोगात्मक)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.4-Firefox-Win7.zip)
 
 [अनुकूलता और परीक्षण की सीमा (अरबी / अंग्रेज़ी)](BROWSERS.md)
 

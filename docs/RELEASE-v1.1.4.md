@@ -34,3 +34,7 @@ All automated runtime checks ran on Windows Server 2022. Actual Windows 7 runtim
 Exit the app from the system tray before a manual upgrade. Ed25519 update signatures do not add a Windows publisher certificate; existing Windows trust warnings may still appear.
 
 البرنامج مجاني تمامًا — مع تحيات المطور KeRo HaZem.
+
+## Independent browser extension 1.1.4
+
+Standalone Chromium, Firefox and Firefox-Win7 packages now use version 1.1.4 to match the app. This is a version-number alignment; browser logic and permissions are unchanged. Original desktop installers remain byte-for-byte unchanged and still bundle extension 1.1.1. Update the extension using the separate ZIP package and reload it; Firefox packages remain unsigned temporary-loading packages. New source builds enforce synchronized app/extension versions.

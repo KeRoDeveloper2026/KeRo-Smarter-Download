@@ -74,17 +74,17 @@
 
 **لمستخدمي Windows 7:** اختر حزمة **Firefox-Win7** المحدثة أدناه لإصدار **Firefox 115 ESR**. تشغيل الإضافات على Windows 7 ما زال بحاجة إلى تجربة فعلية.
 
-الإضافات المحدثة **v1.1.1** متاحة كتنزيلات مستقلة وتعمل مع البرنامج المثبّت 1.1.3 و1.1.4؛ تتضمن مثبّتات v1.1.4 الإضافة 1.1.1 بالفعل:
+الإضافات المحدثة **v1.1.4** متاحة كتنزيلات مستقلة وتعمل مع البرنامج المثبّت 1.1.3 و1.1.4؛ رقم حزم الإضافة الجديدة موحّد مع البرنامج. مثبّتات v1.1.4 المنشورة ما زالت تتضمن الإضافة 1.1.1؛ استخدم الحزم المستقلة أدناه لتحديث الإضافة دون إعادة تثبيت البرنامج:
 
 | المتصفح | الحزمة المحدثة | طريقة التركيب |
 |---|---|---|
-| Chrome / Brave / Edge / Opera / Opera GX / Vivaldi | [تنزيل إضافة Chromium — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Chromium.zip) | فك الضغط ثم Developer mode → Load unpacked → مجلد `extension` |
-| Firefox 140 أو أحدث | [تنزيل إضافة Firefox — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Firefox.zip) | تحميل `extension-firefox/manifest.json` مؤقتًا من about:debugging |
-| Firefox 115 ESR على Windows 7 — تجريبي | [تنزيل إضافة Firefox-Win7 — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Firefox-Win7.zip) | الحزمة المخصصة للمتصفح القديم؛ تحتاج اختبارًا فعليًا على Win7 |
+| Chrome / Brave / Edge / Opera / Opera GX / Vivaldi | [تنزيل إضافة Chromium — v1.1.4](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.4-Chromium.zip) | فك الضغط ثم Developer mode → Load unpacked → مجلد `extension` |
+| Firefox 140 أو أحدث | [تنزيل إضافة Firefox — v1.1.4](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.4-Firefox.zip) | تحميل `extension-firefox/manifest.json` مؤقتًا من about:debugging |
+| Firefox 115 ESR على Windows 7 — تجريبي | [تنزيل إضافة Firefox-Win7 — v1.1.4](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.4-Firefox-Win7.zip) | الحزمة المخصصة للمتصفح القديم؛ تحتاج اختبارًا فعليًا على Win7 |
 
 **بعد تحديث الإضافة:** أوقف أي نسخة قديمة مكررة، وشغّل البرنامج، ثم حدّث تبويبات المواقع المفتوحة بـ**Ctrl+R** مرة واحدة لتشغيل الكود الجديد.
 
-[دليل المتصفحات وحالة التحقق](docs/BROWSERS.md) · [بصمات الحزم SHA-256](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extensions-v1.1.1-SHA256SUMS.txt) · [الإضافات القديمة v1.1.0](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.0)
+[دليل المتصفحات وحالة التحقق](docs/BROWSERS.md) · [بصمات الحزم SHA-256](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extensions-v1.1.4-SHA256SUMS.txt) · [الإضافات القديمة v1.1.0](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.0)
 
 [عرض كل ملفات الإصدار v1.1.4](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.4) · [المصدر الكامل — Code → Download ZIP](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download)
 
@@ -234,7 +234,7 @@ node extension/test/content.sim.js --firefox
 | المشكلة | الخطوة المقترحة |
 |---|---|
 | `ffmpeg.exe` غير موجود | شغّل `REPAIR-FFMPEG.bat` ثم أعد فتح التطبيق واستأنف التنزيل؛ يحتاج الإصلاح إلى الإنترنت ويتحقق من الملف المنزّل |
-| `Extension context invalidated` | ثبّت تحديث الإضافة v1.1.1، ثم حدّث صفحات المواقع المفتوحة مرة واحدة؛ الكود القديم في التبويب لا يتغير تلقائيًا |
+| `Extension context invalidated` | ثبّت تحديث الإضافة v1.1.4، ثم حدّث صفحات المواقع المفتوحة مرة واحدة؛ الكود القديم في التبويب لا يتغير تلقائيًا |
 | الإضافة لا ترسل التنزيل | تأكد من تشغيل التطبيق والإضافة، وأعد تحميل الصفحة، وأوقف النسخ القديمة المتكررة |
 | لا تظهر كل الجودات | قد يقيّد الموقع الجودات أو يحتاج إلى جلسة دخول؛ أعد تحليل الرابط وتحقق من صلاحية الوصول |
 | تحذير SmartScreen | قد يظهر للملفات غير الموقّعة؛ تحقّق من مصدر الملف قبل تشغيله |

@@ -68,17 +68,17 @@ Run your selected EXE installer, open the app and add a download link. Installer
 
 ### Browser extension downloads
 
-Standalone extension update **v1.1.1** works with desktop apps 1.1.3 and 1.1.4; v1.1.4 installers already bundle extension 1.1.1:
+Standalone extension **v1.1.4** matches the app version and works with desktop apps 1.1.3 and 1.1.4. Published v1.1.4 installers still bundle extension 1.1.1; update with the independent package below without reinstalling the desktop app:
 
 | Desktop browser on Windows | Updated extension |
 |---|---|
-| Chrome, Brave, Edge, Opera / Opera GX, Vivaldi | [Chromium v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Chromium.zip) |
-| Firefox 140+ | [Firefox v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Firefox.zip) |
-| Firefox 115 ESR on Windows 7 (experimental) | [Firefox-Win7 v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.1-Firefox-Win7.zip) |
+| Chrome, Brave, Edge, Opera / Opera GX, Vivaldi | [Chromium v1.1.4](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.4-Chromium.zip) |
+| Firefox 140+ | [Firefox v1.1.4](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.4-Firefox.zip) |
+| Firefox 115 ESR on Windows 7 (experimental) | [Firefox-Win7 v1.1.4](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extension-v1.1.4-Firefox-Win7.zip) |
 
 Extract to a permanent folder, load the updated extension folder and disable any duplicate old copy. Refresh existing website tabs once after the update. The v1.1.4 installers include extension 1.1.1; older installers may contain earlier extension versions.
 
-[Package SHA-256 checksums](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extensions-v1.1.1-SHA256SUMS.txt) · [Browser compatibility and validation details](BROWSERS.md). API simulations passed; live testing on every listed browser and Windows 7 is still required. Safari and mobile browser packages are not included.
+[Package SHA-256 checksums](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.4/KeRo-Extensions-v1.1.4-SHA256SUMS.txt) · [Browser compatibility and validation details](BROWSERS.md). API simulations passed; live testing on every listed browser and Windows 7 is still required. Safari and mobile browser packages are not included.
 
 Extension ZIP files contain the extension and installation instructions, not the desktop installer. For full source, use **Code → Download ZIP**. Each installer has a separate signed update manifest in [release v1.1.4](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.4). Checksums for the older v1.1.0 assets are available in [that release's SHA256SUMS.txt](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/SHA256SUMS.txt). Generated ZIP/XPI packages are published in Releases rather than tracked in Git.
 
