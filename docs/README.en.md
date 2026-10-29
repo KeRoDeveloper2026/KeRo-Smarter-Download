@@ -100,8 +100,8 @@ The extension communicates with the desktop app over loopback and may pass downl
 
 See [contribution guidance](../CONTRIBUTING.md), [security reporting](../SECURITY.md) and [third-party notices](../THIRD-PARTY-NOTICES.txt).
 
-## License status
+## License
 
-The supplied Cargo metadata says MIT, while the original documentation states all rights reserved. No standalone LICENSE file was supplied. The owner must clarify the intended license; this documentation does not grant a new license.
+The project's original code is licensed under **[GNU GPL-3.0-only](../LICENSE)**. **Copyright (c) 2026 KeRo HaZem.** The official app is free of charge. Distributed modified versions must provide corresponding source to their recipients under the GPL; commercial use is allowed and private modifications need not be published. Third-party components retain their own terms. See [licensing details](LICENSING.md).
 
 Developed by **KeRo** — [KeRoDeveloper2026](https://github.com/KeRoDeveloper2026).

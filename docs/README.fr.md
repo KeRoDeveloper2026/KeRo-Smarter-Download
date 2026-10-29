@@ -73,3 +73,7 @@ L’extension communique localement avec l’application et peut transmettre les
 [Tous les fichiers de la version](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3) · [Guide technique et statut de la licence (anglais)](README.en.md) · [Signaler un problème](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/issues)
 
 Développé par **KeRo HaZem**.
+
+## Licence
+
+Le code original du projet est sous licence **[GNU GPL-3.0-only](../LICENSE)**. Copyright (c) 2026 KeRo HaZem. La version officielle est gratuite. Les composants tiers conservent leurs propres licences. [Détails (arabe / anglais)](LICENSING.md).

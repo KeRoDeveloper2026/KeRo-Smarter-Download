@@ -71,6 +71,8 @@ https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/blob/main/docs/BROWSE
     ):
         payload = {f'{folder}/{name}': data for name, data in entries.items()}
         payload[f'{folder}/manifest.json'] = (json.dumps(manifest, ensure_ascii=False, indent=2) + '\n').encode()
+        for legal_name in ('LICENSE', 'COPYRIGHT', 'THIRD-PARTY-NOTICES.txt'):
+            payload[legal_name] = (ROOT / legal_name).read_bytes()
         payload['INSTALL-README.txt'] = ('\ufeff' + instructions).encode()
         for name in manifest['content_scripts'][0]['js']:
             if f'{folder}/{name}' not in payload:

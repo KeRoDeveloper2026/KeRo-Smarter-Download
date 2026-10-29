@@ -73,3 +73,7 @@ La extensión se comunica localmente con la aplicación y puede enviar las cooki
 [Todos los archivos de la versión](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3) · [Guía técnica y estado de la licencia (inglés)](README.en.md) · [Informar de un problema](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/issues)
 
 Desarrollado por **KeRo HaZem**.
+
+## Licencia
+
+El código original del proyecto está bajo **[GNU GPL-3.0-only](../LICENSE)**. Copyright (c) 2026 KeRo HaZem. La versión oficial es gratuita. Los componentes de terceros conservan sus propias licencias. [Detalles (árabe / inglés)](LICENSING.md).

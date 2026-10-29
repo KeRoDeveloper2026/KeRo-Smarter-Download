@@ -192,7 +192,7 @@ jobs:
           $p = "build-cache/stage"
           New-Item -ItemType Directory -Force "$p/tools", "dist" | Out-Null
           Copy-Item target/release/KeRoDownload.exe $p
-          Copy-Item THIRD-PARTY-NOTICES.txt $p
+          Copy-Item LICENSE, COPYRIGHT, THIRD-PARTY-NOTICES.txt $p
           Copy-Item -Recurse extension "$p/extension"
           Copy-Item -Recurse extension "$p/extension-firefox"
           Remove-Item -Recurse -Force "$p/extension/test"

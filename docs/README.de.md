@@ -73,3 +73,7 @@ Die Erweiterung kommuniziert lokal mit der Anwendung und kann Cookies sowie den 
 [Alle Dateien der Version](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3) · [Technische Anleitung und Lizenzstatus (Englisch)](README.en.md) · [Problem melden](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/issues)
 
 Entwickelt von **KeRo HaZem**.
+
+## Lizenz
+
+Der ursprüngliche Projektcode steht unter **[GNU GPL-3.0-only](../LICENSE)**. Copyright (c) 2026 KeRo HaZem. Die offizielle Version ist kostenlos. Für Drittanbieterkomponenten gelten deren eigene Lizenzen. [Details (Arabisch / Englisch)](LICENSING.md).

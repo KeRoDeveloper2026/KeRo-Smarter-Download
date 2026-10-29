@@ -73,3 +73,7 @@
 [リリースの全ファイル](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3) · [技術ガイドとライセンスの状況（英語）](README.en.md) · [問題を報告](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/issues)
 
 開発：**KeRo HaZem**。
+
+## ライセンス
+
+プロジェクト独自のコードは **[GNU GPL-3.0-only](../LICENSE)** の下で提供されます。Copyright (c) 2026 KeRo HaZem。公式版は無料です。第三者のコンポーネントには、それぞれのライセンスが適用されます。[詳細（アラビア語 / 英語）](LICENSING.md)。

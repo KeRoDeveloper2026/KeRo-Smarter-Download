@@ -70,6 +70,8 @@ Name: "autostart"; Description: "Start KeRo Smarter Download when Windows starts
 
 [Files]
 Source: "{#Stage}\{#MyAppExe}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#Stage}\LICENSE"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#Stage}\COPYRIGHT"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#Stage}\THIRD-PARTY-NOTICES.txt"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 ; the helpers go into {app}\tools; the app updates them there by itself
 Source: "{#Stage}\tools\ffmpeg.exe"; DestDir: "{app}\tools"; Flags: ignoreversion

@@ -1,0 +1,12 @@
+KeRo Smarter Download
+Copyright (c) 2026 KeRo HaZem
+
+SPDX-License-Identifier: GPL-3.0-only
+
+The project's original code and documentation are licensed under the GNU
+General Public License version 3 only. See LICENSE for the complete terms.
+Third-party code, libraries, assets and helper executables retain their own
+copyrights and licenses; see THIRD-PARTY-NOTICES.txt.
+
+This licensing decision applies from this commit forward. It does not revoke
+permissions validly granted for earlier copies under another license.

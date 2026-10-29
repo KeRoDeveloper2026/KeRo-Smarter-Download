@@ -200,7 +200,7 @@ if (-not (Test-Path "$cache\aria2c.exe")) {
 $redist = Join-Path $cache "redist"
 New-Item -ItemType Directory -Force $redist | Out-Null
 if (Test-Path "$cache\vc_redist.x64.exe") { Copy-Item "$cache\vc_redist.x64.exe" $redist -Force }
-Copy-Item "THIRD-PARTY-NOTICES.txt" $stage -Force
+Copy-Item "LICENSE", "COPYRIGHT", "THIRD-PARTY-NOTICES.txt" $stage -Force
 # the Firefox add-on signed by Mozilla for this version (stays in Firefox for good)
 $extVersion = (Get-Content (Join-Path $PSScriptRoot "extension\manifest.firefox.json") -Raw | ConvertFrom-Json).version
 $signedXpi = "extension-signed\kero-download-firefox-$extVersion.xpi"

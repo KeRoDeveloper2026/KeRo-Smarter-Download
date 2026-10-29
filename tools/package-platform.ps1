@@ -7,7 +7,7 @@ $machine = if ($x86) { 0x14c } else { 0x8664 }
 $stage = 'build-cache/stage'
 New-Item -ItemType Directory -Force "$stage/tools", dist | Out-Null
 Copy-Item "target/$Target/release/KeRoDownload.exe" $stage
-Copy-Item THIRD-PARTY-NOTICES.txt $stage
+Copy-Item LICENSE, COPYRIGHT, THIRD-PARTY-NOTICES.txt $stage
 Copy-Item -Recurse extension "$stage/extension"
 Copy-Item -Recurse extension "$stage/extension-firefox"
 Remove-Item -Recurse -Force "$stage/extension/test", "$stage/extension-firefox/test" -ErrorAction SilentlyContinue

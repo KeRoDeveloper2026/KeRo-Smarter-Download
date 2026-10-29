@@ -73,3 +73,7 @@ Uzantı uygulamayla yerel olarak iletişim kurar ve indirme için gereken çerez
 [Sürümün tüm dosyaları](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3) · [Teknik kılavuz ve lisans durumu (İngilizce)](README.en.md) · [Sorun bildir](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/issues)
 
 Geliştirici: **KeRo HaZem**.
+
+## Lisans
+
+Projenin özgün kodu **[GNU GPL-3.0-only](../LICENSE)** lisansı altındadır. Copyright (c) 2026 KeRo HaZem. Resmî sürüm ücretsizdir. Üçüncü taraf bileşenler kendi lisanslarını korur. [Ayrıntılar (Arapça / İngilizce)](LICENSING.md).

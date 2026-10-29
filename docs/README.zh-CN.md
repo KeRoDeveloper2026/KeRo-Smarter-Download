@@ -73,3 +73,7 @@
 [查看全部发行文件](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3) · [技术指南与许可证状态（英文）](README.en.md) · [报告问题](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/issues)
 
 开发者：**KeRo HaZem**。
+
+## 许可证
+
+项目原创代码采用 **[GNU GPL-3.0-only](../LICENSE)** 许可证。Copyright (c) 2026 KeRo HaZem。官方版本免费。第三方组件保留各自的许可证。[详情（阿拉伯语 / 英语）](LICENSING.md)。

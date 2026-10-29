@@ -23,11 +23,14 @@ version remain applicable; this summary does not replace them.
 Project: https://slint.dev
 Source: https://github.com/slint-ui/slint
 
-Used under the Slint Royalty-free Desktop, Mobile, and Web Applications
-License, version 2.0. The application's AboutSlint attribution is retained.
+For builds from this licensing commit onward, Slint is used under its
+GNU GPL version 3 option (GPL-3.0-only). The application's AboutSlint
+attribution is retained. Previously published installers were built under
+the Slint Royalty-free Desktop, Mobile, and Web Applications License 2.0;
+this source change does not modify those existing installer files.
 
 License text for the Slint 1.18.1 source used in the current builds:
-https://github.com/slint-ui/slint/blob/v1.18.1/LICENSES/LicenseRef-Slint-Royalty-free-2.0.md
+https://github.com/slint-ui/slint/blob/v1.18.1/LICENSES/GPL-3.0-only.txt
 
 Slint's own third-party assets and dependencies retain their individual
 licenses and notices.
