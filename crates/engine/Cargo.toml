@@ -6,7 +6,7 @@ license.workspace = true
 description = "Download engine: multi-connection segmented downloads, resume, HLS, queue and scheduler"
 
 [features]
-legacy-win7 = []
+legacy-win7 = ["dep:windows_i686_msvc_048", "dep:windows_x86_64_msvc_048"]
 
 [dependencies]
 anyhow.workspace = true
@@ -40,3 +40,11 @@ windows-sys = { version = "0.59", features = [
 
 [dev-dependencies]
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "io-util", "time"] }
+
+# windows-targets 0.48 predates Rust's win7 vendor and does not select its
+# native import libraries there. Supply only the matching architecture.
+[target.'cfg(all(windows, target_arch = "x86"))'.dependencies]
+windows_i686_msvc_048 = { package = "windows_i686_msvc", version = "=0.48.5", optional = true }
+
+[target.'cfg(all(windows, target_arch = "x86_64"))'.dependencies]
+windows_x86_64_msvc_048 = { package = "windows_x86_64_msvc", version = "=0.48.5", optional = true }
