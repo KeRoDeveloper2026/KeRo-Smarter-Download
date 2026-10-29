@@ -15,6 +15,7 @@ jobs:
   ffmpeg:
     runs-on: ubuntu-24.04
     strategy:
+      fail-fast: false
       matrix:
         arch: [x86, x86_64]
     steps:
