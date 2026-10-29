@@ -4,23 +4,54 @@
 // own button too.
 (() => {
   const apiBrowser = globalThis.keroAPI || globalThis.chrome;
-  if (window.__keroDownload) return;
+  let contextRetired = false, callbackError = null, fallbackTimer = 0;
+  let cleanupContext = () => {};
+  const invalidContext = (error) => /extension context invalidated|extension context.*(?:unloaded|invalid)/i.test(String(error?.message || error || ""));
+  function retireContext() {
+    if (contextRetired) return;
+    contextRetired = true;
+    cleanupContext();
+  }
+  function contextAlive() {
+    if (contextRetired) return false;
+    try { if (apiBrowser?.runtime?.id) return true; } catch (_) { /* extension unloaded */ }
+    retireContext();
+    return false;
+  }
+  // Capture lastError while the native callback is running. This also handles
+  // synchronous Chromium throws and rejected Firefox/compat Promises exactly once.
+  const messageError = () => callbackError;
+  function sendMessage(message, callback = () => {}) {
+    let finished = false;
+    const finish = (response, error) => {
+      if (finished) return;
+      finished = true;
+      if (invalidContext(error)) retireContext();
+      const previous = callbackError;
+      callbackError = error || (contextRetired ? { message: "Extension context invalidated" } : null);
+      try { callback(response); } finally { callbackError = previous; }
+    };
+    if (!contextAlive()) return finish(undefined, { message: "Extension context invalidated" });
+    try {
+      const work = apiBrowser.runtime.sendMessage(message, (response) => {
+        let error;
+        try { error = apiBrowser.runtime.lastError; } catch (e) { error = e; }
+        finish(response, error);
+      });
+      if (work && typeof work.catch === "function") work.catch((error) => finish(undefined, error));
+    } catch (error) { finish(undefined, error); }
+  }
+  if (!contextAlive() || window.__keroDownload) return;
   window.__keroDownload = true;
   const TOP = window.top === window;
+  const contextEvents = new AbortController();
+  const listen = (target, name, listener, options) => target.addEventListener(name, listener,
+    { signal: contextEvents.signal, ...(typeof options === "boolean" ? { capture: options } : options) });
+  const addEventListener = (...args) => listen(window, ...args);
+  const documentListener = (...args) => listen(document, ...args);
 
-  // Safely send fire-and-forget events across Chrome, Brave and Firefox.
-  // Chromium callback-style sendMessage can return undefined (not a Promise).
-  const sendQuietly = (message) => {
-    try {
-      const result = apiBrowser.runtime.sendMessage(message, () => {
-        // Read lastError to acknowledge a disconnected/reloaded extension.
-        void apiBrowser.runtime.lastError;
-      });
-      if (result && typeof result.catch === "function") result.catch(() => {});
-    } catch (_) {
-      // Content scripts can outlive the extension during reload/update.
-    }
-  };
+  // Fire-and-forget reports use the same guarded transport as downloads.
+  const sendQuietly = (message) => sendMessage(message);
 
 
   let items = [];
@@ -35,7 +66,7 @@
   // the on / off switch of the add-in's window
   let switchedOn = true;
   const panelAllowed = () =>
-    switchedOn && panel.enabled !== false && !(panel.skipSites || []).some((s) => hostMatches(location.hostname.toLowerCase(), s));
+    !contextRetired && switchedOn && panel.enabled !== false && !(panel.skipSites || []).some((s) => hostMatches(location.hostname.toLowerCase(), s));
 
   const fmtSize = (n) => {
     if (!n) return "";
@@ -70,11 +101,11 @@
   let discoveryTimer = 0;
   let frame = 0;
   function schedulePlace() {
-    if (document.hidden || frame) return;
+    if (!contextAlive() || document.hidden || frame) return;
     frame = requestAnimationFrame(() => { frame = 0; place(); });
   }
   function discover(root, depth = 0) {
-    if (depth > 6 || !root.querySelectorAll) return;
+    if (contextRetired || depth > 6 || !root.querySelectorAll) return;
     if (root.matches?.("video")) shadowVideos.add(root);
     for (const v of root.querySelectorAll("video")) shadowVideos.add(v);
     // Shadow discovery runs only for new subtrees, never in a polling loop.
@@ -120,8 +151,9 @@
     if (links.length) sendQuietly({ type: "swiftget-files-found", items: links });
   }
   function observeRoot(root) {
-    if (rootObservers.has(root)) return;
+    if (contextRetired || rootObservers.has(root)) return;
     const observer = new MutationObserver((records) => {
+      if (contextRetired) return;
       for (const record of records) {
         videosDirty = true;
         if (record.type === "attributes") {
@@ -227,6 +259,7 @@
 
   let lastPage = "";
   function watchVideos() {
+    if (!contextAlive()) return;
     const v = biggestVideo();
     if (!v) return;
     // ignore tiny muted background loops that never play for long
@@ -253,6 +286,17 @@
     for (const b of bubbles.values()) b.dispose();
     bubbles.clear();
   }
+  cleanupContext = () => {
+    switchedOn = false;
+    contextEvents.abort();
+    removeAll();
+    for (const observer of rootObservers.values()) observer.disconnect();
+    rootObservers.clear(); shadowVideos.clear(); videoCache = []; items = [];
+    clearTimeout(discoveryTimer); discoveryTimer = 0; addedRoots.clear();
+    if (frame) cancelAnimationFrame(frame);
+    frame = 0;
+    clearInterval(fallbackTimer);
+  };
   // size of the button: the slider in the add-in's menu (50% - 200%)
   const OLD_SIZES = { small: 0.85, normal: 1, large: 1.25 };
   // its look: the add-in's menu > "Button style"
@@ -282,7 +326,7 @@
       if (!ch.enabled) return;
       switchedOn = ch.enabled.newValue !== false;
       if (!switchedOn) removeAll();
-      else apiBrowser.runtime.sendMessage({ type: "swiftget-media-request" }, (res) => !apiBrowser.runtime.lastError && update(res));
+      else sendMessage({ type: "swiftget-media-request" }, (res) => !messageError() && update(res));
     });
   } catch (_) {
     // storage not reachable (add-in reloading): stays on
@@ -506,7 +550,7 @@
     b.loading = true;
     b.open = true;
     renderOne(b, "Looking for the video qualities…");
-    apiBrowser.runtime.sendMessage(
+    sendMessage(
       // its own post / video link, or its own file; the page only when
       // neither is there
       {
@@ -518,7 +562,7 @@
         frame: !TOP,
       },
       (res) => {
-        const failed = apiBrowser.runtime.lastError;
+        const failed = messageError();
         if (b.disposed) return;
         b.loading = false;
         if (failed || !res) return notRunning(b, () => lookUp(b, stream));
@@ -542,6 +586,7 @@
 
   // The app is closed: offer to open it, then do what the user wanted.
   function notRunning(b, retry) {
+    if (contextRetired || b.disposed) return;
     b.open = true;
     renderOne(b, "KeRo Smarter Download is not running.", true, {
       text: "Open KeRo Smarter Download",
@@ -558,8 +603,8 @@
         clearInterval(b.waitTimer);
         const wait = b.waitTimer = setInterval(() => {
           tries++;
-          apiBrowser.runtime.sendMessage({ type: "swiftget-status" }, (res) => {
-            if (apiBrowser.runtime.lastError) {
+          sendMessage({ type: "swiftget-status" }, (res) => {
+            if (messageError()) {
               if (tries >= 25) clearInterval(wait);
               return;
             }
@@ -620,13 +665,14 @@
   }
 
   function sendPlaylist(b) {
-    apiBrowser.runtime.sendMessage({ type: "swiftget-playlist", url: location.href }, (res) => {
-      if (apiBrowser.runtime.lastError || !res || !res.ok) return notRunning(b, () => sendPlaylist(b));
+    sendMessage({ type: "swiftget-playlist", url: location.href }, (res) => {
+      if (messageError() || !res || !res.ok) return notRunning(b, () => sendPlaylist(b));
       flashOne(b, "The playlist is open in KeRo Smarter Download ✔", false);
     });
   }
 
   function renderOne(b, note, isError, action) {
+    if (contextRetired || b.disposed) return;
     const list = itemsOf(b);
     const usable = list.filter((i) => !i.disabled);
     const busy = b.loading || (!usable.length && list.some((i) => i.disabled && /Getting/.test(i.label)));
@@ -756,16 +802,17 @@
   }
 
   function download(b, m) {
+    if (b.disposed || !contextAlive()) return;
     if (m.blob) return importBlob(b, m);
     // a stream whose qualities are not known yet: ask the app for them
     if (m.resolve) return lookUp(b, m.resolve);
     const fileName = `${cleanTitle()}.${m.ext || "mp4"}`;
-    apiBrowser.runtime.sendMessage(
+    sendMessage(
       { type: "swiftget-download", item: m, title: document.title, fileName, referrer: location.href,
         downloadSubtitles: !!b.withSubtitles, subtitleLanguage: b.subtitleLanguage,
         subtitleTracks: b.withSubtitles ? itemsOf(b).find((item) => item.yt?.subtitles?.length)?.yt.subtitles : [] },
       (res) => {
-        if (apiBrowser.runtime.lastError || !res || !res.ok) notRunning(b, () => download(b, m));
+        if (messageError() || !res || !res.ok) notRunning(b, () => download(b, m));
         else flashOne(b, "Sent to KeRo Smarter Download ✔", false);
       }
     );
@@ -775,13 +822,13 @@
     if (b.loading) return;
     b.loading = true; b.open = true;
     renderOne(b, "Saving the opened status…");
-    const request = (msg) => new Promise((resolve, reject) => apiBrowser.runtime.sendMessage(msg, (res) => {
-      const error = apiBrowser.runtime.lastError;
+    const request = (msg) => new Promise((resolve, reject) => sendMessage(msg, (res) => {
+      const error = messageError();
       if (error || !res?.ok) reject(new Error(error?.message || res?.error || "Could not save this media")); else resolve(res);
     }));
     let id;
     try {
-      const response = await fetch(item.blob);
+      const response = await fetch(item.blob, { signal: contextEvents.signal });
       const size = Number(response.headers.get("content-length"));
       const mime = response.headers.get("content-type") || "";
       if (!response.ok || !size || size > 512 * 1024 * 1024 || !/^(video|audio)\//i.test(mime)) throw new Error("This player does not expose a downloadable media file. Try the detected network stream instead.");
@@ -821,15 +868,15 @@
     for (const b of bubbles.values()) if (!b.own && !b.loading) renderOne(b);
   }
 
-  document.addEventListener("click", (event) => {
-    if (event.button !== 0 || event.altKey || event.ctrlKey || event.shiftKey || event.metaKey || event.defaultPrevented || !switchedOn) return;
+  documentListener("click", (event) => {
+    if (event.button !== 0 || event.altKey || event.ctrlKey || event.shiftKey || event.metaKey || event.defaultPrevented || !switchedOn || !contextAlive()) return;
     const anchor = event.composedPath().find((node) => node?.tagName === "A" && node.href);
     if (!anchor || !/^https?:/i.test(anchor.href) || (!anchor.hasAttribute("download") && !FILE_LINK.test(anchor.href))) return;
     event.preventDefault(); event.stopImmediatePropagation();
     const url = anchor.href;
-    apiBrowser.runtime.sendMessage({ type: "swiftget-direct-link", url,
+    sendMessage({ type: "swiftget-direct-link", url,
       fileName: anchor.getAttribute("download") || "", referrer: location.href }, (res) => {
-      if (apiBrowser.runtime.lastError || !res?.taken) location.assign(url);
+      if (messageError() || !res?.taken) location.assign(url);
     });
   }, true);
 
@@ -837,15 +884,15 @@
   addEventListener(
     "click",
     (e) => {
-      if (e.button !== 0 || e.altKey || e.defaultPrevented || !switchedOn) return;
+      if (e.button !== 0 || e.altKey || e.defaultPrevented || !switchedOn || !contextAlive()) return;
       const a = e.composedPath ? e.composedPath().find((n) => n && n.tagName === "A" && n.href) : null;
       const href = a ? String(a.href) : "";
       if (!/^magnet:\?/i.test(href) || !/xt=urn:bt[im]h:/i.test(href)) return;
       e.preventDefault();
       e.stopPropagation();
-      apiBrowser.runtime.sendMessage({ type: "swiftget-magnet", url: href }, (res) => {
+      sendMessage({ type: "swiftget-magnet", url: href }, (res) => {
         // not taken (the app is closed, or sending is off): the browser's way
-        if (apiBrowser.runtime.lastError || !res || !res.ok) location.href = href;
+        if (messageError() || !res || !res.ok) location.href = href;
       });
     },
     true
@@ -876,7 +923,7 @@
     }
   });
   for (const ev of ["fullscreenchange", "webkitfullscreenchange"]) {
-    document.addEventListener(ev, () => setTimeout(() => bubbles.forEach((b) => placeOne(b)), 50));
+    documentListener(ev, () => setTimeout(() => bubbles.forEach((b) => placeOne(b)), 50));
   }
 
   // every link of the page (or the selection) for "Download all links"
@@ -915,7 +962,8 @@
     return { page: location.href, links: out };
   }
 
-  apiBrowser.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+  try { apiBrowser.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+    if (!contextAlive()) return false;
     if (msg.type === "swiftget-media") update(msg.items);
     if (msg.type === "swiftget-collect-links") {
       if (!TOP) return false; // the page itself answers
@@ -936,9 +984,9 @@
       placeOne(b);
     }
     return false;
-  });
-  apiBrowser.runtime.sendMessage({ type: "swiftget-config" }, (res) => {
-    if (!apiBrowser.runtime.lastError && res) {
+  }); } catch (_) { retireContext(); }
+  sendMessage({ type: "swiftget-config" }, (res) => {
+    if (!messageError() && res) {
       panel = res;
       if (!panelAllowed()) {
         for (const b of bubbles.values()) b.dispose();
@@ -956,19 +1004,19 @@
       true
     );
     // media detected before this script loaded
-    apiBrowser.runtime.sendMessage({ type: "swiftget-media-request" }, (res) => {
-      if (!apiBrowser.runtime.lastError) update(res);
+    sendMessage({ type: "swiftget-media-request" }, (res) => {
+      if (!messageError()) update(res);
     });
   }
 
   addEventListener("scroll", schedulePlace, { passive: true, capture: true });
   addEventListener("resize", schedulePlace, { passive: true });
   for (const event of ["play", "loadedmetadata", "durationchange", "emptied"]) {
-    document.addEventListener(event, () => { videosDirty = true; watchVideos(); schedulePlace(); }, true);
+    documentListener(event, () => { videosDirty = true; watchVideos(); schedulePlace(); }, true);
   }
   // Some web components attach a shadow root without a light-DOM mutation.
   // Discover those when the user reaches the player, without rescanning the page.
-  document.addEventListener("pointerover", (event) => {
+  documentListener("pointerover", (event) => {
     if (document.hidden || !panelAllowed()) return;
     for (const node of event.composedPath()) {
       if (node.shadowRoot && !rootObservers.has(node.shadowRoot)) {
@@ -976,7 +1024,7 @@
       }
     }
   }, { passive: true, capture: true });
-  document.addEventListener("visibilitychange", () => {
+  documentListener("visibilitychange", () => {
     if (document.hidden) { if (frame) cancelAnimationFrame(frame); frame = 0; }
     else { videosDirty = true; watchVideos(); schedulePlace(); }
   });
@@ -989,13 +1037,16 @@
     clearTimeout(discoveryTimer); addedRoots.clear();
     if (frame) cancelAnimationFrame(frame);
   });
+  if (contextRetired) return;
   observeRoot(document);
   discover(document);
   watchVideos(); schedulePlace();
   // A visible-page fallback handles SPA URL changes and player resizing.
   // Hidden tabs do no work, and this path never rescans shadow DOM.
-  setInterval(() => {
-    if (document.hidden || !panelAllowed() || !videoCache.length) return;
+  if (contextRetired) return;
+  fallbackTimer = setInterval(() => {
+    if (!contextAlive() || document.hidden || !panelAllowed() || !videoCache.length) return;
     watchVideos(); schedulePlace();
   }, 2500);
 })();
+

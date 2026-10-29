@@ -173,8 +173,15 @@ const tick = () => new Promise((r) => setTimeout(r, 20));
   pingExt = "1.0.4"; delete session.versionCheckAt;
   await ctx.followAppVersion();
   assert.strictEqual(reloads, 1, "same version: nothing");
+  for (const older of ["1.0.3", "0.9.9", "invalid", "1.0.4.0"]) {
+    pingExt = older; delete session.versionCheckAt;
+    await ctx.followAppVersion();
+    assert.strictEqual(reloads, 1, "older, equivalent or invalid versions must not reload a newer standalone extension");
+  }
+  assert(ctx.newerExtensionVersion("1.10.0", "1.9.9"), "versions compare numeric segments");
+  assert(!ctx.newerExtensionVersion("1.1.0", "1.1.1"), "an older desktop app cannot force a newer extension to reload");
   pingExt = null;
-  console.log("self update: reloads once when the program has a newer add-in");
+  console.log("self update: reloads once for a newer version; older, equivalent and invalid app versions ignored");
   // a player inside a frame (Dailymotion's "geo.dailymotion.com/player/…"):
   // the page around it is looked up, its qualities are offered
   {
@@ -296,3 +303,4 @@ const tick = () => new Promise((r) => setTimeout(r, 20));
   console.log(`${FIREFOX ? "Firefox" : "Chrome"} API simulation: direct-click handoff, scrolling PDF size, quality prefix and selected subtitles passed`);
   console.log("background simulation: all checks passed");
 })().catch((e) => { console.error(e); process.exit(1); });
+

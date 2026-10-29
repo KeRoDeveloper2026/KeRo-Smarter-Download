@@ -11,6 +11,10 @@ on:
     paths-ignore:
       - "README.md"
       - "docs/**"
+      - "extension/**"
+      - "extension-firefox/**"
+      - ".github/workflows/extension-packages.yml"
+      - "tools/package-extensions.py"
       - ".github/workflows/platform-builds.yml"
       - ".github/workflows/publish-ready-x86.yml"
       - ".github/workflows/publish-ready-win7.yml"

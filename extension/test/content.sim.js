@@ -1,6 +1,7 @@
 // DOM simulation for lifecycle/performance regressions; no network or browser.
 const fs = require('fs'), vm = require('vm'), path = require('path'), assert = require('assert');
 const FIREFOX = process.argv.includes('--firefox');
+const FAILURE = (process.argv.find((s) => s.startsWith('--invalidated=')) || '--invalidated=throw').split('=')[1];
 const messages = [], shadows = [], observers = [], windowListeners = new Map(), intervals = [];
 let fullWalks = 0;
 class Node {
@@ -19,7 +20,7 @@ class Node {
   querySelector(q) { return q.startsWith('#') ? this.getElementById(q.slice(1)) : this.querySelectorAll(q)[0] || null; }
   getElementById(id) { for (const c of this.children) { if (c.attrs.id === id) return c; const x = c.getElementById(id); if (x) return x; } return null; }
   getBoundingClientRect() { return this.tagName === 'VIDEO' ? { left: 10, top: 10, right: 650, bottom: 370, width: 640, height: 360 } : { left: 10, top: 10, right: 190, bottom: 46, width: 180, height: 36 }; }
-  addEventListener(name, fn, opts) { (this.listeners[name] ||= []).push(fn); }
+  addEventListener(name, fn, opts) { const list = this.listeners[name] ||= []; if (opts?.signal?.aborted) return; list.push(fn); opts?.signal?.addEventListener('abort', () => { const i = list.indexOf(fn); if (i >= 0) list.splice(i, 1); }, {once:true}); }
   focus() {}
   contains(n) { return this === n || this.children.some((c) => c.contains(n)); }
 }
@@ -31,11 +32,11 @@ const video = new Node('video'); video.src = video.currentSrc = 'https://cdn.exa
 function addWindow(name, fn, options) { let listeners = windowListeners.get(name); if (!listeners) windowListeners.set(name, listeners = new Set()); listeners.add(fn); options?.signal?.addEventListener('abort', () => listeners.delete(fn), { once: true }); }
 const ctx = { document: doc, window: null, location: new URL('https://site.example/watch'), innerWidth: 1000, innerHeight: 800,
   addEventListener: addWindow, AbortController, console, URL, NodeFilter: { SHOW_ELEMENT: 1 }, getSelection: () => null,
-  setTimeout, clearTimeout, setInterval(fn, ms) { intervals.push({ fn, ms }); return 1; }, clearInterval() {},
+  setTimeout, clearTimeout, setInterval(fn, ms) { intervals.push({ fn, ms, active:true }); return intervals.length; }, clearInterval(id) { if (intervals[id-1]) intervals[id-1].active=false; },
   requestAnimationFrame: (fn) => setTimeout(fn, 0), cancelAnimationFrame: clearTimeout,
   MutationObserver: class { constructor(fn) { this.fn = fn; observers.push(this); } observe() {} disconnect() { this.disconnected = true; } },
   chrome: { storage: { local: { get(defaults, cb) { if (FIREFOX) return Promise.resolve(defaults); queueMicrotask(() => cb(defaults)); } }, onChanged: { addListener() {} } },
-    runtime: { lastError: null, onMessage: { addListener(fn) { ctx.receive = fn; } }, sendMessage(msg, cb) { messages.push(msg); const result = msg.type === 'swiftget-config' ? {enabled: true} : msg.type === 'swiftget-direct-link' ? {taken: true} : [];
+    runtime: { id: 'kero-test-extension', lastError: null, onMessage: { addListener(fn) { ctx.receive = fn; } }, sendMessage(msg, cb) { messages.push(msg); const result = msg.type === 'swiftget-config' ? {enabled: true} : msg.type === 'swiftget-direct-link' ? {taken: true} : [];
       if (cb) queueMicrotask(() => cb(result)); return Promise.resolve(result); } } },
 };
 ctx.window = ctx; ctx.top = ctx;
@@ -44,6 +45,14 @@ vm.createContext(ctx);
 vm.runInContext(fs.readFileSync(path.join(__dirname, '../compat.js'), 'utf8'), ctx);
 vm.runInContext(fs.readFileSync(path.join(__dirname, '../content.js'), 'utf8'), ctx);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+// A page loaded after an unload must not create any UI or touch DOM APIs.
+for (const throws of [false, true]) {
+  const runtime = {}; Object.defineProperty(runtime, 'id', {get(){if(throws)throw new Error('Extension context invalidated.');return undefined;}});
+  const stale = {chrome:{runtime}, window:{}}; vm.createContext(stale);
+  assert.doesNotThrow(() => vm.runInContext(fs.readFileSync(path.join(__dirname,'../content.js'),'utf8'),stale));
+  assert.strictEqual(stale.window.__keroDownload,undefined);
+}
+
 (async () => {
   await sleep(20);
   let root = shadows.find((s) => s.host.isConnected);
@@ -129,7 +138,71 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   for (const timer of intervals) timer.fn(); await sleep(10);
   assert.strictEqual(messages.length, count, 'hidden pages do not send analysis messages');
   assert.strictEqual(fullWalks, walks, 'hidden pages do not scan');
+  // Disconnects from reloads must not break page links or keep old observers alive.
+  {
+    doc.hidden = false;
+    const navigations = [];
+    ctx.location.assign = (url) => navigations.push(url);
+    const click = doc.listeners.click[0];
+    const anchor = new Node('a'); anchor.setAttribute('href', 'https://files.example/final.zip');
+    const makeEvent = () => ({button:0,altKey:false,ctrlKey:false,shiftKey:false,metaKey:false,defaultPrevented:false,
+      composedPath:() => [anchor], preventDefault(){this.defaultPrevented=true;}, stopImmediatePropagation(){this.stopped=true;}});
+    // A temporary transport error leaves the extension usable, but restores navigation.
+    ctx.chrome.runtime.sendMessage = (_msg, cb) => {
+      const error = new Error('Could not establish connection. Receiving end does not exist.');
+      if (FIREFOX) return Promise.reject(error);
+      queueMicrotask(() => {ctx.chrome.runtime.lastError=error; try {cb();} finally {ctx.chrome.runtime.lastError=null;}});
+    };
+    let event = makeEvent(); click(event); await sleep(10);
+    assert(event.defaultPrevented); assert.deepStrictEqual(navigations, [anchor.href]);
+    assert.strictEqual(doc.listeners.click.length, 1, 'temporary transport errors do not retire a valid context');
+    // A healthy callback-only Chromium API (or Promise-only Firefox API) takes the link.
+    ctx.chrome.runtime.sendMessage = (_msg, cb) => {
+      const result={taken:true,ok:true};
+      if(FIREFOX)return Promise.resolve(result);
+      queueMicrotask(() => cb(result)); return undefined;
+    };
+    event=makeEvent(); click(event); await sleep(10);
+    assert(event.defaultPrevented); assert.strictEqual(navigations.length, 1, 'successful handoff never starts a browser fallback');
+    const player=new Node('video'); Object.assign(player,{currentSrc:'https://cdn.example/final.mp4',src:'https://cdn.example/final.mp4',paused:false,ended:false,duration:90});
+    body.append(player); observers[0].fn([{type:'childList',addedNodes:[player]}]); await sleep(120);
+    assert(shadows.some((r) => r.host.isConnected), 'a live panel exists before invalidation');
+    let attempts=0;
+    ctx.chrome.runtime.sendMessage = (_msg, cb) => {
+      attempts++;
+      const error=new Error('Extension context invalidated.');
+      if(FAILURE==='reject')return Promise.reject(error);
+      if(FAILURE==='last-error' && !FIREFOX){
+        queueMicrotask(() => {ctx.chrome.runtime.lastError=error;try{cb();}finally{ctx.chrome.runtime.lastError=null;}});
+        // Some adapters both reject and call back: navigation must happen once.
+        return Promise.reject(error);
+      }
+      throw error;
+    };
+    if(FAILURE==='missing-id')ctx.chrome.runtime.id=undefined;
+    event=makeEvent(); click(event); await sleep(20);
+    if(FAILURE==='missing-id'){
+      assert(!event.defaultPrevented && !event.stopped, 'a known-invalid context never intercepts page navigation');
+      assert.strictEqual(attempts,0); assert.strictEqual(navigations.length,1);
+    }else{
+      assert(event.defaultPrevented); assert.strictEqual(attempts,1);
+      assert.strictEqual(navigations.length,2,'a send-time failure restores navigation exactly once');
+    }
+    assert(!shadows.some((r) => r.host.isConnected),'invalidation removes stale download panels');
+    assert(observers.every((o) => o.disconnected),'invalidation disconnects DOM observers');
+    assert(intervals.every((t) => !t.active),'invalidation cancels polling intervals');
+    assert.strictEqual(doc.listeners.click.length,0,'stale interception handlers are removed');
+    const after=messages.length;
+    for(const timer of intervals)timer.fn();
+    for(const fn of [...(windowListeners.get('scroll') || [])])fn();
+    event=makeEvent();click(event);await sleep(10);
+    assert(!event.defaultPrevented,'a retired handler cannot intercept any later click');
+    assert.strictEqual(messages.length,after,'retired scripts send no more messages');
+    assert.strictEqual(attempts,FAILURE==='missing-id'?0:1);
+    console.log(`context invalidation (${FIREFOX?'Firefox':'Chromium'}, ${FAILURE}): normal handoff, temporary-error recovery, single fallback and full cleanup passed`);
+  }
   for (const fn of windowListeners.get('pagehide')) fn({ persisted: false });
   assert.strictEqual(windowListeners.get('mousemove').size, 0);
   console.log('content lifecycle: direct-source fast path, lazy menu, no repeated deep scans, handler cleanup after 12 player replacements, dismiss and hidden-tab suspension passed');
 })().catch((e) => { console.error(e); process.exitCode = 1; });
+

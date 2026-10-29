@@ -40,6 +40,15 @@ async function fetchWithTimeout(url, opts = {}, ms = 1500) {
 // The add-in is loaded from the program's own folder. When the program
 // updates itself it brings newer add-in files along; the browser only reads
 // them after a reload, so the add-in reloads itself once per new version.
+function newerExtensionVersion(candidate, current) {
+  if (!/^\d+(?:\.\d+){0,3}$/.test(String(candidate)) || !/^\d+(?:\.\d+){0,3}$/.test(String(current))) return false;
+  const want = String(candidate).split(".").map(Number), have = String(current).split(".").map(Number);
+  for (let i = 0; i < 4; i++) {
+    if ((want[i] || 0) !== (have[i] || 0)) return (want[i] || 0) > (have[i] || 0);
+  }
+  return false;
+}
+
 async function followAppVersion() {
   const last = (await apiBrowser.storage.session.get("versionCheckAt")).versionCheckAt || 0;
   if (Date.now() - last < 60000) return;
@@ -50,7 +59,7 @@ async function followAppVersion() {
     if (!r.ok || typeof r.json !== "function") return;
     const want = (await r.json()).ext;
     const have = apiBrowser.runtime.getManifest().version;
-    if (!want || want === have) return;
+    if (!newerExtensionVersion(want, have)) return;
     // only once per version: if the files on disk did not change (the add-in
     // was loaded from somewhere else) it must not keep reloading
     const done = (await apiBrowser.storage.local.get("reloadedFor")).reloadedFor;
@@ -1009,3 +1018,4 @@ apiBrowser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       return false;
   }
 });
+
