@@ -583,7 +583,9 @@ fn main() -> anyhow::Result<()> {
     drop(power_timer);
     // a download nobody pressed Start for is not kept
     cancel_early(&ctx_exit);
-    mgr.shutdown();
+    if mgr.shutdown().is_err() {
+        message(&t("The download list could not be saved securely. The previous file was kept. Recent changes may not survive a restart. Check Windows data protection and folder access."));
+    }
     rt.shutdown_timeout(Duration::from_secs(2));
     if RESTART.load(std::sync::atomic::Ordering::SeqCst) {
         restart_now();
@@ -1243,6 +1245,11 @@ fn handle_events(ui: &Ui) {
                     open_download(&v.save_path);
                 }
             }
+            Event::PersistenceFailed { settings } => message(&t(if settings {
+                "Settings could not be saved securely. The previous file was kept. Check Windows data protection and folder access, then try again."
+            } else {
+                "The download list could not be saved securely. The previous file was kept. Downloads can continue, but recent changes may not survive a restart. Check Windows data protection and folder access."
+            })),
             _ => {}
         }
     }

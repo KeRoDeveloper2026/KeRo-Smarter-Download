@@ -96,7 +96,7 @@ The updater accepts signed releases from this repository. See [release preparati
 
 If the app is useful to you, consider starring this repository and sharing its download page.
 
-The extension communicates with the desktop app over loopback and may pass download-related cookies and page context. The source uses Windows DPAPI for designated sensitive fields, with plaintext fallback paths; do not share settings, cookies or private download lists.
+The extension communicates with the desktop app over loopback and may pass download-related cookies and page context. The current source uses Windows DPAPI for designated sensitive fields and aborts a save if protection fails, keeping the previous file and notifying the user. Legacy plaintext fields are read for compatibility and protected on a successful subsequent save. Do not share settings, cookies or private download lists. Published installers are unchanged until a new release is built.
 
 See [contribution guidance](../CONTRIBUTING.md), [security reporting](../SECURITY.md) and [third-party notices](../THIRD-PARTY-NOTICES.txt).
 

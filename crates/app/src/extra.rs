@@ -458,7 +458,10 @@ fn power_now(ui: &Ui) {
         let _ = d.hide();
     }
     // save the list first: the downloads resume after the restart
-    ui.ctx.mgr.shutdown();
+    if ui.ctx.mgr.shutdown().is_err() {
+        message(&t("Automatic shutdown was cancelled because the download list could not be saved securely. The previous file was kept."));
+        return;
+    }
     let force = ui.ctx.mgr.settings().force_shutdown;
     swiftget_engine::system::power(action, force);
 }
