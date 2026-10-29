@@ -24,6 +24,7 @@ jobs:
           github-token: ${{ github.token }}
           run-id: 40959334297
           artifact-ids: 12935930431
+          merge-multiple: true
           path: dist
       - name: Continue only publication using the retained signed files
         shell: pwsh
