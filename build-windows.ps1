@@ -3,6 +3,9 @@
 # KeRoDownload.exe, gets ffmpeg + yt-dlp and makes dist\KeRoDownload-Setup.exe.
 
 $ErrorActionPreference = "Stop"
+# Never pass the release key to installers, downloads or Cargo build scripts.
+$releaseSigningKey = $env:UPDATE_SIGNING_KEY
+Remove-Item Env:UPDATE_SIGNING_KEY -ErrorAction SilentlyContinue
 # Windows PowerShell 5.1 starts with old TLS versions that GitHub refuses, and its
 # progress bar makes downloads very slow: switch both before any download.
 try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.ServicePointManager]::SecurityProtocol } catch { }
@@ -70,6 +73,10 @@ Get-Process KeRoDownload, SwiftGet -ErrorAction SilentlyContinue | Stop-Process 
 Step "Building KeRoDownload.exe (first time: 5-15 minutes)"
 cargo build --locked --release
 if ($LASTEXITCODE -ne 0) { Fail "The build failed. Scroll up to see the first red 'error' lines." }
+if ($releaseSigningKey) {
+    cargo build --locked --release -p swiftget-engine --example sign_update
+    if ($LASTEXITCODE -ne 0) { Fail "The update signing utility build failed." }
+}
 
 # ---------------------------------------------------------------- 4. package
 # The result is ONE file: dist\KeRoDownload-Setup.exe (+ dist\version.json
@@ -277,9 +284,16 @@ if ($iscc) {
         # to update itself. Never leave an unsigned or stale update manifest.
         $hash = (Get-FileHash $setup -Algorithm SHA256).Hash.ToLower()
         Remove-Item (Join-Path $dist "version.json") -Force -ErrorAction SilentlyContinue
-        if ($env:UPDATE_SIGNING_KEY) {
-            $sig = (cargo run --locked --quiet --release -p swiftget-engine --example sign_update -- $version $hash)
-            if ($LASTEXITCODE -ne 0 -or -not $sig -or $sig.Trim().Length -ne 128) { Fail "Could not sign the update. Check UPDATE_SIGNING_KEY against UPDATE_PUBLIC_KEY." }
+        if ($releaseSigningKey) {
+            try {
+                $env:UPDATE_SIGNING_KEY = $releaseSigningKey
+                $sig = (& ./target/release/examples/sign_update.exe $version $hash)
+                $signExit = $LASTEXITCODE
+            } finally {
+                Remove-Item Env:UPDATE_SIGNING_KEY -ErrorAction SilentlyContinue
+                $releaseSigningKey = $null
+            }
+            if ($signExit -ne 0 -or -not $sig -or $sig.Trim().Length -ne 128) { Fail "Could not sign the update. Check UPDATE_SIGNING_KEY against UPDATE_PUBLIC_KEY." }
             $json = [ordered]@{
                 version = $version
                 url = "https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v$version/KeRoDownload-Setup.exe"

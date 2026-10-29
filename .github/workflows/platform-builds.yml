@@ -107,6 +107,8 @@ jobs:
           name: diagnostic-${{ matrix.platform }}
           path: target/${{ matrix.target }}/release/KeRoDownload.exe
           if-no-files-found: ignore
+      - name: Build update signing utility without secrets
+        run: cargo build --locked --release -p swiftget-engine --example sign_update
       - name: Package and verify architecture
         shell: pwsh
         env:

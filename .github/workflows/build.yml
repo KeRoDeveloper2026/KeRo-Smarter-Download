@@ -110,19 +110,6 @@ jobs:
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           cache-on-failure: true
-      - name: Validate release signing key
-        shell: pwsh
-        env:
-          UPDATE_SIGNING_KEY: ${{ secrets.UPDATE_SIGNING_KEY }}
-        run: |
-          if (-not $env:UPDATE_SIGNING_KEY) {
-            if ($env:IS_RELEASE -eq "true") { throw "Set UPDATE_SIGNING_KEY first; see docs/RELEASING.md" }
-            Write-Host "::notice::UPDATE_SIGNING_KEY is not configured. This build produces a manual installer only."
-          } else {
-            $version = ([regex]::Match((Get-Content Cargo.toml -Raw), '(?m)^version\s*=\s*"([^"]+)"')).Groups[1].Value
-            cargo run --locked --quiet --release -p swiftget-engine --example sign_update -- $version ('0' * 64) | Out-Null
-            if ($LASTEXITCODE -ne 0) { throw "UPDATE_SIGNING_KEY does not match the public key in selfupdate.rs" }
-          }
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: ffmpeg
@@ -183,17 +170,33 @@ jobs:
           cargo audit
       - name: Build release
         run: cargo build --locked --release
+      - name: Build update signing utility without secrets
+        if: env.IS_RELEASE == 'true'
+        run: cargo build --locked --release -p swiftget-engine --example sign_update
+      - name: Validate release signing key
+        if: env.IS_RELEASE == 'true'
+        shell: pwsh
+        env:
+          UPDATE_SIGNING_KEY: ${{ secrets.UPDATE_SIGNING_KEY }}
+        run: |
+          if (-not $env:UPDATE_SIGNING_KEY) { throw 'Set UPDATE_SIGNING_KEY first; see docs/RELEASING.md' }
+          $version = ([regex]::Match((Get-Content Cargo.toml -Raw), '(?m)^version\s*=\s*"([^"]+)"')).Groups[1].Value
+          & ./target/release/examples/sign_update.exe $version ('0' * 64) | Out-Null
+          if ($LASTEXITCODE -ne 0) { throw 'Update signing key validation failed' }
       - name: Package
         shell: pwsh
         env:
           # Mozilla add-on keys (addons.mozilla.org > Developer Hub > API keys);
           # with them the Firefox add-on is signed and stays in Firefox for good
-          AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
-          AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+          AMO_JWT_ISSUER: ${{ env.IS_RELEASE == 'true' && secrets.AMO_JWT_ISSUER || '' }}
+          AMO_JWT_SECRET: ${{ env.IS_RELEASE == 'true' && secrets.AMO_JWT_SECRET || '' }}
           # Ed25519 key that signs version.json; the program installs only
           # updates signed with it (selfupdate.rs has the public half)
-          UPDATE_SIGNING_KEY: ${{ secrets.UPDATE_SIGNING_KEY }}
+          UPDATE_SIGNING_KEY: ${{ env.IS_RELEASE == 'true' && secrets.UPDATE_SIGNING_KEY || '' }}
         run: |
+          # Downloaded helper tools must not inherit the update signing key.
+          $releaseSigningKey = $env:UPDATE_SIGNING_KEY
+          Remove-Item Env:UPDATE_SIGNING_KEY -ErrorAction SilentlyContinue
           $version = ([regex]::Match((Get-Content Cargo.toml -Raw), '(?m)^version\s*=\s*"([^"]+)"')).Groups[1].Value
           if ("${{ github.ref_type }}" -eq "tag") {
             $tag = "${{ github.ref_name }}".TrimStart("v")
@@ -232,6 +235,7 @@ jobs:
             $fx = "{`n  ""addons"": {`n    ""kero-download@kero.app"": {`n      ""updates"": [`n        { ""version"": ""$extVersion"", ""update_link"": ""https://github.com/${{ github.repository }}/releases/download/v$version/kero-download-firefox.xpi"" }`n      ]`n    }`n  }`n}`n"
             [IO.File]::WriteAllText("$PWD/dist/firefox-updates.json", $fx)
           }
+          Remove-Item Env:AMO_JWT_ISSUER, Env:AMO_JWT_SECRET -ErrorAction SilentlyContinue
           # our own small ffmpeg (job "ffmpeg") and its licences
           Copy-Item ffmpeg-out/* "$p/tools/"
           Copy-Item REPAIR-FFMPEG.bat, repair-ffmpeg.ps1 $p -Force
@@ -260,9 +264,16 @@ jobs:
           $hash = (Get-FileHash dist/KeRoDownload-Setup.exe -Algorithm SHA256).Hash.ToLower()
           # the signature the program checks before it installs an update
           $sig = ""
-          if ($env:UPDATE_SIGNING_KEY) {
-            $sig = (cargo run --locked --quiet --release -p swiftget-engine --example sign_update -- $version $hash).Trim()
-            if ($LASTEXITCODE -ne 0 -or $sig.Length -ne 128) { throw "could not sign the release" }
+          if ($releaseSigningKey) {
+            try {
+              $env:UPDATE_SIGNING_KEY = $releaseSigningKey
+              $sig = (& ./target/release/examples/sign_update.exe $version $hash).Trim()
+              $signExit = $LASTEXITCODE
+            } finally {
+              Remove-Item Env:UPDATE_SIGNING_KEY -ErrorAction SilentlyContinue
+              $releaseSigningKey = $null
+            }
+            if ($signExit -ne 0 -or $sig.Length -ne 128) { throw "could not sign the release" }
           } elseif ($env:IS_RELEASE -eq "true") {
             throw "UPDATE_SIGNING_KEY is not set: installed copies would refuse this update"
           }

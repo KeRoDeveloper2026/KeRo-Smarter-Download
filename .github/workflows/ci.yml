@@ -59,6 +59,15 @@ jobs:
           key: quality-inspection
           cache-on-failure: true
       - run: cargo clippy --locked --workspace --all-targets -- -D warnings
+      - name: Parse PowerShell build scripts without executing them
+        shell: pwsh
+        run: |
+          foreach ($path in @('build-windows.ps1', 'tools/package-platform.ps1')) {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile((Join-Path $PWD $path), [ref]$tokens, [ref]$errors) | Out-Null
+            if ($errors.Count) { throw "$path has PowerShell syntax errors" }
+          }
       - run: cargo test --locked -p swiftget-engine --no-fail-fast
 
   win7-dependency-guard:

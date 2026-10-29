@@ -6,6 +6,7 @@
 //! On the disk a protected text looks like `"dpapi:<hex>"`. Files of older
 //! versions hold plain text: it is read as it is and protected on the next
 //! save. Use the field attributes below:
+//! Protection failures abort serialization; there is no plaintext fallback.
 //!
 //! ```ignore
 //! #[serde(with = "crate::secret::string")]          pub password: String,
@@ -14,6 +15,35 @@
 //! ```
 
 const PREFIX: &str = "dpapi:";
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ProtectionError;
+
+impl std::fmt::Display for ProtectionError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("Secure storage is unavailable; sensitive data was not saved")
+    }
+}
+
+impl std::error::Error for ProtectionError {}
+
+#[cfg(test)]
+std::thread_local! {
+    static FAIL_PROTECTION: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// Fault injection is thread-local and absent from production builds.
+#[cfg(test)]
+pub(crate) fn with_failed_protection<T>(f: impl FnOnce() -> T) -> T {
+    struct Reset(bool);
+    impl Drop for Reset {
+        fn drop(&mut self) {
+            FAIL_PROTECTION.with(|v| v.set(self.0));
+        }
+    }
+    let _reset = Reset(FAIL_PROTECTION.with(|v| v.replace(true)));
+    f()
+}
 
 fn to_hex(b: &[u8]) -> String {
     b.iter().map(|x| format!("{x:02x}")).collect()
@@ -89,7 +119,7 @@ mod os {
 
 #[cfg(not(windows))]
 mod os {
-    // other systems (the tests): no user key store, so nothing is encrypted
+    // No secure backend on other systems: nonempty secrets cannot be saved.
     pub fn protect(_data: &[u8]) -> Option<Vec<u8>> {
         None
     }
@@ -106,25 +136,29 @@ static SEALED: std::sync::Mutex<Option<std::collections::HashMap<String, String>
     std::sync::Mutex::new(None);
 
 /// The text as it is kept on the disk.
-pub fn seal(plain: &str) -> String {
+pub fn seal(plain: &str) -> Result<String, ProtectionError> {
     if plain.is_empty() {
-        return String::new();
+        return Ok(String::new());
+    }
+    #[cfg(test)]
+    if FAIL_PROTECTION.with(|v| v.get()) {
+        return Err(ProtectionError);
     }
     let mut cache = SEALED.lock().unwrap_or_else(|p| p.into_inner());
     let map = cache.get_or_insert_with(Default::default);
     if let Some(done) = map.get(plain) {
-        return done.clone();
+        return Ok(done.clone());
     }
     let sealed = match os::protect(plain.as_bytes()) {
-        Some(enc) => format!("{PREFIX}{}", to_hex(&enc)),
-        None => plain.to_string(),
+        Some(enc) if !enc.is_empty() => format!("{PREFIX}{}", to_hex(&enc)),
+        _ => return Err(ProtectionError),
     };
     // a cookie text is a few KB: keep at most about a thousand of them
     if map.len() > 1000 {
         map.clear();
     }
     map.insert(plain.to_string(), sealed.clone());
-    sealed
+    Ok(sealed)
 }
 
 /// The text from the disk. A protected text that can't be opened (another
@@ -142,7 +176,8 @@ pub fn open(stored: &str) -> String {
 pub mod string {
     use serde::{Deserialize, Deserializer, Serializer};
     pub fn serialize<S: Serializer>(v: &str, s: S) -> Result<S::Ok, S::Error> {
-        s.serialize_str(&super::seal(v))
+        let sealed = super::seal(v).map_err(<S::Error as serde::ser::Error>::custom)?;
+        s.serialize_str(&sealed)
     }
     pub fn deserialize<'de, D: Deserializer<'de>>(d: D) -> Result<String, D::Error> {
         Ok(super::open(&String::deserialize(d)?))
@@ -152,7 +187,11 @@ pub mod string {
 pub mod opt {
     use serde::{Deserialize, Deserializer, Serialize, Serializer};
     pub fn serialize<S: Serializer>(v: &Option<String>, s: S) -> Result<S::Ok, S::Error> {
-        v.as_deref().map(super::seal).serialize(s)
+        v.as_deref()
+            .map(super::seal)
+            .transpose()
+            .map_err(<S::Error as serde::ser::Error>::custom)?
+            .serialize(s)
     }
     pub fn deserialize<'de, D: Deserializer<'de>>(d: D) -> Result<Option<String>, D::Error> {
         Ok(Option::<String>::deserialize(d)?
@@ -164,9 +203,12 @@ pub mod opt {
 pub mod pair {
     use serde::{Deserialize, Deserializer, Serialize, Serializer};
     pub fn serialize<S: Serializer>(v: &Option<(String, String)>, s: S) -> Result<S::Ok, S::Error> {
-        v.as_ref()
-            .map(|(u, p)| (u.clone(), super::seal(p)))
-            .serialize(s)
+        let sealed = v
+            .as_ref()
+            .map(|(u, p)| super::seal(p).map(|password| (u.clone(), password)))
+            .transpose()
+            .map_err(<S::Error as serde::ser::Error>::custom)?;
+        sealed.serialize(s)
     }
     pub fn deserialize<'de, D: Deserializer<'de>>(
         d: D,
@@ -200,8 +242,16 @@ mod tests {
                 a: Some(("u".into(), "x".into()))
             }
         );
-        let back: T = serde_json::from_str(&serde_json::to_string(&t).unwrap()).unwrap();
-        assert_eq!(back, t);
+        #[cfg(windows)]
+        {
+            let json = serde_json::to_string(&t).unwrap();
+            assert!(!json.contains("k=v"));
+            assert!(json.contains(PREFIX));
+            let back: T = serde_json::from_str(&json).unwrap();
+            assert_eq!(back, t);
+        }
+        #[cfg(not(windows))]
+        assert!(serde_json::to_string(&t).is_err());
     }
 
     #[test]
@@ -211,6 +261,55 @@ mod tests {
         let t: T = serde_json::from_str(r#"{"p":"dpapi:1234","c":"dpapi:","a":null}"#).unwrap();
         assert_eq!(t.p, "");
         assert_eq!(t.c, None);
-        assert_eq!(seal(""), "");
+        assert_eq!(seal(""), Ok(String::new()));
+    }
+
+    #[test]
+    fn every_secret_serializer_refuses_plaintext_on_protection_failure() {
+        for t in [
+            T {
+                p: "test-password".into(),
+                c: None,
+                a: None,
+            },
+            T {
+                p: String::new(),
+                c: Some("test-cookie=value".into()),
+                a: None,
+            },
+            T {
+                p: String::new(),
+                c: None,
+                a: Some(("user".into(), "test-auth-password".into())),
+            },
+        ] {
+            with_failed_protection(|| {
+                let error = serde_json::to_string(&t).unwrap_err().to_string();
+                assert!(error.contains("Secure storage is unavailable"));
+                assert!(!error.contains("test-password"));
+                assert!(!error.contains("test-cookie"));
+                assert!(!error.contains("test-auth-password"));
+            });
+        }
+        with_failed_protection(|| {
+            let t = T {
+                p: String::new(),
+                c: None,
+                a: None,
+            };
+            assert!(serde_json::to_string(&t).is_ok());
+        });
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn failed_protection_is_not_cached_and_legacy_data_migrates() {
+        let plain = "test-cookie=retry-after-dpapi-failure";
+        with_failed_protection(|| assert!(seal(plain).is_err()));
+        let protected = seal(plain).unwrap();
+        assert!(protected.starts_with(PREFIX));
+        assert!(!protected.contains(plain));
+        assert_eq!(open(&protected), plain);
+        assert_eq!(seal(plain).unwrap(), protected);
     }
 }

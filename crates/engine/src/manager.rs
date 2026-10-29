@@ -50,6 +50,10 @@ pub enum Event {
     QuotaReached,
     /// the queue wants this finished file opened
     OpenFile(DownloadId),
+    /// A save failed; no secret values or low-level error details are exposed.
+    PersistenceFailed {
+        settings: bool,
+    },
 }
 
 #[derive(Default)]
@@ -88,6 +92,7 @@ pub struct Manager {
     proxy: Mutex<ProxyConfig>,
     rt: Handle,
     data_dir: PathBuf,
+    save_failures: Mutex<[bool; 2]>,
     /// the hidden torrent program (started when the first torrent runs)
     torrents: Arc<torrent::Aria2>,
 }
@@ -198,6 +203,7 @@ impl Manager {
             rt: rt.clone(),
             torrents: Arc::new(torrent::Aria2::new(&data_dir.join("torrents"))),
             data_dir,
+            save_failures: Mutex::new([false; 2]),
         });
 
         for q in startup_queues {
@@ -221,13 +227,20 @@ impl Manager {
     }
 
     pub fn set_settings(self: &Arc<Self>, s: Settings) -> anyhow::Result<()> {
-        self.shared.limiter.set_rate(s.effective_limit());
         let proxy = ProxyConfig::from_settings(&s);
-        if *self.proxy.lock().unwrap() != proxy {
-            self.shared.set_client(build_client_with(&proxy)?);
+        let client = if *self.proxy.lock().unwrap() != proxy {
+            Some(build_client_with(&proxy)?)
+        } else {
+            None
+        };
+        let saved = s.save(&self.data_dir.join("settings.json"));
+        self.note_save_result(true, saved.is_err());
+        saved?;
+        self.shared.limiter.set_rate(s.effective_limit());
+        if let Some(client) = client {
+            self.shared.set_client(client);
             *self.proxy.lock().unwrap() = proxy;
         }
-        s.save(&self.data_dir.join("settings.json"))?;
         s.create_folders();
         *self.settings.write().unwrap() = s;
         self.pump();
@@ -1140,7 +1153,7 @@ impl Manager {
     }
 
     /// Stop everything and write the state to disk (call before exiting).
-    pub fn shutdown(&self) {
+    pub fn shutdown(&self) -> anyhow::Result<()> {
         let records = {
             let mut inner = self.inner.lock().unwrap();
             for e in inner.entries.values_mut() {
@@ -1153,10 +1166,29 @@ impl Manager {
             }
             collect_records(&inner)
         };
-        let _ = store::save_downloads(&self.data_dir.join("downloads.json"), &records);
+        self.persist_downloads(&records)
     }
 
     // ---------------------------------------------------------------- internals
+
+    fn note_save_result(&self, settings: bool, failed: bool) {
+        let mut failures = self.save_failures.lock().unwrap();
+        let index = usize::from(settings);
+        if failed && !failures[index] {
+            self.inner
+                .lock()
+                .unwrap()
+                .events
+                .push(Event::PersistenceFailed { settings });
+        }
+        failures[index] = failed;
+    }
+
+    fn persist_downloads(&self, records: &[DownloadRecord]) -> anyhow::Result<()> {
+        let saved = store::save_downloads(&self.data_dir.join("downloads.json"), records);
+        self.note_save_result(false, saved.is_err());
+        saved
+    }
 
     /// Launch waiting downloads while there are free slots: no global limit
     /// unless set in options, and each queue runs its own number of files at
@@ -2182,7 +2214,10 @@ impl Manager {
             }
         };
         if let Some(records) = to_save {
-            let _ = store::save_downloads(&self.data_dir.join("downloads.json"), &records);
+            if self.persist_downloads(&records).is_err() {
+                // Keep retrying at the normal interval, without repeated alerts.
+                self.inner.lock().unwrap().dirty = true;
+            }
         }
         self.pump();
         self.check_schedule();
@@ -2619,6 +2654,116 @@ mod name_tests {
         );
         assert_eq!(playlist_stem("2024 plans", "Plans"), "Plans");
         assert_eq!(playlist_stem("07 - Old", "  "), "07 - Old");
+    }
+}
+
+#[cfg(test)]
+mod persistence_tests {
+    use super::*;
+    use std::sync::atomic::AtomicU64;
+
+    fn manager() -> (tokio::runtime::Runtime, Arc<Manager>, PathBuf) {
+        static NEXT: AtomicU64 = AtomicU64::new(0);
+        let dir = std::env::temp_dir().join(format!(
+            "kero-save-failure-{}-{}",
+            std::process::id(),
+            NEXT.fetch_add(1, Ordering::Relaxed)
+        ));
+        let settings = Settings {
+            download_dir: dir.join("files"),
+            ..Settings::default()
+        };
+        settings.save(&dir.join("settings.json")).unwrap();
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .unwrap();
+        let mgr = Manager::new(rt.handle().clone(), dir.clone()).unwrap();
+        (rt, mgr, dir)
+    }
+
+    #[test]
+    fn settings_failure_keeps_saved_and_active_settings_and_deduplicates_alerts() {
+        let (_rt, mgr, dir) = manager();
+        let previous = std::fs::read(dir.join("settings.json")).unwrap();
+        let original = mgr.settings();
+        let mut changed = original.clone();
+        changed.proxy_password = "test-proxy-private-value".into();
+        changed.speed_limit_on = true;
+        changed.speed_limit_kb = 73;
+        crate::secret::with_failed_protection(|| {
+            assert!(mgr.set_settings(changed.clone()).is_err());
+            assert!(mgr.set_settings(changed.clone()).is_err());
+        });
+        assert_eq!(std::fs::read(dir.join("settings.json")).unwrap(), previous);
+        assert_eq!(mgr.settings().proxy_password, original.proxy_password);
+        assert_eq!(mgr.settings().speed_limit_on, original.speed_limit_on);
+        assert_eq!(
+            mgr.take_events(),
+            vec![Event::PersistenceFailed { settings: true }]
+        );
+        assert!(!dir.join("settings.json.tmp").exists());
+        mgr.set_settings(original).unwrap();
+        crate::secret::with_failed_protection(|| assert!(mgr.set_settings(changed).is_err()));
+        assert_eq!(
+            mgr.take_events(),
+            vec![Event::PersistenceFailed { settings: true }]
+        );
+        std::fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn autosave_failure_preserves_list_and_credentials_and_retries_without_spam() {
+        let (_rt, mgr, dir) = manager();
+        store::save_downloads(&dir.join("downloads.json"), &[]).unwrap();
+        let previous = std::fs::read(dir.join("downloads.json")).unwrap();
+        let id = mgr.add(NewDownload {
+            url: "https://example.invalid/test.bin".into(),
+            file_name: Some("test.bin".into()),
+            save_dir: Some(dir.join("files")),
+            headers: RequestHeaders {
+                cookies: Some("test-session=private-value".into()),
+                ..RequestHeaders::default()
+            },
+            ..NewDownload::default()
+        });
+        crate::secret::with_failed_protection(|| {
+            for _ in 0..2 {
+                mgr.inner.lock().unwrap().last_save = Instant::now() - Duration::from_secs(4);
+                mgr.tick();
+                assert!(mgr.inner.lock().unwrap().dirty);
+            }
+            assert!(mgr.shutdown().is_err());
+        });
+        assert_eq!(std::fs::read(dir.join("downloads.json")).unwrap(), previous);
+        assert!(!dir.join("downloads.json.tmp").exists());
+        assert_eq!(
+            mgr.inner.lock().unwrap().entries[&id]
+                .rec
+                .headers
+                .cookies
+                .as_deref(),
+            Some("test-session=private-value")
+        );
+        assert_eq!(
+            mgr.take_events(),
+            vec![Event::PersistenceFailed { settings: false }]
+        );
+        #[cfg(windows)]
+        {
+            mgr.shutdown().unwrap();
+            let json = std::fs::read_to_string(dir.join("downloads.json")).unwrap();
+            assert!(json.contains("dpapi:"));
+            assert!(!json.contains("test-session=private-value"));
+            assert_eq!(
+                store::load_downloads(&dir.join("downloads.json"))[0]
+                    .headers
+                    .cookies
+                    .as_deref(),
+                Some("test-session=private-value")
+            );
+        }
+        std::fs::remove_dir_all(dir).unwrap();
     }
 }
 

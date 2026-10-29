@@ -1,0 +1,58 @@
+name: Secure storage Windows 7 compatibility
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - crates/engine/src/secret.rs
+      - crates/engine/src/store.rs
+      - crates/engine/src/manager.rs
+      - .github/workflows/security-compatibility.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  win7:
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-win7-windows-msvc
+            platform: Win7-x64
+            arch: x86_64
+          - target: i686-win7-windows-msvc
+            platform: Win7-x86
+            arch: x86
+    env:
+      RUSTFLAGS: -C target-feature=+crt-static
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+        with:
+          toolchain: nightly-2026-10-29
+          components: rust-src
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          key: platform-${{ matrix.platform }}-${{ hashFiles('tools/prepare-win7.py') }}
+          cache-on-failure: true
+      - name: Build and test secure persistence for the legacy target
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          cargo fetch --locked --target ${{ matrix.target }}
+          if ($LASTEXITCODE -ne 0) { throw 'Locked dependency fetch failed' }
+          $cargoRoot = if ($env:CARGO_HOME) { $env:CARGO_HOME } else { Join-Path $env:USERPROFILE '.cargo' }
+          $package = if ('${{ matrix.arch }}' -eq 'x86') { 'windows_i686_msvc' } else { 'windows_x86_64_msvc' }
+          $imports = (Resolve-Path "$cargoRoot/registry/src/*/$package-0.48.5/lib" | Select-Object -First 1).Path
+          python tools/prepare-win7.py --cargo-root "$cargoRoot"
+          if ($LASTEXITCODE -ne 0) { throw 'Compatibility source verification failed' }
+          $env:CARGO_ENCODED_RUSTFLAGS = "-C$([char]31)target-feature=+crt-static$([char]31)-Lnative=$imports$([char]31)--cfg$([char]31)windows_slim_errors"
+          cargo build --locked --release --target ${{ matrix.target }} -Z build-std=std,panic_abort --features legacy-win7
+          if ($LASTEXITCODE -ne 0) { throw 'Legacy application build failed' }
+          python tools/check-win7-imports.py target/${{ matrix.target }}/release/KeRoDownload.exe
+          if ($LASTEXITCODE -ne 0) { throw 'Known post-Windows-7 import detected' }
+          cargo test --locked -p swiftget-engine --target ${{ matrix.target }} -Z build-std=std,panic_abort --features legacy-win7
+          if ($LASTEXITCODE -ne 0) { throw 'Secure persistence tests failed' }

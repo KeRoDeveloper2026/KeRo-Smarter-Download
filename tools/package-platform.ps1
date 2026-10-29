@@ -1,6 +1,9 @@
 param([Parameter(Mandatory)][string]$Platform, [Parameter(Mandatory)][string]$Target, [bool]$Legacy)
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
+# Keep the key out of every helper/tool process; expose it only to our signer.
+$releaseSigningKey = $env:UPDATE_SIGNING_KEY
+Remove-Item Env:UPDATE_SIGNING_KEY -ErrorAction SilentlyContinue
 $version = ([regex]::Match((Get-Content Cargo.toml -Raw), '(?m)^version\s*=\s*"([^"]+)"')).Groups[1].Value
 $x86 = $Target.StartsWith('i686-')
 $machine = if ($x86) { 0x14c } else { 0x8664 }
@@ -80,10 +83,17 @@ if ($x86) { $defines += '/DAppX86' }
 if ($Legacy) { $defines += '/DLegacyWin7' }
 & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /Q @defines installer/KeRo.iss
 if ($LASTEXITCODE -ne 0) { throw 'Inno Setup failed' }
-if (-not $env:UPDATE_SIGNING_KEY) { throw 'UPDATE_SIGNING_KEY is required' }
+if (-not $releaseSigningKey) { throw 'UPDATE_SIGNING_KEY is required' }
 $hash = (Get-FileHash "dist/$name.exe" -Algorithm SHA256).Hash.ToLower()
 # The signing utility executes on the build host, independent of target architecture.
-$sig = (cargo run --locked --quiet --release -p swiftget-engine --example sign_update -- $version $hash).Trim()
-if ($LASTEXITCODE -ne 0 -or $sig.Length -ne 128) { throw 'Update signing failed' }
+try {
+    $env:UPDATE_SIGNING_KEY = $releaseSigningKey
+    $sig = (& ./target/release/examples/sign_update.exe $version $hash).Trim()
+    $signExit = $LASTEXITCODE
+} finally {
+    Remove-Item Env:UPDATE_SIGNING_KEY -ErrorAction SilentlyContinue
+    $releaseSigningKey = $null
+}
+if ($signExit -ne 0 -or $sig.Length -ne 128) { throw 'Update signing failed' }
 $manifest = @{ version = $version; url = "https://github.com/$env:GITHUB_REPOSITORY/releases/download/v$version/$name.exe"; sha256 = $hash; sig = $sig }
 $manifest | ConvertTo-Json | Set-Content "dist/version-$Platform.json" -Encoding utf8
