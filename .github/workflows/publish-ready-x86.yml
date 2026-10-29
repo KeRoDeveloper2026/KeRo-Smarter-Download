@@ -1,50 +1,130 @@
-name: Publish verified Windows 10-11 x86 installer
+name: One-time repository history cleanup
 
 on:
   push:
     branches: [main]
     paths: [.github/workflows/publish-ready-x86.yml]
-  workflow_dispatch:
 
 permissions:
-  actions: read
   contents: write
 
 jobs:
-  publish:
+  clean-history:
+    if: github.event.head_commit.message == 'Clean distribution archives from all branch and tag history'
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      EXPECTED_HEAD: ${{ github.sha }}
     steps:
-      # Reuse the successful package; do not rebuild the application.
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+      - name: Back up all branch and tag history
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet git-filter-repo==2.47.0
+          git clone --mirror "https://github.com/$GITHUB_REPOSITORY.git" history.git
+          test "$(git --git-dir=history.git rev-parse refs/heads/main)" = "$EXPECTED_HEAD"
+          git --git-dir=history.git bundle create "$GITHUB_WORKSPACE/before-history-cleanup.bundle" --all
+          git clone --mirror --no-hardlinks history.git original.git
+          gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" > releases-before.json
+          sha256sum before-history-cleanup.bundle > before-history-cleanup.bundle.sha256
+      - name: Keep a recovery bundle outside Git history
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: KeRoDownload-Win10_11-x86
-          run-id: 40800403612
-          github-token: ${{ github.token }}
-          path: dist
-      - name: Verify the existing installer and signed update manifest
+          name: before-history-cleanup
+          path: |
+            before-history-cleanup.bundle
+            before-history-cleanup.bundle.sha256
+            releases-before.json
+          retention-days: 30
+          if-no-files-found: error
+      - name: Remove distribution archives and verify every rewritten commit
         shell: bash
         run: |
-          node <<'JS'
-          const fs = require('node:fs');
-          const crypto = require('node:crypto');
-          const assert = require('node:assert/strict');
-          const m = JSON.parse(fs.readFileSync('dist/version-Win10_11-x86.json', 'utf8').replace(/^\uFEFF/, ''));
-          const file = 'KeRoDownload-v1.1.3-Win10_11-x86.exe';
-          assert.equal(m.version, '1.1.3');
-          assert.equal(m.url, `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/download/v1.1.3/${file}`);
-          const digest = crypto.createHash('sha256').update(fs.readFileSync(`dist/${file}`)).digest('hex');
-          assert.equal(digest, m.sha256.toLowerCase());
-          const key = crypto.createPublicKey({format: 'der', type: 'spki', key: Buffer.from('302a300506032b6570032100' + '075015a13e692aee5ef27f6129b767f116029728146c0fb7091200d4e05c11fd', 'hex')});
-          assert(crypto.verify(null, Buffer.from(`kero-download-update\n${m.version.trim()}\n${m.sha256.trim().toLowerCase()}\n`), key, Buffer.from(m.sig, 'hex')));
-          const ff = 'ffmpeg-Win10_11-x86.zip';
-          const expected = fs.readFileSync(`dist/${ff}.sha256`, 'utf8').trim().split(/\s+/)[0];
-          assert.equal(crypto.createHash('sha256').update(fs.readFileSync(`dist/${ff}`)).digest('hex'), expected);
-          console.log('Existing installer, Ed25519 signature and helper archive verified.');
-          JS
-      - name: Append x86 files to the existing release
+          set -euo pipefail
+          cd history.git
+          git filter-repo --force --invert-paths --path KeRo-Smarter-Download.zip --path KeRo-Extension-Chromium.zip --path KeRo-Extension-Firefox.zip --path kero-download-firefox-1.1.0-unsigned.xpi --path SHA256SUMS.txt --prune-empty never --prune-degenerate never
+          cd ..
+          python <<'PY'
+          import json, pathlib, subprocess
+          root = pathlib.Path.cwd()
+          before, after = root / 'original.git', root / 'history.git'
+          removed = {b'KeRo-Smarter-Download.zip', b'KeRo-Extension-Chromium.zip', b'KeRo-Extension-Firefox.zip', b'kero-download-firefox-1.1.0-unsigned.xpi', b'SHA256SUMS.txt'}
+          def git(repo, *args):
+              return subprocess.check_output(['git', '--git-dir=' + str(repo), *args])
+          def refs(repo):
+              return dict(line.split() for line in git(repo, 'for-each-ref', '--format=%(refname) %(objectname)', 'refs/heads/', 'refs/tags/').decode().splitlines())
+          def tree(repo, sha):
+              entries = {}
+              for row in git(repo, 'ls-tree', '-rz', sha).split(b'\0'):
+                  if row:
+                      meta, name = row.split(b'\t', 1)
+                      if name not in removed:
+                          entries[name] = meta
+              return entries
+          def metadata(repo, sha):
+              header, message = git(repo, 'cat-file', '-p', sha).split(b'\n\n', 1)
+              return [line for line in header.splitlines() if line.startswith((b'author ', b'committer '))], message
+          mapping = dict(line.split() for line in (after / 'filter-repo/commit-map').read_text().splitlines()[1:])
+          for old, new in mapping.items():
+              assert new != '0' * 40, 'A commit was unexpectedly removed'
+              assert tree(before, old) == tree(after, new), 'Source tree mismatch: ' + old
+              assert metadata(before, old) == metadata(after, new), 'Authorship or message changed: ' + old
+          old_refs, new_refs = refs(before), refs(after)
+          assert set(old_refs) == set(new_refs), 'Ref names changed'
+          for ref, old in old_refs.items():
+              assert new_refs[ref] == mapping[old], 'Ref mapping mismatch: ' + ref
+          assert git(before, 'rev-parse', 'refs/heads/main^{tree}') == git(after, 'rev-parse', 'refs/heads/main^{tree}'), 'Current source tree changed'
+          for row in git(after, 'rev-list', '--objects', '--all').splitlines():
+              parts = row.split(b' ', 1)
+              assert len(parts) == 1 or not parts[1].lower().endswith((b'.zip', b'.xpi')), 'Archive still reachable'
+          def pack_bytes(repo):
+              return sum(p.stat().st_size for p in (repo / 'objects/pack').glob('*.pack'))
+          report = {'commits_verified': len(mapping), 'old_refs': old_refs, 'new_refs': new_refs, 'pack_bytes_before': pack_bytes(before), 'pack_bytes_after': pack_bytes(after), 'current_source_tree_unchanged': True}
+          (root / 'cleanup-report.json').write_text(json.dumps(report, indent=2) + '\n')
+          print(json.dumps(report, indent=2))
+          PY
+      - name: Atomically replace only the verified branch and release tags
         shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
-          gh release view v1.1.3 --repo "$GITHUB_REPOSITORY"
-          gh release upload v1.1.3 dist/* --repo "$GITHUB_REPOSITORY"
+          set -euo pipefail
+          python <<'PY'
+          import base64, json, os, subprocess
+          from pathlib import Path
+          report = json.loads(Path('cleanup-report.json').read_text())
+          repository = os.environ['GITHUB_REPOSITORY']
+          repo = Path('history.git').resolve()
+          subprocess.run(['git', '--git-dir=' + str(repo), 'remote', 'add', 'origin', 'https://github.com/' + repository + '.git'], check=True)
+          env = os.environ.copy()
+          auth = base64.b64encode(('x-access-token:' + env['GH_TOKEN']).encode()).decode()
+          env.update(GIT_CONFIG_COUNT='1', GIT_CONFIG_KEY_0='http.https://github.com/.extraheader', GIT_CONFIG_VALUE_0='AUTHORIZATION: basic ' + auth)
+          command = ['git', '--git-dir=' + str(repo), 'push', '--atomic', 'origin']
+          for ref, old in report['old_refs'].items():
+              command.append('--force-with-lease=' + ref + ':' + old)
+          for ref, new in report['new_refs'].items():
+              command.append(new + ':' + ref)
+          subprocess.run(command, check=True, env=env)
+          PY
+      - name: Verify release attachments were preserved
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" > releases-after.json
+          python <<'PY'
+          import json, pathlib
+          def snapshot(path):
+              releases = json.loads(pathlib.Path(path).read_text())
+              return sorted((r['id'], r['tag_name'], r['name'], r['body'], sorted((a['id'], a['name'], a['size'], a.get('digest'), a['browser_download_url']) for a in r['assets'])) for r in releases)
+          assert snapshot('releases-before.json') == snapshot('releases-after.json'), 'Release metadata or attachments changed'
+          print('All release IDs, names, descriptions and attachment IDs, sizes, digests and URLs preserved.')
+          PY
+      - name: Keep the verification report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: history-cleanup-verification
+          path: |
+            cleanup-report.json
+            history.git/filter-repo/commit-map
+            releases-after.json
+          retention-days: 30
