@@ -28,6 +28,16 @@
 
 > **Windows 7용은 실험 버전입니다.** Windows Server 2022에서 빌드, 다운로드 엔진 테스트, 보조 도구 및 종속성 검사를 통과했습니다. 실제 Windows 7 기기에서 설치, 화면 동작, 브라우저 연동은 아직 검증하지 않았습니다. [호환성 세부 정보 (영어)](WINDOWS-BUILDS.md).
 
+## 확장 기능 업데이트 — v1.1.1
+
+아래에서 맞는 패키지를 받으세요. 데스크톱 앱을 다시 설치할 필요는 없습니다. 기존 설치 파일에는 이전 확장 기능이 포함될 수 있습니다. 압축을 풀고 새 폴더를 로드한 뒤 중복된 이전 확장 기능을 끄고 열려 있는 웹페이지를 새로 고치세요. Chromium 패키지는 Windows의 Chrome, Brave, Edge, Opera / Opera GX, Vivaldi용입니다. Safari와 모바일 브라우저 버전은 포함되지 않습니다.
+
+- [Chromium — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Chromium.zip)
+- [Firefox 140+ — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Firefox.zip)
+- [Firefox 115 ESR / Win7 — v1.1.1 (실험 버전)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Firefox-Win7.zip)
+
+[호환성 및 테스트 범위 (아랍어 / 영어)](BROWSERS.md)
+
 ## 주요 기능
 
 - 서버가 지원하는 경우 최대 32개 연결로 다운로드합니다.

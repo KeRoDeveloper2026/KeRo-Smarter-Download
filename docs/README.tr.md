@@ -28,6 +28,16 @@
 
 > **Windows 7 sürümleri deneyseldir.** Derleme, indirme motoru testleri, yardımcı araç ve bağımlılık kontrolleri Windows Server 2022 üzerinde başarılı oldu. Kurulum, arayüz ve tarayıcı entegrasyonu henüz gerçek bir Windows 7 cihazında test edilmedi. [Uyumluluk ayrıntıları (İngilizce)](WINDOWS-BUILDS.md).
 
+## Uzantı güncellemesi — v1.1.1
+
+Programı yeniden kurmadan uygun paketi indirin. Yayımlanmış yükleyiciler daha eski bir uzantı içerebilir. Yeni paketi açıp klasörünü yükleyin, yinelenen eski kopyaları devre dışı bırakın ve açık sayfaları yenileyin. Chromium paketi Windows üzerinde Chrome, Brave, Edge, Opera / Opera GX ve Vivaldi için hazırlanmıştır. Safari ve mobil tarayıcılar dahil değildir.
+
+- [Chromium — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Chromium.zip)
+- [Firefox 140+ — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Firefox.zip)
+- [Firefox 115 ESR / Win7 — v1.1.1 (Deneysel)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Firefox-Win7.zip)
+
+[Uyumluluk ve test kapsamı (Arapça / İngilizce)](BROWSERS.md)
+
 ## Özellikler
 
 - Sunucu destekliyorsa 32 bağlantıya kadar indirme.

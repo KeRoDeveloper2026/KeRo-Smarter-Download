@@ -28,6 +28,16 @@ No Windows 10 de 32 bits, escolha x86. No Windows 10 ou Windows 11 de 64 bits, r
 
 > **Windows 7: versões experimentais.** A compilação, os testes do mecanismo de download e as verificações das ferramentas e dependências passaram no Windows Server 2022. A instalação, a interface e a integração com navegadores ainda não foram testadas em um dispositivo real com Windows 7. [Detalhes de compatibilidade (inglês)](WINDOWS-BUILDS.md).
 
+## Atualização da extensão — v1.1.1
+
+Baixe o pacote adequado sem reinstalar o programa. Os instaladores publicados podem conter uma extensão mais antiga. Extraia e carregue a nova pasta, desative cópias antigas duplicadas e atualize as páginas abertas. O pacote Chromium é destinado ao Chrome, Brave, Edge, Opera / Opera GX e Vivaldi no Windows. Safari e navegadores móveis não estão incluídos.
+
+- [Chromium — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Chromium.zip)
+- [Firefox 140+ — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Firefox.zip)
+- [Firefox 115 ESR / Win7 — v1.1.1 (Experimental)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Firefox-Win7.zip)
+
+[Compatibilidade e limites dos testes (árabe / inglês)](BROWSERS.md)
+
 ## Recursos
 
 - Downloads com até 32 conexões, quando o servidor oferece suporte.

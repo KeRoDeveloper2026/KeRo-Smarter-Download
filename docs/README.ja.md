@@ -28,6 +28,16 @@
 
 > **Windows 7 向けは実験版です。** Windows Server 2022 上でビルド、ダウンロードエンジンのテスト、補助ツールと依存関係の確認を実施しました。実際の Windows 7 端末でのインストール、画面の動作、ブラウザー連携は未検証です。 [互換性の詳細（英語）](WINDOWS-BUILDS.md).
 
+## 拡張機能の更新 — v1.1.1
+
+下の対応するパッケージをダウンロードしてください。アプリの再インストールは不要です。公開済みのインストーラーには古い拡張機能が含まれる場合があります。新しいフォルダーを展開して読み込み、重複する古い拡張機能を無効にしてから、開いているページを更新してください。Chromium パッケージは Windows の Chrome、Brave、Edge、Opera / Opera GX、Vivaldi 向けです。Safari とモバイルブラウザーは含まれていません。
+
+- [Chromium — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Chromium.zip)
+- [Firefox 140+ — v1.1.1](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Firefox.zip)
+- [Firefox 115 ESR / Win7 — v1.1.1 (実験版)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extension-v1.1.1-Firefox-Win7.zip)
+
+[互換性とテスト範囲（アラビア語／英語）](BROWSERS.md)
+
 ## 主な機能
 
 - サーバーが対応している場合、最大 32 接続でダウンロード。
