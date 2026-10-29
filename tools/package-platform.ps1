@@ -1,4 +1,4 @@
-param([Parameter(Mandatory)][string]$Platform, [Parameter(Mandatory)][string]$Target, [bool]$Legacy)
+param([Parameter(Mandatory)][string]$Platform, [Parameter(Mandatory)][string]$Target, [bool]$Legacy, [switch]$Preview)
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 # Keep the key out of every helper/tool process; expose it only to our signer.
@@ -50,10 +50,10 @@ if ($Legacy) {
     Download-Checked "https://github.com/nicolaasjan/yt-dlp/releases/download/2026.10.27.141215/$ytName" "$stage/tools/yt-dlp.exe" $ytHash
 } else {
     $release = Invoke-RestMethod https://api.github.com/repos/yt-dlp/yt-dlp/releases/latest -Headers @{ Authorization = "Bearer $env:GH_TOKEN" }
-    $ytName = 'yt-dlp_x86.exe'
+    $ytName = if ($x86) { 'yt-dlp_x86.exe' } else { 'yt-dlp.exe' }
     $sums = (Invoke-WebRequest ($release.assets | Where-Object name -eq 'SHA2-256SUMS').browser_download_url).Content
     if ($sums -is [byte[]]) { $sums = [Text.Encoding]::UTF8.GetString($sums) }
-    $ytHash = [regex]::Match($sums, '(?m)^([0-9a-fA-F]{64})\s+\*?yt-dlp_x86\.exe\s*$').Groups[1].Value
+    $ytHash = [regex]::Match($sums, ('(?m)^([0-9a-fA-F]{64})\s+\*?' + [regex]::Escape($ytName) + '\s*$')).Groups[1].Value
     if ($ytHash.Length -ne 64) { throw 'Missing yt-dlp checksum' }
     Download-Checked ($release.assets | Where-Object name -eq $ytName).browser_download_url "$stage/tools/yt-dlp.exe" $ytHash
 }
@@ -73,7 +73,7 @@ foreach ($tool in @('ffmpeg', 'yt-dlp', 'aria2c')) {
     & "$stage/tools/$tool.exe" $arg
     if ($LASTEXITCODE -ne 0) { throw "$tool smoke test failed on the build host" }
 }
-$description = if ($Legacy) { 'EXPERIMENTAL: built for Windows 7 SP1; runtime testing on Windows 7 is still required. Engine and helper smoke tests run on Windows Server 2022 only. Community yt-dlp build is pinned; automatic replacement with upstream yt-dlp is disabled.' } else { 'x86 build for Windows 10; can also run through x86 compatibility on Windows 11. Engine and helper smoke tests run on Windows Server 2022.' }
+$description = if ($Legacy) { 'EXPERIMENTAL: built for Windows 7 SP1; runtime testing on Windows 7 is still required. Engine and helper smoke tests run on Windows Server 2022 only. Community yt-dlp build is pinned; automatic replacement with upstream yt-dlp is disabled.' } else { "$Platform build for Windows 10/11. Engine and helper smoke tests run on Windows Server 2022." }
 [IO.File]::WriteAllText("$PWD/dist/BUILD-INFO-$Platform.txt", "KeRo Smarter Download $version`nSource: $env:GITHUB_SHA`nTarget: $Target`n$description`n")
 $label = if ($Legacy) { $Platform.Replace('Win7-', 'Win7-Experimental-') } else { $Platform }
 $name = "KeRoDownload-v$version-$label"
@@ -83,8 +83,14 @@ if ($x86) { $defines += '/DAppX86' }
 if ($Legacy) { $defines += '/DLegacyWin7' }
 & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /Q @defines installer/KeRo.iss
 if ($LASTEXITCODE -ne 0) { throw 'Inno Setup failed' }
-if (-not $releaseSigningKey) { throw 'UPDATE_SIGNING_KEY is required' }
 $hash = (Get-FileHash "dist/$name.exe" -Algorithm SHA256).Hash.ToLower()
+[IO.File]::WriteAllText("$PWD/dist/$name.exe.sha256", "$hash  $name.exe`n")
+# Candidates never produce an update manifest or access a signing secret.
+if ($Preview) {
+    $releaseSigningKey = $null
+    return
+}
+if (-not $releaseSigningKey) { throw 'UPDATE_SIGNING_KEY is required' }
 # The signing utility executes on the build host, independent of target architecture.
 try {
     $env:UPDATE_SIGNING_KEY = $releaseSigningKey

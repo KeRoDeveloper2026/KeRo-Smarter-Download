@@ -1,0 +1,151 @@
+name: v1.1.4 installer previews (no publication)
+
+# Candidates are artifacts only. No tag, release, update manifest or signing secret.
+on:
+  push:
+    branches: [release/1.1.4-preview]
+    paths:
+      - .github/workflows/preview-builds.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ffmpeg:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x86, x86_64]
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+        id: cache
+        with:
+          path: ffmpeg-out
+          key: ffmpeg-platform-${{ matrix.arch }}-${{ hashFiles('tools/ffmpeg/build.sh') }}
+      - name: Build matching FFmpeg
+        if: steps.cache.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q mingw-w64 nasm pkg-config make
+          git clone -q --depth 1 --branch n8.0.3 https://github.com/FFmpeg/FFmpeg ffmpeg-src
+          test "$(git -C ffmpeg-src rev-parse HEAD)" = 8ae0b34901ba60a802f183ee75a250a9fc3e09a5
+          curl -fsSL -o lame.tar.gz https://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz
+          echo 'ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e  lame.tar.gz' | sha256sum -c -
+          tar xzf lame.tar.gz
+          ARCH=${{ matrix.arch }} tools/ffmpeg/build.sh ffmpeg-src lame-3.100 ffmpeg-out
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ffmpeg-${{ matrix.arch }}
+          path: ffmpeg-out
+
+  build:
+    needs: ffmpeg
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: Win10_11-x64
+            target: x86_64-pc-windows-msvc
+            toolchain: 1.99.1
+            arch: x86_64
+            legacy: false
+          - platform: Win10_11-x86
+            target: i686-pc-windows-msvc
+            toolchain: 1.99.1
+            arch: x86
+            legacy: false
+          - platform: Win7-x64
+            target: x86_64-win7-windows-msvc
+            toolchain: nightly-2026-10-29
+            arch: x86_64
+            legacy: true
+          - platform: Win7-x86
+            target: i686-win7-windows-msvc
+            toolchain: nightly-2026-10-29
+            arch: x86
+            legacy: true
+    env:
+      RUSTFLAGS: -C target-feature=+crt-static
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Parse packaging and upgrade scripts
+        shell: pwsh
+        run: |
+          foreach ($path in @('tools/package-platform.ps1', 'tools/test-installer-upgrade.ps1')) {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile((Join-Path $PWD $path), [ref]$tokens, [ref]$errors) | Out-Null
+            if ($errors.Count) { throw "$path has PowerShell syntax errors: $errors" }
+          }
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+        with:
+          toolchain: ${{ matrix.toolchain }}
+          components: rust-src
+      - name: Install standard target
+        if: ${{ !matrix.legacy }}
+        run: rustup target add ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          key: platform-${{ matrix.platform }}-${{ hashFiles('tools/prepare-win7.py') }}
+          cache-on-failure: true
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: ffmpeg-${{ matrix.arch }}
+          path: ffmpeg-out
+      - name: Build application and test engine for target
+        shell: pwsh
+        run: |
+          $extra = @()
+          if ('${{ matrix.legacy }}' -eq 'true') { $extra = @('-Z', 'build-std=std,panic_abort', '--features', 'legacy-win7') }
+          if ('${{ matrix.legacy }}' -eq 'true') {
+            cargo fetch --locked --target ${{ matrix.target }}
+            if ($LASTEXITCODE -ne 0) { throw 'Dependency fetch failed' }
+            $legacyCargoRoot = if ($env:CARGO_HOME) { $env:CARGO_HOME } else { Join-Path $env:USERPROFILE '.cargo' }
+            $legacyPackage = if ('${{ matrix.arch }}' -eq 'x86') { 'windows_i686_msvc' } else { 'windows_x86_64_msvc' }
+            $legacyImportDir = (Resolve-Path "$legacyCargoRoot/registry/src/*/$legacyPackage-0.48.5/lib" | Select-Object -First 1).Path
+            if (-not $legacyImportDir) { throw 'Legacy Windows import libraries are missing' }
+            python tools/prepare-win7.py --cargo-root "$legacyCargoRoot"
+            if ($LASTEXITCODE -ne 0) { throw 'Windows 7 COM compatibility patch failed' }
+            # The app and engine test binaries both use older Windows crates.
+            # Encode arguments separately so even a Cargo path with spaces is safe.
+            $env:CARGO_ENCODED_RUSTFLAGS = "-C$([char]31)target-feature=+crt-static$([char]31)-Lnative=$legacyImportDir$([char]31)--cfg$([char]31)windows_slim_errors"
+          }
+          cargo build --locked --release --target ${{ matrix.target }} @extra
+          if ($LASTEXITCODE -ne 0) { throw 'Application build failed' }
+          if ('${{ matrix.legacy }}' -eq 'true') {
+            python tools/check-win7-imports.py 'target/${{ matrix.target }}/release/KeRoDownload.exe' ffmpeg-out/ffmpeg.exe
+            if ($LASTEXITCODE -ne 0) { throw 'Known post-Windows-7 API dependency found' }
+          }
+          cargo test --locked -p swiftget-engine --target ${{ matrix.target }} @extra
+          if ($LASTEXITCODE -ne 0) { throw 'Engine tests failed' }
+      - name: Preserve Windows 7 candidate for diagnostics on failure
+        if: ${{ failure() && matrix.legacy }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: diagnostic-${{ matrix.platform }}
+          path: target/${{ matrix.target }}/release/KeRoDownload.exe
+          if-no-files-found: ignore
+      - name: Package and verify architecture
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./tools/package-platform.ps1 -Platform '${{ matrix.platform }}' -Target '${{ matrix.target }}' -Legacy:$${{ matrix.legacy }} -Preview
+      - name: Check installation over v1.1.3 preserves data
+        shell: pwsh
+        run: ./tools/test-installer-upgrade.ps1 -Platform '${{ matrix.platform }}'
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: KeRoDownload-v1.1.4-preview-${{ matrix.platform }}
+          path: |
+            dist/*.exe
+            dist/*.exe.sha256
+            dist/BUILD-INFO-*.txt
+            dist/IMPORTS-*.json
+            dist/UPGRADE-*.txt
+          if-no-files-found: error
+          retention-days: 30
