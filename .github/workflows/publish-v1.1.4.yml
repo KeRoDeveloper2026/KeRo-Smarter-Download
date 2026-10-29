@@ -1,0 +1,81 @@
+name: Publish approved v1.1.4 installers
+
+# One approved promotion: never builds or repackages the application.
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/publish-v1.1.4.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: publish-approved-v1.1.4
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    if: github.ref == 'refs/heads/main'
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - name: Validate approved source, successful checks and selected artifacts
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./tools/promote-tested-release.ps1 -Phase Validate
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          github-token: ${{ github.token }}
+          run-id: 40953114738
+          artifact-ids: 12933755326,12933256235,12933250822,12933067125
+          merge-multiple: true
+          path: dist
+      - name: Verify exact tested installers and retain matching support packages
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./tools/promote-tested-release.ps1 -Phase Prepare
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+        with:
+          toolchain: 1.99.1
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          key: quality-inspection
+          cache-on-failure: true
+      - name: Compile only the existing update signer, without secrets
+        run: cargo build --locked -p swiftget-engine --example sign_update
+      - name: Sign the four update manifests with the existing trust key
+        shell: pwsh
+        env:
+          UPDATE_SIGNING_KEY: ${{ secrets.UPDATE_SIGNING_KEY }}
+        run: ./tools/promote-tested-release.ps1 -Phase Sign
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: release-v1.1.4-ready
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 30
+
+  publish:
+    needs: prepare
+    runs-on: windows-2022
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: release-v1.1.4-ready
+          path: dist
+      - name: Publish retained payload (retry only this job if publication fails)
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./tools/promote-tested-release.ps1 -Phase Publish
