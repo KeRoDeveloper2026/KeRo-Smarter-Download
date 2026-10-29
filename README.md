@@ -4,6 +4,9 @@
 
 # KeRo Smarter Download
 
+**العربية** · [English](docs/README.en.md) · [Français](docs/README.fr.md) · [Deutsch](docs/README.de.md) · [Español](docs/README.es.md) · [Português (Brasil)](docs/README.pt-BR.md)  
+[Русский](docs/README.ru.md) · [Türkçe](docs/README.tr.md) · [简体中文](docs/README.zh-CN.md) · [日本語](docs/README.ja.md) · [한국어](docs/README.ko.md) · [हिन्दी](docs/README.hi.md)
+
 ### تحميل منظّم · تحكّم أوضح · تجربة عربية
 
 مدير تنزيلات لسطح مكتب **Windows**، مبني بلغة **Rust** وواجهة **Slint**، مع تكامل للمتصفح ولوجو عائم لمتابعة التنزيلات.
@@ -14,10 +17,13 @@
 [![Version](https://img.shields.io/badge/release-v1.1.3-0EA5A4?style=flat-square)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3)
 ![Windows 7 Experimental](https://img.shields.io/badge/Windows_7-SP1_Experimental-B7791F?style=flat-square)
 ![Languages](https://img.shields.io/badge/UI-8_languages-6366F1?style=flat-square)
+[![Documentation languages](https://img.shields.io/badge/docs-12_languages-0EA5A4?style=flat-square)](docs/LANGUAGES.md)
 
 [تحميل البرنامج](#التحميل-المباشر) · [البدء](#البدء) · [المميزات](#المميزات) · [إضافات المتصفح](#إضافات-المتصفح) · [البناء](#البناء-من-المصدر) · [English](docs/README.en.md)
 
 </div>
+
+**اختر لغة الصفحة من القائمة بالأعلى.** صفحات التعريف والتنزيل متاحة بـ**12 لغة**، وواجهة البرنامج تدعم **8 لغات**. ترجمة صفحة المشروع لا تغيّر اللغات المتاحة داخل التطبيق. [دليل اللغات](docs/LANGUAGES.md).
 
 ---
 

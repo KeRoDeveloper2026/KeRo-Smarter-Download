@@ -4,11 +4,16 @@
 
 # KeRo Smarter Download
 
+[العربية](../README.md) · **English** · [Français](README.fr.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Português (Brasil)](README.pt-BR.md)  
+[Русский](README.ru.md) · [Türkçe](README.tr.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [हिन्दी](README.hi.md)
+
 A Windows download manager built with **Rust** and **Slint**, with browser integration, an Arabic interface and a floating progress widget.
 
-[العربية](../README.md) · [Releases](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases) · [Actions](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/actions)
+[Languages](LANGUAGES.md) · [Releases](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases) · [Actions](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/actions)
 
 </div>
+
+**Choose a page language above.** Project and download guides are available in **12 languages**. The app interface supports **8 languages**: Arabic, English, French, Spanish, German, Portuguese, Turkish and Russian. A translated project page does not add interface languages to the app. [Language guide](LANGUAGES.md).
 
 ## Features
 
