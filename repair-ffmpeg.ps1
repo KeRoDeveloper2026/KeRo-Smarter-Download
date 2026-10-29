@@ -35,6 +35,18 @@ try {
     $work = Join-Path ([IO.Path]::GetTempPath()) ('KeRo-FFmpeg-' + [Guid]::NewGuid().ToString('N'))
     New-Item -ItemType Directory -Path $work -Force | Out-Null
     $url = 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip'
+    $appBytes = [IO.File]::ReadAllBytes((Join-Path $AppDir 'KeRoDownload.exe'))
+    $peOffset = [BitConverter]::ToInt32($appBytes, 60)
+    if ([BitConverter]::ToUInt16($appBytes, $peOffset + 4) -eq 0x14c) {
+        $url = 'https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/latest/download/ffmpeg-Win10_11-x86.zip'
+    }
+    $platformFile = Join-Path $tools 'build-platform.txt'
+    if (Test-Path $platformFile -PathType Leaf) {
+        $platform = ([IO.File]::ReadAllText($platformFile)).Trim()
+        if ($platform -match '^(Win7-(x86|x64)|Win10_11-x86)$') {
+            $url = "https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/latest/download/ffmpeg-$platform.zip"
+        }
+    }
     function Download-File([string]$Uri, [string]$OutFile) {
         for ($attempt = 1; $attempt -le 3; $attempt++) {
             try {

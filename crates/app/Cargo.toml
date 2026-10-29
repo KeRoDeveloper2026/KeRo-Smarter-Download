@@ -6,6 +6,9 @@ license.workspace = true
 description = "KeRo Smarter Download – download manager (desktop app)"
 build = "build.rs"
 
+[features]
+legacy-win7 = ["swiftget-engine/legacy-win7"]
+
 [dependencies]
 swiftget-engine = { path = "../engine" }
 anyhow.workspace = true

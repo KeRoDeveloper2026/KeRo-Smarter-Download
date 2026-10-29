@@ -1,0 +1,126 @@
+name: Additional Windows architectures
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/platform-builds.yml
+      - tools/package-platform.ps1
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  ffmpeg:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        arch: [x86, x86_64]
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+        id: cache
+        with:
+          path: ffmpeg-out
+          key: ffmpeg-platform-${{ matrix.arch }}-${{ hashFiles('tools/ffmpeg/build.sh') }}
+      - name: Build matching FFmpeg
+        if: steps.cache.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q mingw-w64 nasm pkg-config make
+          git clone -q --depth 1 --branch n8.0.3 https://github.com/FFmpeg/FFmpeg ffmpeg-src
+          test "$(git -C ffmpeg-src rev-parse HEAD)" = 8ae0b34901ba60a802f183ee75a250a9fc3e09a5
+          curl -fsSL -o lame.tar.gz https://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz
+          echo 'ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e  lame.tar.gz' | sha256sum -c -
+          tar xzf lame.tar.gz
+          ARCH=${{ matrix.arch }} tools/ffmpeg/build.sh ffmpeg-src lame-3.100 ffmpeg-out
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ffmpeg-${{ matrix.arch }}
+          path: ffmpeg-out
+
+  build:
+    needs: ffmpeg
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: Win10_11-x86
+            target: i686-pc-windows-msvc
+            toolchain: stable
+            arch: x86
+            legacy: false
+          - platform: Win7-x64
+            target: x86_64-win7-windows-msvc
+            toolchain: nightly
+            arch: x86_64
+            legacy: true
+          - platform: Win7-x86
+            target: i686-win7-windows-msvc
+            toolchain: nightly
+            arch: x86
+            legacy: true
+    env:
+      RUSTFLAGS: -C target-feature=+crt-static
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+        with:
+          toolchain: ${{ matrix.toolchain }}
+          components: rust-src
+      - name: Install standard target
+        if: ${{ !matrix.legacy }}
+        run: rustup target add ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          key: platform-${{ matrix.platform }}
+          cache-on-failure: true
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: ffmpeg-${{ matrix.arch }}
+          path: ffmpeg-out
+      - name: Build application and test engine for target
+        shell: pwsh
+        run: |
+          $extra = @()
+          if ('${{ matrix.legacy }}' -eq 'true') { $extra = @('-Z', 'build-std=std,panic_abort', '--features', 'legacy-win7') }
+          cargo build --release --target ${{ matrix.target }} @extra
+          if ($LASTEXITCODE -ne 0) { throw 'Application build failed' }
+          cargo test -p swiftget-engine --target ${{ matrix.target }} @extra
+          if ($LASTEXITCODE -ne 0) { throw 'Engine tests failed' }
+      - name: Package and verify architecture
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          UPDATE_SIGNING_KEY: ${{ secrets.UPDATE_SIGNING_KEY }}
+        run: ./tools/package-platform.ps1 -Platform '${{ matrix.platform }}' -Target '${{ matrix.target }}' -Legacy:$${{ matrix.legacy }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: KeRoDownload-${{ matrix.platform }}
+          path: dist/*
+
+  publish:
+    needs: build
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          pattern: KeRoDownload-*
+          merge-multiple: true
+          path: dist
+      - name: Add all three packages to current release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = ([regex]::Match((Get-Content Cargo.toml -Raw), '(?m)^version\s*=\s*"([^"]+)"')).Groups[1].Value
+          gh release view "v$version" --repo $env:GITHUB_REPOSITORY
+          if ($LASTEXITCODE -ne 0) { throw 'The current release must already exist' }
+          $files = @(Get-ChildItem dist -File | ForEach-Object FullName)
+          # No --clobber: existing installers and signed manifests stay intact.
+          gh release upload "v$version" @files --repo $env:GITHUB_REPOSITORY
+          if ($LASTEXITCODE -ne 0) { throw 'Release upload failed' }

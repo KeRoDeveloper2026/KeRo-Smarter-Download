@@ -20,10 +20,21 @@ use sha2::{Digest, Sha256};
 use std::path::{Path, PathBuf};
 
 pub const REPO: &str = "KeRoDeveloper2026/KeRo-Smarter-Download";
-pub const SETUP_NAME: &str = "KeRoDownload-Setup.exe";
+pub const SETUP_NAME: &str = match (cfg!(feature = "legacy-win7"), cfg!(target_arch = "x86")) {
+    (true, true) => "KeRoDownload-Win7-Experimental-x86.exe",
+    (true, false) => "KeRoDownload-Win7-Experimental-x64.exe",
+    (false, true) => "KeRoDownload-Win10_11-x86.exe",
+    (false, false) => "KeRoDownload-Setup.exe",
+};
+const MANIFEST_NAME: &str = match (cfg!(feature = "legacy-win7"), cfg!(target_arch = "x86")) {
+    (true, true) => "version-Win7-x86.json",
+    (true, false) => "version-Win7-x64.json",
+    (false, true) => "version-Win10_11-x86.json",
+    (false, false) => "version.json",
+};
 
 pub fn version_url() -> String {
-    format!("https://github.com/{REPO}/releases/latest/download/version.json")
+    format!("https://github.com/{REPO}/releases/latest/download/{MANIFEST_NAME}")
 }
 
 /// The running version.

@@ -9,20 +9,54 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::time::{Duration, SystemTime};
 
+#[cfg(all(not(target_arch = "x86"), not(feature = "legacy-win7")))]
 const YTDLP_URL: &str = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe";
-/// the SHA-256 of every file of that release, published by yt-dlp
+#[cfg(all(target_arch = "x86", not(feature = "legacy-win7")))]
+const YTDLP_URL: &str = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_x86.exe";
+#[cfg(all(feature = "legacy-win7", target_arch = "x86"))]
+const YTDLP_URL: &str = "https://github.com/nicolaasjan/yt-dlp/releases/download/2026.10.27.141215/yt-dlp_x86_win7.exe";
+#[cfg(all(feature = "legacy-win7", not(target_arch = "x86")))]
+const YTDLP_URL: &str = "https://github.com/nicolaasjan/yt-dlp/releases/download/2026.10.27.141215/yt-dlp_win7.exe";
+const YTDLP_ASSET: &str = match (cfg!(feature = "legacy-win7"), cfg!(target_arch = "x86")) {
+    (true, true) => "yt-dlp_x86_win7.exe",
+    (true, false) => "yt-dlp_win7.exe",
+    (false, true) => "yt-dlp_x86.exe",
+    (false, false) => "yt-dlp.exe",
+};
+#[cfg(not(feature = "legacy-win7"))]
 const YTDLP_SUMS_URL: &str = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/SHA2-256SUMS";
+#[cfg(feature = "legacy-win7")]
+const YTDLP_SUMS_URL: &str = "https://github.com/nicolaasjan/yt-dlp/releases/download/2026.10.27.141215/SHA2-256SUMS";
 /// none of the helpers is anywhere near this big
 const MAX_TOOL_BYTES: u64 = 400 << 20;
 /// aria2 for torrents: one fixed, known build (it changes rarely), checked
 /// against this SHA-256 before use
 /// ffmpeg, when the setup does not carry it: the public "essentials" build,
 /// checked against the SHA-256 that is published next to it
-const FFMPEG_URL: &str = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip";
-const FFMPEG_SUM_URL: &str = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip.sha256";
+const FFMPEG_URL: &str = match (cfg!(feature = "legacy-win7"), cfg!(target_arch = "x86")) {
+    (true, true) => "https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/latest/download/ffmpeg-Win7-x86.zip",
+    (true, false) => "https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/latest/download/ffmpeg-Win7-x64.zip",
+    (false, true) => "https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/latest/download/ffmpeg-Win10_11-x86.zip",
+    (false, false) => "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip",
+};
+const FFMPEG_SUM_URL: &str = match (cfg!(feature = "legacy-win7"), cfg!(target_arch = "x86")) {
+    (true, true) => "https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/latest/download/ffmpeg-Win7-x86.zip.sha256",
+    (true, false) => "https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/latest/download/ffmpeg-Win7-x64.zip.sha256",
+    (false, true) => "https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/latest/download/ffmpeg-Win10_11-x86.zip.sha256",
+    (false, false) => "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip.sha256",
+};
+#[cfg(not(target_arch = "x86"))]
 pub const ARIA2_URL: &str = "https://github.com/aria2/aria2/releases/download/release-1.37.0/aria2-1.37.0-win-64bit-build1.zip";
+#[cfg(target_arch = "x86")]
+pub const ARIA2_URL: &str = "https://github.com/aria2/aria2/releases/download/release-1.37.0/aria2-1.37.0-win-32bit-build1.zip";
+#[cfg(not(target_arch = "x86"))]
 pub const ARIA2_ZIP_SHA256: &str = "67d015301eef0b612191212d564c5bb0a14b5b9c4796b76454276a4d28d9b288";
+#[cfg(target_arch = "x86")]
+pub const ARIA2_ZIP_SHA256: &str = "35f6514cc5dd7e98a87b3c4c2d25a0754b9b063dbe59bc0f22d483464f61e5b6";
+#[cfg(not(target_arch = "x86"))]
 pub const ARIA2_EXE_SHA256: &str = "be2099c214f63a3cb4954b09a0becd6e2e34660b886d4c898d260febfe9d70c2";
+#[cfg(target_arch = "x86")]
+pub const ARIA2_EXE_SHA256: &str = "b9cd71b275af11b63c33457b0f43f2f2675937070c563e195f223efd7fa4c74b";
 
 fn exe(name: &str) -> String {
     if cfg!(windows) {
@@ -167,7 +201,7 @@ async fn yt_dlp(client: &reqwest::Client, data_dir: &Path) {
         if cfg!(windows) {
             if let Some(dir) = writable_dir("yt-dlp") {
                 if let Ok(sums) = get_text(client, YTDLP_SUMS_URL).await {
-                    if let Some(sum) = sum_for(&sums, "yt-dlp.exe") {
+                    if let Some(sum) = sum_for(&sums, YTDLP_ASSET) {
                         let _ = download(client, YTDLP_URL, &dir.join(exe("yt-dlp")), &sum).await;
                     }
                 }
@@ -175,6 +209,7 @@ async fn yt_dlp(client: &reqwest::Client, data_dir: &Path) {
         }
         return;
     }
+    if cfg!(feature = "legacy-win7") { return; }
     let stamp = data_dir.join("yt-dlp-updated");
     if !due(&stamp, Duration::from_secs(20 * 3600)) {
         return;

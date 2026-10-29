@@ -28,7 +28,11 @@ DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 PrivilegesRequired=lowest
 OutputDir=..\dist
+#ifdef OutputName
+OutputBaseFilename={#OutputName}
+#else
 OutputBaseFilename=KeRoDownload-Setup
+#endif
 #ifndef NoIcon
 SetupIconFile=..\crates\app\icon.ico
 #endif
@@ -45,8 +49,15 @@ UninstallDisplayName={#MyAppName}
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
+#ifdef LegacyWin7
+MinVersion=6.1sp1
+#else
+MinVersion=10.0
+#endif
+#ifndef AppX86
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
+#endif
 CloseApplications=yes
 RestartApplications=no
 
@@ -69,9 +80,11 @@ Source: "{#Stage}\extension\*"; DestDir: "{app}\extension"; Flags: ignoreversion
 Source: "{#Stage}\extension-firefox\*"; DestDir: "{app}\extension-firefox"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#Stage}\kero-download-firefox.xpi"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 ; system runtime files, installed only when they are missing (see [Code])
+#ifndef AppX86
 #ifexist "..\build-cache\redist\vc_redist.x64.exe"
   #define HaveRedist
 Source: "..\build-cache\redist\vc_redist.x64.exe"; DestDir: "{tmp}"; Flags: dontcopy
+#endif
 #endif
 
 [InstallDelete]

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Builds KeRo Smarter Download's own small ffmpeg.exe for 64-bit Windows: only what the
+# Builds KeRo Smarter Download's own small ffmpeg.exe for x86/x64 Windows: only what the
 # program uses (joining video + sound without re-encoding, the "play while
 # downloading" preview, turning streams into MP4, and MP3 files with LAME).
 # Nothing else is built: no network, no video encoders, no filters for video,
@@ -10,14 +10,19 @@
 # Needs a mingw-w64 cross compiler (x86_64-w64-mingw32-gcc / -clang on PATH).
 set -euo pipefail
 FF_SRC=$(realpath "$1"); LAME_SRC=$(realpath "$2"); OUT=$(realpath -m "$3")
-HOST=x86_64-w64-mingw32
+ARCH=${ARCH:-x86_64}
+case "$ARCH" in
+  x86_64) HOST=x86_64-w64-mingw32; PE_FLAGS="-Wl,--high-entropy-va" ;;
+  x86) HOST=i686-w64-mingw32; PE_FLAGS="" ;;
+  *) echo "Unsupported architecture: $ARCH" >&2; exit 1 ;;
+esac
 JOBS=$(nproc 2>/dev/null || echo 4)
 WORK=$(mktemp -d)
 PREFIX="$WORK/prefix"
 mkdir -p "$PREFIX" "$OUT"
 CC=${CC:-$HOST-gcc}
 command -v "$CC" >/dev/null || CC=$HOST-clang
-export CFLAGS="-O2 -fno-strict-aliasing"
+export CFLAGS="-O2 -fno-strict-aliasing -D_WIN32_WINNT=0x0601"
 
 echo "== LAME"
 cp -r "$LAME_SRC" "$WORK/lame"
@@ -30,11 +35,11 @@ make install >/dev/null
 echo "== ffmpeg"
 mkdir -p "$WORK/ff" && cd "$WORK/ff"
 "$FF_SRC/configure" \
-  --prefix="$PREFIX" --target-os=mingw32 --arch=x86_64 --enable-cross-compile \
+  --prefix="$PREFIX" --target-os=mingw32 --arch="$ARCH" --enable-cross-compile \
   --cross-prefix=$HOST- --cc="$CC" \
   --pkg-config=pkg-config --pkg-config-flags=--static \
   --extra-cflags="-I$PREFIX/include" \
-  --extra-ldflags="-L$PREFIX/lib -static -Wl,--dynamicbase -Wl,--nxcompat -Wl,--high-entropy-va" \
+  --extra-ldflags="-L$PREFIX/lib -static -Wl,--dynamicbase -Wl,--nxcompat ${PE_FLAGS}" \
   --disable-everything --disable-autodetect --disable-network --disable-doc \
   --disable-ffplay --disable-ffprobe --disable-debug --disable-swscale \
   --disable-avdevice --disable-hwaccels --disable-iconv --disable-zlib --disable-bzlib --disable-lzma \
