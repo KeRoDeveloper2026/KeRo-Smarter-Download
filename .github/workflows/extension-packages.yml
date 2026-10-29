@@ -1,0 +1,51 @@
+name: Browser extension packages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - extension/**
+      - extension-firefox/**
+      - tools/package-extensions.py
+      - docs/BROWSERS.md
+      - .github/workflows/extension-packages.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  verify-package-publish:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Verify Chromium and Firefox behavior
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check extension/content.js
+          node --check extension/background.js
+          node extension/test/compat.test.js
+          node extension/test/yt-core.test.js
+          node extension/test/background.sim.js
+          node extension/test/background.sim.js --firefox
+          for scenario in throw missing-id reject last-error; do
+            node extension/test/content.sim.js --invalidated="$scenario"
+            node extension/test/content.sim.js --firefox --invalidated="$scenario"
+          done
+      - name: Package all desktop browser variants
+        run: python tools/package-extensions.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: KeRo-Browser-Extensions
+          path: dist-extensions/*
+      - name: Add extension packages to current app release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="$(python -c 'import tomllib; print("v" + tomllib.load(open("Cargo.toml", "rb"))["workspace"]["package"]["version"])')"
+          gh release view "$tag" --repo "$GITHUB_REPOSITORY"
+          # Existing application installers and update manifests are not replaced.
+          gh release upload "$tag" dist-extensions/* --repo "$GITHUB_REPOSITORY"
