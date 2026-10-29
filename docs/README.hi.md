@@ -1,11 +1,15 @@
 <div align="center">
 
-<img src="../crates/app/ui/kero-logo.png" alt="KeRo Smarter Download" width="128">
-
-# KeRo Smarter Download
+**🌐 Languages**
 
 [العربية](../README.md) · [English](README.en.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Português (Brasil)](README.pt-BR.md)  
 [Русский](README.ru.md) · [Türkçe](README.tr.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · **हिन्दी**
+
+<br>
+
+<img src="../crates/app/ui/kero-logo.png" alt="KeRo Smarter Download" width="128">
+
+# KeRo Smarter Download
 
 **Rust** और **Slint** से बना Windows डाउनलोड मैनेजर, जिसमें ब्राउज़र एक्सटेंशन और डाउनलोड की प्रगति दिखाने वाली फ़्लोटिंग विंडो शामिल है।
 

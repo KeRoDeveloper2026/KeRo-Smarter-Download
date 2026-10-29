@@ -1,29 +1,45 @@
 <div align="center">
 
-<img src="crates/app/ui/kero-logo.png" alt="KeRo Smarter Download" width="144">
-
-# KeRo Smarter Download
+**🌐 اختر لغتك · Choose your language**
 
 **العربية** · [English](docs/README.en.md) · [Français](docs/README.fr.md) · [Deutsch](docs/README.de.md) · [Español](docs/README.es.md) · [Português (Brasil)](docs/README.pt-BR.md)  
 [Русский](docs/README.ru.md) · [Türkçe](docs/README.tr.md) · [简体中文](docs/README.zh-CN.md) · [日本語](docs/README.ja.md) · [한국어](docs/README.ko.md) · [हिन्दी](docs/README.hi.md)
 
-### تحميل منظّم · تحكّم أوضح · تجربة عربية
+<br>
 
-مدير تنزيلات لسطح مكتب **Windows**، مبني بلغة **Rust** وواجهة **Slint**، مع تكامل للمتصفح ولوجو عائم لمتابعة التنزيلات.
+<img src="crates/app/ui/kero-logo.png" alt="KeRo Smarter Download" width="156">
 
-![Windows](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=flat-square)
-![Rust](https://img.shields.io/badge/Rust-engine-DEA584?style=flat-square&logo=rust&logoColor=white)
-![Slint](https://img.shields.io/badge/Slint-desktop_UI-2379F4?style=flat-square)
-[![Version](https://img.shields.io/badge/release-v1.1.3-0EA5A4?style=flat-square)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3)
-![Windows 7 Experimental](https://img.shields.io/badge/Windows_7-SP1_Experimental-B7791F?style=flat-square)
-![Languages](https://img.shields.io/badge/UI-8_languages-6366F1?style=flat-square)
-[![Documentation languages](https://img.shields.io/badge/docs-12_languages-0EA5A4?style=flat-square)](docs/LANGUAGES.md)
+# KeRo Smarter Download
 
-[تحميل البرنامج](#التحميل-المباشر) · [البدء](#البدء) · [المميزات](#المميزات) · [إضافات المتصفح](#إضافات-المتصفح) · [البناء](#البناء-من-المصدر) · [English](docs/README.en.md)
+### تنزيلاتك في مكان واحد
+
+حمّل الملفات والفيديو والصوت، واختر الجودة، وتابع تقدم التنزيل من نافذة عائمة.<br>
+تكامل مع المتصفح وواجهة متعددة اللغات تدعم العربية.
+
+[![اختيار نسخة Windows وتنزيل البرنامج](https://img.shields.io/badge/DOWNLOAD-WINDOWS_APP-0078D4?style=for-the-badge&logo=windows&logoColor=white)](#التحميل-المباشر)
+[![تنزيل إضافات المتصفح](https://img.shields.io/badge/DOWNLOAD-BROWSER_EXTENSIONS-6D28D9?style=for-the-badge)](#تحميل-إضافات-المتصفح)
+
+[![Release v1.1.3](https://img.shields.io/badge/APP-v1.1.3-0EA5A4?style=flat-square)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3)
+![Windows 10 and 11](https://img.shields.io/badge/WINDOWS-10_%7C_11-0078D4?style=flat-square)
+![8 interface languages](https://img.shields.io/badge/APP_UI-8_LANGUAGES-6366F1?style=flat-square)
+[![12 documentation languages](https://img.shields.io/badge/DOCS-12_LANGUAGES-0EA5A4?style=flat-square)](docs/LANGUAGES.md)
+
+**مجاني تمامًا · تطوير KeRo HaZem**
+
+[المميزات](#المميزات) · [طريقة التثبيت](#البدء) · [دعم المتصفحات](docs/BROWSERS.md) · [الإبلاغ عن مشكلة](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/issues/new/choose)
 
 </div>
 
-**اختر لغة الصفحة من القائمة بالأعلى.** صفحات التعريف والتنزيل متاحة بـ**12 لغة**، وواجهة البرنامج تدعم **8 لغات**. ترجمة صفحة المشروع لا تغيّر اللغات المتاحة داخل التطبيق. [دليل اللغات](docs/LANGUAGES.md).
+| ⬇️ تنزيل ومتابعة | 🎬 فيديو وصوت | 🌐 تكامل المتصفح |
+|:---:|:---:|:---:|
+| اتصالات متعددة، إيقاف واستئناف، وجدولة | اختيار الجودة والصيغة وتحويل الصوت | إضافات Chromium وFirefox لإرسال الروابط للبرنامج |
+
+<details>
+<summary>عن لغات الصفحة والبرنامج</summary>
+
+توثيق المشروع متاح بـ**12 لغة**، وواجهة البرنامج تدعم **8 لغات**. اختر اللغة من أول الصفحة. ترجمة التوثيق لا تضيف لغة جديدة إلى واجهة التطبيق. [دليل اللغات](docs/LANGUAGES.md).
+
+</details>
 
 ---
 
@@ -41,6 +57,7 @@
 | **Windows 7 SP1** | 32-bit · x86 | [![تحميل Windows 7 SP1 32-bit · x86](https://img.shields.io/badge/Download-Win7%20x86%20Experimental-B7791F?style=for-the-badge)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRoDownload-v1.1.3-Win7-Experimental-x86.exe) | تجريبي |
 
 **كيف تختار نسختك؟**
+
 - **Windows 10 بنواة 32-bit:** اختر Win10/11 x86.
 - **Windows 10 أو Windows 11 بنواة 64-bit:** اختر Win10/11 x64. نسخة x86 متاحة أيضًا كتطبيق 32-bit.
 - **Windows 7 SP1:** اختر Win7 x64 أو Win7 x86 وفق نوع نظامك.
@@ -49,7 +66,7 @@
 
 > **نسختا Windows 7 تجريبيتان:** نجحت اختبارات المحرك وفحوص ملفات البرنامج والأدوات على Windows Server 2022. لم يُختبر التثبيت والتشغيل أو تكامل المتصفح على جهاز Windows 7 فعلي بعد. [تفاصيل التوافق والفحوص](docs/WINDOWS-BUILDS.md).
 
-### الإضافات المرفقة والتحميل المنفصل
+### تحميل إضافات المتصفح
 
 **المثبّت يتضمن البرنامج والأدوات المساعدة ومجلدي الإضافات.** بعد التثبيت، استخدم مجلد `extension` لمتصفحات Chrome وBrave وEdge، أو `extension-firefox` لمتصفح Firefox من داخل مجلد تثبيت البرنامج. [خطوات تركيب الإضافة](#إضافات-المتصفح).
 
@@ -235,9 +252,11 @@ node extension/test/content.sim.js --firefox
 
 ## المساهمة والتواصل
 
+إذا أفادك البرنامج، يمكنك إضافة **Star ⭐** للمستودع ومشاركة [صفحة التحميل](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download#التحميل-المباشر) مع الآخرين.
+
 افتح [Issue](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/issues/new/choose) للإبلاغ عن عطل أو اقتراح تحسين، وراجع [دليل المساهمة](CONTRIBUTING.md) قبل إرسال تعديل.
 
-**تطوير KeRo — [KeRoDeveloper2026](https://github.com/KeRoDeveloper2026)**
+**تطوير KeRo HaZem — [KeRoDeveloper2026](https://github.com/KeRoDeveloper2026)**
 
 ## الحقوق والمكوّنات الخارجية
 

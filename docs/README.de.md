@@ -1,11 +1,15 @@
 <div align="center">
 
-<img src="../crates/app/ui/kero-logo.png" alt="KeRo Smarter Download" width="128">
-
-# KeRo Smarter Download
+**🌐 Languages**
 
 [العربية](../README.md) · [English](README.en.md) · [Français](README.fr.md) · **Deutsch** · [Español](README.es.md) · [Português (Brasil)](README.pt-BR.md)  
 [Русский](README.ru.md) · [Türkçe](README.tr.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [हिन्दी](README.hi.md)
+
+<br>
+
+<img src="../crates/app/ui/kero-logo.png" alt="KeRo Smarter Download" width="128">
+
+# KeRo Smarter Download
 
 Downloadmanager für Windows, entwickelt mit **Rust** und **Slint**, mit Browser-Erweiterungen und schwebender Fortschrittsanzeige.
 

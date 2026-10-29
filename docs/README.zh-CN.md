@@ -1,11 +1,15 @@
 <div align="center">
 
-<img src="../crates/app/ui/kero-logo.png" alt="KeRo Smarter Download" width="128">
-
-# KeRo Smarter Download
+**🌐 Languages**
 
 [العربية](../README.md) · [English](README.en.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Português (Brasil)](README.pt-BR.md)  
 [Русский](README.ru.md) · [Türkçe](README.tr.md) · **简体中文** · [日本語](README.ja.md) · [한국어](README.ko.md) · [हिन्दी](README.hi.md)
+
+<br>
+
+<img src="../crates/app/ui/kero-logo.png" alt="KeRo Smarter Download" width="128">
+
+# KeRo Smarter Download
 
 使用 **Rust** 和 **Slint** 开发的 Windows 下载管理器，提供浏览器扩展和悬浮下载进度窗口。
 

@@ -1,11 +1,15 @@
 <div align="center">
 
-<img src="../crates/app/ui/kero-logo.png" alt="KeRo Smarter Download" width="128">
-
-# KeRo Smarter Download
+**🌐 Languages**
 
 [العربية](../README.md) · [English](README.en.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Português (Brasil)](README.pt-BR.md)  
 [Русский](README.ru.md) · [Türkçe](README.tr.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · **한국어** · [हिन्दी](README.hi.md)
+
+<br>
+
+<img src="../crates/app/ui/kero-logo.png" alt="KeRo Smarter Download" width="128">
+
+# KeRo Smarter Download
 
 **Rust**와 **Slint**로 개발한 Windows용 다운로드 관리자입니다. 브라우저 확장 기능과 플로팅 다운로드 진행 표시를 제공합니다.
 

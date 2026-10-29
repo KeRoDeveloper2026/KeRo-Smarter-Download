@@ -1,19 +1,40 @@
 <div align="center">
 
-<img src="../crates/app/ui/kero-logo.png" alt="KeRo Smarter Download" width="128">
-
-# KeRo Smarter Download
+**🌐 Choose your language**
 
 [العربية](../README.md) · **English** · [Français](README.fr.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [Português (Brasil)](README.pt-BR.md)  
 [Русский](README.ru.md) · [Türkçe](README.tr.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [हिन्दी](README.hi.md)
 
-A Windows download manager built with **Rust** and **Slint**, with browser integration, an Arabic interface and a floating progress widget.
+<br>
 
-[Languages](LANGUAGES.md) · [Releases](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases) · [Actions](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/actions)
+<img src="../crates/app/ui/kero-logo.png" alt="KeRo Smarter Download" width="156">
+
+# KeRo Smarter Download
+
+### Your downloads, in one place
+
+Download files, video and audio. Choose media quality and follow progress in a floating window.<br>
+A Windows desktop app with Chromium and Firefox integration.
+
+[![Choose a Windows installer](https://img.shields.io/badge/DOWNLOAD-WINDOWS_APP-0078D4?style=for-the-badge&logo=windows&logoColor=white)](#downloads--v113)
+[![Download browser extensions](https://img.shields.io/badge/DOWNLOAD-BROWSER_EXTENSIONS-6D28D9?style=for-the-badge)](#browser-extension-downloads)
+
+[![Release v1.1.3](https://img.shields.io/badge/APP-v1.1.3-0EA5A4?style=flat-square)](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3)
+![Windows 10 and 11](https://img.shields.io/badge/WINDOWS-10_%7C_11-0078D4?style=flat-square)
+![8 interface languages](https://img.shields.io/badge/APP_UI-8_LANGUAGES-6366F1?style=flat-square)
+[![12 documentation languages](https://img.shields.io/badge/DOCS-12_LANGUAGES-0EA5A4?style=flat-square)](LANGUAGES.md)
+
+**Free to use · Developed by KeRo HaZem**
+
+[Features](#features) · [Installation](#getting-started) · [Browser support](BROWSERS.md) · [Report an issue](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/issues/new/choose)
 
 </div>
 
-**Choose a page language above.** Project and download guides are available in **12 languages**. The app interface supports **8 languages**: Arabic, English, French, Spanish, German, Portuguese, Turkish and Russian. A translated project page does not add interface languages to the app. [Language guide](LANGUAGES.md).
+| ⬇️ Download & resume | 🎬 Video & audio | 🌐 Browser integration |
+|:---:|:---:|:---:|
+| Multiple connections, queues and scheduling | Quality selection and audio conversion | Chromium and Firefox extensions |
+
+Documentation is available in **12 languages**. The app interface supports **8 languages**: Arabic, English, French, Spanish, German, Portuguese, Turkish and Russian. [Language guide](LANGUAGES.md).
 
 ## Features
 
@@ -45,6 +66,8 @@ Windows 7 packages passed engine tests, helper smoke tests and import checks on 
 
 Run your selected EXE installer, open the app and add a download link. Installers include the helper tools and the `extension` and `extension-firefox` folders. Use the folders installed with your selected package. Windows 7 packages contain a Firefox manifest adapted for **Firefox 115 ESR**; modern packages require Firefox 140 or newer. The Firefox extension is unsigned and loaded temporarily.
 
+### Browser extension downloads
+
 Standalone extension update **v1.1.1** works with the installed desktop app 1.1.3; no desktop reinstallation is needed:
 
 | Desktop browser on Windows | Updated extension |
@@ -70,6 +93,8 @@ Source version: **1.1.3**. Each platform package has its own signed update manif
 The updater accepts signed releases from this repository. See [release preparation](RELEASING.md) for one-time signing setup, manual first installation and publishing from Actions.
 
 ## Privacy and contribution
+
+If the app is useful to you, consider starring this repository and sharing its download page.
 
 The extension communicates with the desktop app over loopback and may pass download-related cookies and page context. The source uses Windows DPAPI for designated sensitive fields, with plaintext fallback paths; do not share settings, cookies or private download lists.
 
