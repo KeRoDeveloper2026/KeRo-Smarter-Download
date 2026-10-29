@@ -94,5 +94,6 @@
       "name": "KeRo-Extensions-v1.1.1-SHA256SUMS.txt",
       "sha256": "a3be60c840baf78edd6b98db18f5999b5cc390715f021ac695229edfecc66ad3"
     }
-  ]
+  ],
+  "release_commit": "489d97e3c378d0961ec65095f6ea37a071516534"
 }

@@ -55,7 +55,7 @@ if ($Phase -eq 'Prepare') {
     # Compatibility alias is byte-for-byte identical to the clearly named x64 EXE.
     Copy-Item 'dist/KeRoDownload-v1.1.4-Win10_11-x64.exe' 'dist/KeRoDownload-Setup.exe'
     if ((Hash dist/KeRoDownload-Setup.exe) -ne $plan.installers[0].sha256) { throw 'Compatibility alias mismatch' }
-    $provenance = @{ version=$version; source=$plan.source_sha; release_commit=$env:GITHUB_SHA; preview_run=$plan.preview_run; quality_run=$plan.quality_run; installers=$plan.installers; support_source=$plan.support_release; support_assets=$plan.support_assets; note='Exact approved installers promoted without rebuilding or repackaging; all runtime CI tests ran on Windows Server 2022. Windows 7 remains experimental.' }
+    $provenance = @{ version=$version; source=$plan.source_sha; release_commit=$(if ($plan.release_commit) { $plan.release_commit } else { $env:GITHUB_SHA }); preview_run=$plan.preview_run; quality_run=$plan.quality_run; installers=$plan.installers; support_source=$plan.support_release; support_assets=$plan.support_assets; note='Exact approved installers promoted without rebuilding or repackaging; all runtime CI tests ran on Windows Server 2022. Windows 7 remains experimental.' }
     $provenance | ConvertTo-Json -Depth 12 | Set-Content dist/PROVENANCE.json -Encoding utf8NoBOM
     return
 }
@@ -84,23 +84,34 @@ foreach ($line in Get-Content dist/SHA256SUMS.txt) {
     if ($line -notmatch '^([0-9a-f]{64})  ([^/\\]+)$') { throw 'Invalid checksum entry' }
     if ((Hash "dist/$($Matches[2])") -ne $Matches[1]) { throw 'Retained release payload checksum mismatch' }
 }
+$provenance = Get-Content dist/PROVENANCE.json -Raw | ConvertFrom-Json
+$releaseCommit = if ($plan.release_commit) { $plan.release_commit } else { $env:GITHUB_SHA }
+if ($provenance.version -ne $version -or $provenance.source -ne $plan.source_sha -or $provenance.release_commit -ne $releaseCommit) { throw 'Retained payload provenance mismatch' }
+git merge-base --is-ancestor $releaseCommit HEAD
+if ($LASTEXITCODE -ne 0) { throw 'Release commit must remain in reviewed main history' }
 $latest = Api 'releases/latest'
 if ([version]$latest.tag_name.TrimStart('v') -gt [version]$version) { throw 'Refusing to replace a newer Latest release' }
 $refRaw = gh api "repos/$repo/git/ref/tags/$tag" 2>$null
 if ($LASTEXITCODE -eq 0) {
     $tagCommit = (Api "commits/$tag").sha
-    if ($tagCommit -ne $env:GITHUB_SHA) { throw 'Existing tag points to a different release commit' }
+    if ($tagCommit -ne $releaseCommit) { throw 'Existing tag points to a different release commit' }
 } else {
     # Use only GITHUB_TOKEN: the created tag does not start another native build.
-    gh api --method POST "repos/$repo/git/refs" -f "ref=refs/tags/$tag" -f "sha=$env:GITHUB_SHA" | Out-Null
+    gh api --method POST "repos/$repo/git/refs" -f "ref=refs/tags/$tag" -f "sha=$releaseCommit" | Out-Null
     if ($LASTEXITCODE -ne 0) { throw 'Could not create release tag' }
 }
-$releaseRaw = gh api "repos/$repo/releases/tags/$tag" 2>$null
-if ($LASTEXITCODE -eq 0) { $release = $releaseRaw | ConvertFrom-Json } else {
+# Drafts are found through the release collection, then accessed by ID.
+# GET releases/tags/<tag> does not resolve an unpublished draft reliably.
+$found = @((Api 'releases?per_page=100') | Where-Object tag_name -eq $tag)
+if ($found.Count -gt 1) { throw 'Ambiguous release identity' }
+if ($found.Count -eq 1) { $release = $found[0] } else {
     gh release create $tag --repo $repo --verify-tag --draft --title "KeRo Smarter Download $version" --generate-notes --notes-file docs/RELEASE-v1.1.4.md
     if ($LASTEXITCODE -ne 0) { throw 'Could not create draft release' }
-    $release = Api "releases/tags/$tag"
+    $found = @((Api 'releases?per_page=100') | Where-Object tag_name -eq $tag)
+    if ($found.Count -ne 1) { throw 'Could not resolve created draft release' }
+    $release = $found[0]
 }
+$releaseId = $release.id
 $files = @(Get-ChildItem dist -File)
 foreach ($file in $files) {
     $existing = @($release.assets | Where-Object name -eq $file.Name)
@@ -109,19 +120,20 @@ foreach ($file in $files) {
         continue
     }
     if (-not $release.draft) { throw 'Published release is incomplete; refusing to silently alter it' }
-    gh release upload $tag $file.FullName --repo $repo
-    if ($LASTEXITCODE -ne 0) { throw "Could not upload $($file.Name); retry the publication job only" }
+    $uploadUrl = $release.upload_url.Replace('{?name,label}', ('?name=' + [Uri]::EscapeDataString($file.Name)))
+    $headers = @{ Authorization="Bearer $env:GH_TOKEN"; Accept='application/vnd.github+json'; 'X-GitHub-Api-Version'='2022-11-28' }
+    Invoke-RestMethod -Method Post -Uri $uploadUrl -InFile $file.FullName -ContentType 'application/octet-stream' -Headers $headers | Out-Null
 }
-$release = Api "releases/tags/$tag"
+$release = Api "releases/$releaseId"
 if ($release.assets.Count -ne $files.Count) { throw 'Unexpected release asset count' }
 foreach ($file in $files) {
     $asset = @($release.assets | Where-Object name -eq $file.Name)
     if ($asset.Count -ne 1 -or $asset[0].digest -ne "sha256:$(Hash $file.FullName)") { throw 'Uploaded release payload verification failed' }
 }
 if ($release.draft) {
-    gh release edit $tag --repo $repo --draft=false --latest
+    gh api --method PATCH "repos/$repo/releases/$releaseId" -F draft=false -f make_latest=true | Out-Null
     if ($LASTEXITCODE -ne 0) { throw 'Could not publish verified draft; retry publication only' }
 }
-$published = Api "releases/tags/$tag"
+$published = Api "releases/$releaseId"
 if ($published.draft -or $published.prerelease -or (Api 'releases/latest').tag_name -ne $tag) { throw 'Published release state verification failed' }
 Write-Host "Published $tag with exact approved installer hashes"
