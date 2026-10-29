@@ -1,0 +1,33 @@
+name: Prepare v1.1.4 candidate lockfile
+on:
+  push:
+    branches: [release/1.1.4-preview]
+    paths:
+      - Cargo.toml
+      - .github/workflows/prepare-preview-lock.yml
+permissions:
+  contents: read
+jobs:
+  lock:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+        with:
+          toolchain: 1.99.1
+      - run: cargo update --workspace
+      - name: Verify registry dependencies did not change
+        run: |
+          python - <<'PYTHON'
+          import subprocess, tomllib
+          old = tomllib.loads(subprocess.check_output(['git', 'show', 'HEAD:Cargo.lock'], text=True))
+          new = tomllib.load(open('Cargo.lock', 'rb'))
+          registry = lambda lock: [p for p in lock['package'] if p.get('source')]
+          assert registry(old) == registry(new), 'Unexpected dependency update'
+          assert {p['version'] for p in new['package'] if not p.get('source')} == {'1.1.4'}
+          PYTHON
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: candidate-Cargo-lock
+          path: Cargo.lock
+          if-no-files-found: error

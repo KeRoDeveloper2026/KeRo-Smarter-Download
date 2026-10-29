@@ -1,0 +1,98 @@
+{
+  "version": "1.1.4",
+  "source_sha": "83a20b27870c4f04a93c202e5c3915637620cbf5",
+  "preview_run": 40953114738,
+  "quality_run": 40953122626,
+  "public_key": "075015a13e692aee5ef27f6129b767f116029728146c0fb7091200d4e05c11fd",
+  "installers": [
+    {
+      "platform": "Win10_11-x64",
+      "file": "KeRoDownload-v1.1.4-Win10_11-x64.exe",
+      "sha256": "52395e642223856414a20aef9ccf0562d7177c51bef488962c735aea63dcf821",
+      "manifest": "version.json"
+    },
+    {
+      "platform": "Win10_11-x86",
+      "file": "KeRoDownload-v1.1.4-Win10_11-x86.exe",
+      "sha256": "bfbb7d02a9605f57f669ddd2e751371889b369882785e9c9e0d86d27ddadf8a2",
+      "manifest": "version-Win10_11-x86.json"
+    },
+    {
+      "platform": "Win7-x64",
+      "file": "KeRoDownload-v1.1.4-Win7-Experimental-x64.exe",
+      "sha256": "e5bbf6432c646f39cdf81d9c711c9fe979999270ef5afe5479852a0dd42d219b",
+      "manifest": "version-Win7-x64.json"
+    },
+    {
+      "platform": "Win7-x86",
+      "file": "KeRoDownload-v1.1.4-Win7-Experimental-x86.exe",
+      "sha256": "d696a4618db0c9cb1d74d8591faba79888eaa961e1be6e93adcadde7546450c9",
+      "manifest": "version-Win7-x86.json"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 12933755326,
+      "name": "KeRoDownload-v1.1.4-preview-Win7-x64",
+      "digest": "sha256:5b276e5ef1bb0803a4df82050855324fd7caccbf4f7ef48b796218cfaf1862b5"
+    },
+    {
+      "id": 12933256235,
+      "name": "KeRoDownload-v1.1.4-preview-Win10_11-x64",
+      "digest": "sha256:45b5ed5e29f0d17955223eaeec26efbf1bae7bfc9b8b2c3725bbd6e192ac6253"
+    },
+    {
+      "id": 12933250822,
+      "name": "KeRoDownload-v1.1.4-preview-Win10_11-x86",
+      "digest": "sha256:5dff08f69e630d024d9ecb0b6b0735aeee6e383ffdbc2c6e77c6b9dee2336e31"
+    },
+    {
+      "id": 12933067125,
+      "name": "KeRoDownload-v1.1.4-preview-Win7-x86",
+      "digest": "sha256:7758dce39fcd1d2fe049bcf1141eab72b84c090d25eedbe4a1143e5c8e3f7fde"
+    }
+  ],
+  "support_release": "v1.1.3",
+  "support_assets": [
+    {
+      "name": "ffmpeg-Win10_11-x86.zip",
+      "sha256": "3d68911a1b765ad86a6559d3fe12b6d16f9c5c15c7ff02302f5791fc1f9009bf"
+    },
+    {
+      "name": "ffmpeg-Win10_11-x86.zip.sha256",
+      "sha256": "36a5c541026bad6e0a989ecd244340890949d5c1827039340109973ac580a5c5"
+    },
+    {
+      "name": "ffmpeg-Win7-x64.zip",
+      "sha256": "c3be108a0028eb62081d57c3a08ae0c1a8c2c19a8b6a8d9f7e46305a7d951463"
+    },
+    {
+      "name": "ffmpeg-Win7-x64.zip.sha256",
+      "sha256": "a85f8809ec1f1a4dc80ae9f7c51b158c5d3b45532289d84d9d424da2e538e623"
+    },
+    {
+      "name": "ffmpeg-Win7-x86.zip",
+      "sha256": "2aead04de446c1b48e72ee572a9bb0af4398c6454098f6dd1f32edded17cdd6d"
+    },
+    {
+      "name": "ffmpeg-Win7-x86.zip.sha256",
+      "sha256": "38177d8ca79aa660e7358e0e873bc75bf68a44ea2115cce69b6b4bc5ae138bbc"
+    },
+    {
+      "name": "KeRo-Extension-v1.1.1-Chromium.zip",
+      "sha256": "e2e30894284712871054bc9c45f3d3314a68da5cc3142e1ac8e1a24cf79d939f"
+    },
+    {
+      "name": "KeRo-Extension-v1.1.1-Firefox-Win7.zip",
+      "sha256": "de640df76a6c4cdaedf8d5d2c49db3bc8c8a53a69f91099d4863cf8056500a06"
+    },
+    {
+      "name": "KeRo-Extension-v1.1.1-Firefox.zip",
+      "sha256": "20164c9ecaf350c2f72d4f2402bbf6f13521c98b37c169f13c0ca3fa173c4203"
+    },
+    {
+      "name": "KeRo-Extensions-v1.1.1-SHA256SUMS.txt",
+      "sha256": "a3be60c840baf78edd6b98db18f5999b5cc390715f021ac695229edfecc66ad3"
+    }
+  ]
+}
