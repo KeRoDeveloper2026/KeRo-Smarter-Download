@@ -80,7 +80,7 @@ Extract to a permanent folder, load the updated extension folder and disable any
 
 [Package SHA-256 checksums](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.3/KeRo-Extensions-v1.1.1-SHA256SUMS.txt) · [Browser compatibility and validation details](BROWSERS.md). API simulations passed; live testing on every listed browser and Windows 7 is still required. Safari and mobile browser packages are not included.
 
-Extension ZIP files contain the extension and installation instructions, not the desktop installer. For full source, use **Code → Download ZIP**. Each installer has a separate signed update manifest in [release v1.1.3](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3). Root `SHA256SUMS.txt` describes the older v1.1.0 assets.
+Extension ZIP files contain the extension and installation instructions, not the desktop installer. For full source, use **Code → Download ZIP**. Each installer has a separate signed update manifest in [release v1.1.3](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/tag/v1.1.3). Checksums for the older v1.1.0 assets are available in [that release's SHA256SUMS.txt](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/SHA256SUMS.txt). Generated ZIP/XPI packages are published in Releases rather than tracked in Git.
 
 To build on Windows, run `BUILD.bat`. It uses winget to install missing development tools, downloads helper tools and creates `dist/KeRoDownload-Setup.exe` after successful packaging. Tool installation may require administrator permission.
 

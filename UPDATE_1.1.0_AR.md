@@ -30,7 +30,7 @@
 
 ### Firefox — نسخة اختبار غير موقعة
 
-افتح `about:debugging#/runtime/this-firefox`، واختر Load Temporary Add-on، ثم `extension-firefox/manifest.json` من هذه الحزمة. يوجد أيضًا ملف `kero-download-firefox-1.1.0-unsigned.xpi` للتجربة.
+افتح `about:debugging#/runtime/this-firefox`، واختر Load Temporary Add-on، ثم `extension-firefox/manifest.json` من هذه الحزمة. للحزمة القديمة استخدم [أرشيف Firefox في Release v1.1.0](https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases/download/v1.1.0/KeRo-Extension-Firefox.zip)؛ الإضافة غير موقّعة.
 
 هذه ليست إضافة موقعة من Mozilla. التثبيت المؤقت ينتهي بإعادة تشغيل Firefox، والتثبيت الدائم في النسخة العادية يحتاج توقيع Mozilla. لا يلزم إيقاف فحوص التوقيع أو تغيير إعدادات حماية المتصفح.
 

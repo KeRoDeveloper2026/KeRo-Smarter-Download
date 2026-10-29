@@ -4,3 +4,9 @@ build-cache/
 signing/
 __pycache__/
 tools/ffmpeg/win64/
+
+# Generated distribution archives belong in GitHub Releases.
+*.zip
+*.xpi
+/dist/
+/dist-extensions/
