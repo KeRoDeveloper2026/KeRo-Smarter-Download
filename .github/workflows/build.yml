@@ -11,6 +11,12 @@ on:
     paths-ignore:
       - "README.md"
       - "docs/**"
+      - ".github/workflows/platform-builds.yml"
+      - ".github/workflows/publish-ready-x86.yml"
+      - ".github/workflows/publish-ready-win7.yml"
+      - "tools/prepare-win7.py"
+      - "tools/check-win7-imports.py"
+      - "tools/package-platform.ps1"
   workflow_dispatch:
     inputs:
       publish_release:

@@ -61,6 +61,8 @@ POST_WIN7 = {
     'GetDpiForWindow', 'GetDpiForSystem', 'AdjustWindowRectExForDpi',
     'SetProcessDpiAwareness', 'GetProcessDpiAwareness', 'GetDpiForMonitor',
     'DCompositionCreateDevice', 'DCompositionCreateDevice2',
+    'UiaDisconnectProvider', 'UiaRaiseNotificationEvent', 'CoIncrementMTAUsage',
+    'RoInitialize', 'RoGetActivationFactory', 'RoGetAgileReference', 'RoOriginateErrorW',
 }
 
 if __name__ == '__main__':
@@ -68,5 +70,10 @@ if __name__ == '__main__':
     print(json.dumps(report, indent=2))
     bad = [(path, dll, name) for path, dlls in report.items()
            for dll, names in dlls.items() for name in names if name in POST_WIN7]
+    bad_dlls = [(path, dll) for path, dlls in report.items() for dll in dlls
+                if dll.lower() in {'combase.dll', 'shcore.dll'}
+                or dll.lower().startswith('api-ms-win-core-winrt-')]
+    if bad_dlls:
+        raise SystemExit(f'Known post-Windows-7 DLLs: {bad_dlls}')
     if bad:
         raise SystemExit(f'Known post-Windows-7 direct imports: {bad}')

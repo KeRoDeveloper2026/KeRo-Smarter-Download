@@ -13,6 +13,14 @@ Copy-Item -Recurse extension "$stage/extension-firefox"
 Remove-Item -Recurse -Force "$stage/extension/test", "$stage/extension-firefox/test" -ErrorAction SilentlyContinue
 Copy-Item extension/manifest.firefox.json "$stage/extension-firefox/manifest.json" -Force
 Remove-Item "$stage/extension/manifest.firefox.json"
+if ($Legacy) {
+    $legacyFirefox = Get-Content "$stage/extension-firefox/manifest.json" -Raw | ConvertFrom-Json
+    $legacyFirefox.name = 'KeRo Smarter Download (Windows 7)'
+    $legacyFirefox.browser_specific_settings.gecko.strict_min_version = '115.0'
+    $legacyFirefox.browser_specific_settings.gecko.PSObject.Properties.Remove('data_collection_permissions')
+    $legacyFirefox.browser_specific_settings.PSObject.Properties.Remove('gecko_android')
+    $legacyFirefox | ConvertTo-Json -Depth 20 | Set-Content "$stage/extension-firefox/manifest.json" -Encoding utf8
+}
 Copy-Item ffmpeg-out/* "$stage/tools/"
 Copy-Item REPAIR-FFMPEG.bat, repair-ffmpeg.ps1 $stage
 [IO.File]::WriteAllText("$stage/build-platform.txt", $Platform)

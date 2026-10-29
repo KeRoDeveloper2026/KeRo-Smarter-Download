@@ -29,7 +29,8 @@ builds never request the default x64 `version.json`. Future releases must includ
 matching manifests and helper archives before these installations can update.
 Missing manifests fail safely instead of switching architecture or operating system.
 
-All three builds must succeed before the workflow uploads any supplemental installers.
+The Windows 10/11 x86 build was published separately from its successful immutable artifact.
+The architecture workflow now builds Windows 7 only; both legacy builds must pass before publication.
 Release uploads do not use `--clobber`. A rerun encountering existing asset names
 requires reviewing the existing assets; it does not silently replace them.
 
@@ -37,3 +38,17 @@ References:
 - https://doc.rust-lang.org/nightly/rustc/platform-support/win7-windows-msvc.html
 - https://docs.slint.dev/latest/docs/slint/guide/platforms/desktop/windows/general/
 - https://github.com/nicolaasjan/yt-dlp/releases/tag/2026.10.27.141215
+
+
+## Windows 7 compatibility preparation
+
+`tools/prepare-win7.py` checks the exact upstream source hashes of windows-core 0.62.2
+before redirecting three classic COM bindings from Combase to Ole32. Microsoft documents
+these functions in Ole32 on Windows 2000 and newer. No substitute system DLL is shipped.
+The build uses Microsoft's documented `windows_slim_errors` cfg: HRESULT error codes
+remain available, while extended COM/WinRT error information is omitted on legacy builds.
+Import preflight rejects Combase, Shcore and WinRT error API-set dependencies.
+
+Only Windows 7 packages adapt the temporary Firefox extension manifest for Firefox 115 ESR,
+removing the newer unsupported data-collection manifest field. Browser behavior still needs
+validation on the actual legacy browser. Modern extension packages retain their existing manifest.

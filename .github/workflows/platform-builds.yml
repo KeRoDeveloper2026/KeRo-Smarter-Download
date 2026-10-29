@@ -6,6 +6,8 @@ on:
     paths:
       - .github/workflows/platform-builds.yml
       - tools/package-platform.ps1
+      - tools/prepare-win7.py
+      - tools/check-win7-imports.py
       - crates/app/src/winfx.rs
       - crates/engine/Cargo.toml
   workflow_dispatch:
@@ -51,11 +53,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: Win10_11-x86
-            target: i686-pc-windows-msvc
-            toolchain: stable
-            arch: x86
-            legacy: false
           - platform: Win7-x64
             target: x86_64-win7-windows-msvc
             toolchain: nightly
@@ -79,7 +76,7 @@ jobs:
         run: rustup target add ${{ matrix.target }}
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
         with:
-          key: platform-${{ matrix.platform }}
+          key: platform-${{ matrix.platform }}-${{ hashFiles('tools/prepare-win7.py') }}
           cache-on-failure: true
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
@@ -97,9 +94,11 @@ jobs:
             $legacyPackage = if ('${{ matrix.arch }}' -eq 'x86') { 'windows_i686_msvc' } else { 'windows_x86_64_msvc' }
             $legacyImportDir = (Resolve-Path "$legacyCargoRoot/registry/src/*/$legacyPackage-0.48.5/lib" | Select-Object -First 1).Path
             if (-not $legacyImportDir) { throw 'Legacy Windows import libraries are missing' }
+            python tools/prepare-win7.py --cargo-root "$legacyCargoRoot"
+            if ($LASTEXITCODE -ne 0) { throw 'Windows 7 COM compatibility patch failed' }
             # The app and engine test binaries both use older Windows crates.
             # Encode arguments separately so even a Cargo path with spaces is safe.
-            $env:CARGO_ENCODED_RUSTFLAGS = "-C$([char]31)target-feature=+crt-static$([char]31)-Lnative=$legacyImportDir"
+            $env:CARGO_ENCODED_RUSTFLAGS = "-C$([char]31)target-feature=+crt-static$([char]31)-Lnative=$legacyImportDir$([char]31)--cfg$([char]31)windows_slim_errors"
           }
           cargo build --release --target ${{ matrix.target }} @extra
           if ($LASTEXITCODE -ne 0) { throw 'Application build failed' }
@@ -137,7 +136,7 @@ jobs:
           pattern: KeRoDownload-*
           merge-multiple: true
           path: dist
-      - name: Add all three packages to current release
+      - name: Add Windows 7 packages to current release
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
