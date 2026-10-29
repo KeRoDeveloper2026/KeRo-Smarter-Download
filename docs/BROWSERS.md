@@ -1,6 +1,6 @@
 # إضافات المتصفح · Browser extensions
 
-**إصدار الإضافة: 1.1.1**. يمكن استخدام الحزم المحدثة مع برنامج KeRo Smarter Download 1.1.3 المثبّت بالفعل. الإضافة لا تحتاج نسخة مختلفة حسب x86 أو x64؛ اختر الحزمة وفق المتصفح.
+**إصدار الإضافة: 1.1.4**. يمكن استخدام الحزم المحدثة مع برنامج KeRo Smarter Download 1.1.3 أو 1.1.4 المثبّت بالفعل. الإضافة لا تحتاج نسخة مختلفة حسب x86 أو x64؛ اختر الحزمة وفق المتصفح.
 
 ## المتصفحات المستهدفة على Windows
 
@@ -55,3 +55,9 @@ The Chromium package targets desktop Chrome, Brave, Edge, Opera / Opera GX and V
 - Opera: https://help.opera.com/en/extensions/testing/
 - Vivaldi: https://help.vivaldi.com/desktop/appearance-customization/extensions/
 - Safari packaging: https://developer.apple.com/documentation/safariservices/packaging-a-web-extension-for-safari
+
+## ترقيم الإصدارات المتزامن
+
+رقم حزم الإضافة الجديدة يطابق إصدار البرنامج في Cargo.toml. بعد تعديل رقم البرنامج شغّل `python tools/sync-extension-version.py` لتحديث ملفات manifest الثلاثة معًا. يتحقق التغليف وCI من التطابق ويرفضان نشر حزم مختلفة الرقم.
+
+حزم الإضافة المستقلة 1.1.4 تحدّث الترقيم، وتحتفظ بنفس سلوك الإضافة 1.1.1 وتوافقها. مثبّتات البرنامج v1.1.4 المنشورة سابقًا تتضمن الإضافة 1.1.1 ولم يُعد بناؤها؛ حدّث مجلد الإضافة من الحزمة المستقلة ثم أعد تحميلها والمتصفحات المفتوحة. الإضافة 1.1.4 لا تحاول الرجوع للرقم الأقدم الذي يعلنه البرنامج المثبّت. توقيع Mozilla وإصدار المتجر منفصلان عن تغيير الرقم في manifest.
