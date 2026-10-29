@@ -19,7 +19,8 @@ Invoke-WebRequest "https://github.com/$env:GITHUB_REPOSITORY/releases/download/v
 if ((Get-FileHash $oldPath -Algorithm SHA256).Hash.ToLower() -ne $old[1]) { throw 'Previous installer checksum mismatch' }
 $installDir = Join-Path $env:RUNNER_TEMP 'KeRo-upgrade-test'
 $dataDir = Join-Path $env:APPDATA 'KeRo/KeRoDownload/data'
-if (Test-Path $dataDir) { throw 'Refusing to touch an existing profile' }
+# Engine tests may have created this disposable runner profile already.
+# Preserve any existing files instead of overwriting them with canaries.
 function Install-Candidate([string]$Path, [string]$LogName) {
     $logPath = Join-Path $env:RUNNER_TEMP $LogName
     $arguments = @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-', '/TASKS=', ('/DIR="' + $installDir + '"'), ('/LOG="' + $logPath + '"'))
@@ -34,8 +35,12 @@ if (-not $previousVersion.StartsWith('1.1.3')) { throw 'Unexpected previous appl
 New-Item -ItemType Directory -Force $dataDir | Out-Null
 # Synthetic canaries only: the application is not launched by this test.
 # Real serialization/DPAPI behavior is covered by the engine tests separately.
-[IO.File]::WriteAllText((Join-Path $dataDir 'settings.json'), '{"language":"ar","upgrade_test":"settings-canary"}')
-[IO.File]::WriteAllText((Join-Path $dataDir 'downloads.json'), '[{"upgrade_test":"download-history-canary"}]')
+if (-not (Test-Path (Join-Path $dataDir 'settings.json'))) {
+    [IO.File]::WriteAllText((Join-Path $dataDir 'settings.json'), '{"language":"ar","upgrade_test":"settings-canary"}')
+}
+if (-not (Test-Path (Join-Path $dataDir 'downloads.json'))) {
+    [IO.File]::WriteAllText((Join-Path $dataDir 'downloads.json'), '[{"upgrade_test":"download-history-canary"}]')
+}
 $partial = Join-Path $env:RUNNER_TEMP 'download-canary.part'
 [IO.File]::WriteAllBytes($partial, [byte[]](0..255))
 $preservedPaths = @((Join-Path $dataDir 'settings.json'), (Join-Path $dataDir 'downloads.json'), $partial)
@@ -57,5 +62,5 @@ foreach ($legal in @('LICENSE', 'COPYRIGHT', 'THIRD-PARTY-NOTICES.txt')) {
 }
 $protocol = (Get-ItemProperty 'HKCU:/Software/Classes/kero-download/shell/open/command').'(default)'
 if (-not $protocol.Contains($installedExe) -or -not $protocol.Contains('--from-browser')) { throw 'Browser protocol registration is incorrect' }
-[IO.File]::WriteAllText("$PWD/dist/UPGRADE-$Platform.txt", "PASS: verified v1.1.3 installer upgraded to candidate v1.1.4 on Windows Server 2022.`nSettings/history synthetic canaries and a partial download were preserved byte-for-byte. Installed EXE matches candidate; version, extension 1.1.1, legal files and protocol registration checked.`nApplication UI, actual download resume and Windows 7 runtime were not exercised by this installer check. Engine tests are reported separately in the workflow.`n")
+[IO.File]::WriteAllText("$PWD/dist/UPGRADE-$Platform.txt", "PASS: verified v1.1.3 installer upgraded to candidate v1.1.4 on Windows Server 2022.`nExisting CI settings/history (or synthetic canaries when absent) and a partial download were preserved byte-for-byte. Installed EXE matches candidate; version, extension 1.1.1, legal files and protocol registration checked.`nApplication UI, actual download resume and Windows 7 runtime were not exercised by this installer check. Engine tests are reported separately in the workflow.`n")
 Write-Host 'Installer upgrade preservation checks passed'
