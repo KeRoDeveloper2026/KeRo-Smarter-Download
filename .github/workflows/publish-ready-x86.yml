@@ -1,50 +1,50 @@
-name: Publish verified Windows 10-11 x86 installer
+name: Inspect CI quality checks
 
 on:
   push:
     branches: [main]
     paths: [.github/workflows/publish-ready-x86.yml]
-  workflow_dispatch:
 
 permissions:
-  actions: read
-  contents: write
+  contents: read
 
 jobs:
-  publish:
-    runs-on: ubuntu-24.04
+  inspect:
+    if: github.event.head_commit.message == 'Inspect formatting and lint checks without changing application behavior'
+    runs-on: windows-2022
     steps:
-      # Reuse the successful package; do not rebuild the application.
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
         with:
-          name: KeRoDownload-Win10_11-x86
-          run-id: 40800403612
-          github-token: ${{ github.token }}
-          path: dist
-      - name: Verify the existing installer and signed update manifest
-        shell: bash
+          toolchain: stable
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          key: quality-inspection
+          cache-on-failure: true
+      - name: Format sources and collect Clippy diagnostics
+        shell: pwsh
         run: |
-          node <<'JS'
-          const fs = require('node:fs');
-          const crypto = require('node:crypto');
-          const assert = require('node:assert/strict');
-          const m = JSON.parse(fs.readFileSync('dist/version-Win10_11-x86.json', 'utf8').replace(/^\uFEFF/, ''));
-          const file = 'KeRoDownload-v1.1.3-Win10_11-x86.exe';
-          assert.equal(m.version, '1.1.3');
-          assert.equal(m.url, `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/download/v1.1.3/${file}`);
-          const digest = crypto.createHash('sha256').update(fs.readFileSync(`dist/${file}`)).digest('hex');
-          assert.equal(digest, m.sha256.toLowerCase());
-          const key = crypto.createPublicKey({format: 'der', type: 'spki', key: Buffer.from('302a300506032b6570032100' + '075015a13e692aee5ef27f6129b767f116029728146c0fb7091200d4e05c11fd', 'hex')});
-          assert(crypto.verify(null, Buffer.from(`kero-download-update\n${m.version.trim()}\n${m.sha256.trim().toLowerCase()}\n`), key, Buffer.from(m.sig, 'hex')));
-          const ff = 'ffmpeg-Win10_11-x86.zip';
-          const expected = fs.readFileSync(`dist/${ff}.sha256`, 'utf8').trim().split(/\s+/)[0];
-          assert.equal(crypto.createHash('sha256').update(fs.readFileSync(`dist/${ff}`)).digest('hex'), expected);
-          console.log('Existing installer, Ed25519 signature and helper archive verified.');
-          JS
-      - name: Append x86 files to the existing release
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release view v1.1.3 --repo "$GITHUB_REPOSITORY"
-          gh release upload v1.1.3 dist/* --repo "$GITHUB_REPOSITORY"
+          $ErrorActionPreference = 'Stop'
+          rustc --version | Out-File rust-version.txt
+          cargo fmt --all
+          if ($LASTEXITCODE -ne 0) { throw 'Formatting failed' }
+          git -c core.autocrlf=false diff --binary --output=format.patch
+          cargo fmt --all -- --check
+          if ($LASTEXITCODE -ne 0) { throw 'Formatted sources failed validation' }
+          cargo clippy --locked --workspace --all-targets --message-format=json 1> clippy.json
+          $code = $LASTEXITCODE
+          "Clippy exit: $code" | Out-File clippy-exit.txt
+          exit $code
+      - name: Test formatted engine sources
+        run: cargo test --locked -p swiftget-engine --no-fail-fast
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: Quality-Inspection
+          path: |
+            format.patch
+            clippy.json
+            clippy-exit.txt
+            rust-version.txt
+          if-no-files-found: error
