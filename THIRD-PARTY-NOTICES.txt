@@ -1,28 +1,164 @@
-KeRo Smarter Download uses the following open source components.
+KeRo Smarter Download
+THIRD-PARTY SOFTWARE NOTICES
+===========================
 
-Slint (user interface toolkit) - https://slint.dev
-  Used under the Slint Royalty-free Desktop, Mobile, and Web Applications License 2.0.
+Developer: KeRo HaZem
+Project: https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download
+Releases: https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/releases
+Updated: 2026-10-29
 
-yt-dlp - https://github.com/yt-dlp/yt-dlp
-  The Unlicense (public domain).
+KeRo Smarter Download is available free of charge. It uses the components
+identified below. Their authors retain their respective copyrights, and their
+own license terms apply. This file does not set or replace the license for the
+application's own source code.
 
-FFmpeg - https://github.com/FFmpeg/FFmpeg
-  The ffmpeg program in the "tools" folder is KeRo Smarter Download's own small build
-  of the unmodified FFmpeg sources (version in ffmpeg-version.txt), made with
-  tools/ffmpeg/build.sh from the KeRo Smarter Download sources. It is licensed under
-  the GNU Lesser General Public License version 3 or later (see
-  ffmpeg-LICENSE.txt in the "tools" folder).
+These notices describe the repository's build recipes and helper sources.
+Component versions and contents can differ between platform packages or after
+a helper update. The full license texts and notices for the actual component
+version remain applicable; this summary does not replace them.
 
-LAME - https://lame.sourceforge.io
-  Built into that ffmpeg program to make MP3 files. GNU Lesser General Public
-  License (see lame-COPYING.txt in the "tools" folder).
 
-aria2 - https://github.com/aria2/aria2
-  The aria2c program in the "tools" folder (used for torrents) is an
-  unmodified release build licensed under the GNU General Public License
-  version 2 or later (see aria2-COPYING.txt in the "tools" folder). Its source
-  code is available at https://github.com/aria2/aria2.
+1. Slint - user interface toolkit
+--------------------------------
+Project: https://slint.dev
+Source: https://github.com/slint-ui/slint
 
-Rust crates (tokio, reqwest, serde, chrono, tiny_http, arboard, rfd, tray-icon,
-regex, sha2, aes, cbc, url, directories, filetime and their dependencies)
-  MIT and/or Apache-2.0 licenses.
+Used under the Slint Royalty-free Desktop, Mobile, and Web Applications
+License, version 2.0. The application's AboutSlint attribution is retained.
+
+License text for the Slint 1.18.1 source used in the current builds:
+https://github.com/slint-ui/slint/blob/v1.18.1/LICENSES/LicenseRef-Slint-Royalty-free-2.0.md
+
+Slint's own third-party assets and dependencies retain their individual
+licenses and notices.
+
+
+2. yt-dlp - media extraction and downloading
+-------------------------------------------
+Original project: https://github.com/yt-dlp/yt-dlp
+Source license: The Unlicense.
+https://github.com/yt-dlp/yt-dlp/blob/master/LICENSE
+
+Windows 10/11 packages:
+  The build recipes obtain the official standalone yt-dlp.exe (x64) or
+  yt-dlp_x86.exe (x86), installed in the application as tools/yt-dlp.exe.
+  Upstream identifies its PyInstaller-bundled executables as a combined work
+  licensed under the GNU General Public License version 3 or later (GPLv3+).
+  The Unlicense description of yt-dlp's own source alone does not describe
+  all code included in these executables.
+
+  Licensing explanation:
+  https://github.com/yt-dlp/yt-dlp#licensing
+  Bundled component license texts, including Python and other dependencies:
+  https://github.com/yt-dlp/yt-dlp/blob/master/THIRD_PARTY_LICENSES.txt
+
+Windows 7 experimental packages:
+  Community build provider: https://github.com/nicolaasjan/yt-dlp
+  Pinned release used by the current build recipes: 2026.10.27.141215
+  https://github.com/nicolaasjan/yt-dlp/releases/tag/2026.10.27.141215
+
+  x64 download: yt-dlp_win7.exe
+  x86 download: yt-dlp_x86_win7.exe
+  Both are installed under the local filename tools/yt-dlp.exe.
+  These are community builds, separate from the official Windows releases.
+
+  The fork retains the Unlicense for yt-dlp's own source and documents the
+  GPLv3+ licensing of the PyInstaller-bundled executable. Its bundled
+  dependencies keep their respective licenses.
+  Source and license notices for the pinned release:
+  https://github.com/nicolaasjan/yt-dlp/tree/2026.10.27.141215
+  https://github.com/nicolaasjan/yt-dlp/blob/2026.10.27.141215/LICENSE
+  https://github.com/nicolaasjan/yt-dlp/blob/2026.10.27.141215/THIRD_PARTY_LICENSES.txt
+
+  Automatic yt-dlp self-update is disabled in these Win7 packages so that the
+  pinned community executable is not replaced by an official Windows 10+
+  executable.
+
+GPL version 3 text:
+https://www.gnu.org/licenses/gpl-3.0.html
+
+
+3. FFmpeg - media processing
+---------------------------
+Original project: https://ffmpeg.org
+Source: https://github.com/FFmpeg/FFmpeg
+
+The project's GitHub Actions packages build their own reduced ffmpeg.exe
+from unmodified FFmpeg n8.0.3 sources:
+https://github.com/FFmpeg/FFmpeg/commit/8ae0b34901ba60a802f183ee75a250a9fc3e09a5
+
+Build configuration:
+https://github.com/KeRoDeveloper2026/KeRo-Smarter-Download/blob/main/tools/ffmpeg/build.sh
+
+This configuration uses static linking and --enable-version3, without
+--enable-gpl or --enable-nonfree. The resulting FFmpeg build is licensed
+under the GNU Lesser General Public License version 3 or later (LGPLv3+).
+It includes LAME for MP3 encoding, described separately below.
+
+The build copies the FFmpeg license into tools/ffmpeg-LICENSE.txt.
+Source license text:
+https://github.com/FFmpeg/FFmpeg/blob/n8.0.3/COPYING.LGPLv3
+
+Alternative FFmpeg downloads:
+  build-windows.ps1 and recovery paths can obtain a different prebuilt
+  FFmpeg from https://www.gyan.dev/ffmpeg/builds/ when the project's build
+  is unavailable. Gyan identifies its main builds as GPLv3, with additional
+  bundled libraries under their own terms. The LGPL description above
+  applies to this project's reduced build, not to every replacement
+  ffmpeg.exe. Consult the replacement build's license and configuration.
+
+
+4. LAME - MP3 encoding library
+-----------------------------
+Project: https://lame.sourceforge.io
+Source archive used by the build recipes: LAME 3.100
+https://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz
+
+LAME is statically included in the project's reduced FFmpeg build for MP3
+encoding, under the GNU LGPL. The LAME frontend and decoder are disabled
+by this project's build configuration.
+
+The build copies LAME's COPYING file into tools/lame-COPYING.txt.
+Upstream licensing information:
+https://lame.sourceforge.io/license.txt
+
+
+5. aria2 - download and BitTorrent helper
+----------------------------------------
+Project and source: https://github.com/aria2/aria2
+Release used by the build recipes: 1.37.0
+https://github.com/aria2/aria2/releases/tag/release-1.37.0
+
+The application packages an unmodified Windows release build, selected for
+x86 or x64 and installed as tools/aria2c.exe. aria2 is licensed under the
+GNU General Public License version 2 or later (GPLv2+). Its dependencies
+retain their own applicable terms.
+
+The build copies the release's COPYING file into tools/aria2-COPYING.txt.
+Source license text:
+https://github.com/aria2/aria2/blob/release-1.37.0/COPYING
+
+
+6. Rust libraries and other transitive dependencies
+--------------------------------------------------
+The application uses Slint and Rust crates including tokio, reqwest, serde,
+serde_json, chrono, tiny_http, arboard, rfd, tray-icon, regex, sha2, ring,
+aes, cbc, url, directories, filetime and Windows bindings, together with
+their transitive dependencies.
+
+Many of these crates use MIT and/or Apache-2.0 licenses, but this is not a
+blanket license statement for the full dependency tree. Other licenses and
+third-party notices can apply. In particular, ring's cryptographic code has
+its own license notices:
+https://github.com/briansmith/ring
+
+Refer to each resolved crate version's Cargo metadata, LICENSE/COPYING files
+and embedded source notices for the exact terms. The application's
+Cargo.toml license field does not override third-party component licenses.
+
+
+Notice maintenance
+------------------
+When replacing a helper or publishing a new platform build, retain its
+copyright and license notices, check its bundled dependencies, and update
+the source/version references in this file as needed.
