@@ -1,0 +1,62 @@
+name: Publish verified experimental Windows 7 installers
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/publish-ready-win7.yml]
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          pattern: KeRoDownload-Win7-*
+          merge-multiple: true
+          run-id: 40800403612
+          github-token: ${{ github.token }}
+          path: dist
+      - name: Verify the successful packages without rebuilding
+        shell: bash
+        run: |
+          node <<'JS'
+          const fs = require('node:fs');
+          const crypto = require('node:crypto');
+          const assert = require('node:assert/strict');
+          const key = crypto.createPublicKey({format: 'der', type: 'spki', key: Buffer.from('302a300506032b6570032100' + '075015a13e692aee5ef27f6129b767f116029728146c0fb7091200d4e05c11fd', 'hex')});
+          const readJson = path => JSON.parse(fs.readFileSync(path, 'utf8').replace(/^\uFEFF/, ''));
+          const sha = path => crypto.createHash('sha256').update(fs.readFileSync(path)).digest('hex');
+          const unavailable = new Set(['UiaDisconnectProvider', 'UiaRaiseNotificationEvent', 'CoIncrementMTAUsage', 'RoInitialize', 'RoGetActivationFactory', 'RoGetAgileReference']);
+          for (const arch of ['x64', 'x86']) {
+            const platform = `Win7-${arch}`;
+            const m = readJson(`dist/version-${platform}.json`);
+            const file = `KeRoDownload-v1.1.3-Win7-Experimental-${arch}.exe`;
+            assert.equal(m.version, '1.1.3');
+            assert.equal(m.url, `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/download/v1.1.3/${file}`);
+            assert.equal(sha(`dist/${file}`), m.sha256.toLowerCase());
+            assert(crypto.verify(null, Buffer.from(`kero-download-update\n${m.version.trim()}\n${m.sha256.trim().toLowerCase()}\n`), key, Buffer.from(m.sig, 'hex')));
+            const ff = `ffmpeg-${platform}.zip`;
+            assert.equal(sha(`dist/${ff}`), fs.readFileSync(`dist/${ff}.sha256`, 'utf8').trim().split(/\s+/)[0]);
+            const report = readJson(`dist/IMPORTS-${platform}.json`);
+            for (const [file, dlls] of Object.entries(report)) {
+              console.log(platform, file, 'DLLs:', Object.keys(dlls).join(', '));
+              for (const [dll, names] of Object.entries(dlls)) {
+                assert(!['combase.dll', 'shcore.dll'].includes(dll.toLowerCase()), `${file}: Windows 8+ DLL ${dll}`);
+                for (const name of names) assert(!unavailable.has(name), `${file}: Windows 8+ API ${name}`);
+              }
+            }
+            console.log(platform, 'package hash, signature and import preflight passed. Windows 7 runtime testing is still required.');
+          }
+          JS
+      - name: Add only Windows 7 files to the existing release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view v1.1.3 --repo "$GITHUB_REPOSITORY"
+          gh release upload v1.1.3 dist/* --repo "$GITHUB_REPOSITORY"
