@@ -33,7 +33,7 @@ jobs:
       - name: Engine regression tests
         env:
           RUSTFLAGS: -C target-feature=+crt-static
-        run: cargo test --locked -p swiftget-engine --target x86_64-pc-windows-msvc
+        run: cargo test --locked -p swiftget-engine --features design-preview --target x86_64-pc-windows-msvc
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: KeRo-download-window-preview-tested

@@ -84,7 +84,15 @@ pub fn tool_dirs() -> Vec<PathBuf> {
         v.push(dir.join("tools"));
         v.push(dir);
     }
-    if let Some(p) = directories::ProjectDirs::from("com", "KeRo", "KeRoDownload") {
+    if let Some(p) = directories::ProjectDirs::from(
+        "com",
+        "KeRo",
+        if cfg!(feature = "design-preview") {
+            "KeRoDesignPreview"
+        } else {
+            "KeRoDownload"
+        },
+    ) {
         v.push(p.data_dir().join("tools"));
     }
     v
@@ -92,9 +100,17 @@ pub fn tool_dirs() -> Vec<PathBuf> {
 
 /// A folder of ours for the helpers' temporary files.
 pub fn work_dir() -> Option<PathBuf> {
-    let dir = directories::ProjectDirs::from("com", "KeRo", "KeRoDownload")?
-        .data_dir()
-        .join("tmp");
+    let dir = directories::ProjectDirs::from(
+        "com",
+        "KeRo",
+        if cfg!(feature = "design-preview") {
+            "KeRoDesignPreview"
+        } else {
+            "KeRoDownload"
+        },
+    )?
+    .data_dir()
+    .join("tmp");
     std::fs::create_dir_all(&dir).ok()?;
     Some(dir)
 }

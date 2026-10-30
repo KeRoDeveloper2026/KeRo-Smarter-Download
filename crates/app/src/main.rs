@@ -201,6 +201,19 @@ fn main() -> anyhow::Result<()> {
     // started by Windows at sign-in: stay next to the clock, no window
     let background = std::env::args().any(|a| a == "--background");
     let data_dir = default_data_dir();
+    if cfg!(feature = "design-preview") && !data_dir.join("settings.json").exists() {
+        std::fs::create_dir_all(&data_dir)?;
+        let preview_settings = Settings {
+            browser_port: 9615,
+            download_dir: data_dir.join("Downloads"),
+            temp_dir: Some(data_dir.join("Temp")),
+            language: "ar".into(),
+            autostart_set: true,
+            ..Settings::default()
+        };
+        preview_settings.save(&data_dir.join("settings.json"))?;
+    }
+
     let port = Settings::load(&data_dir.join("settings.json")).browser_port;
 
     // opened again by the program itself: the old one may still be closing
@@ -231,7 +244,9 @@ fn main() -> anyhow::Result<()> {
         .build()?;
     let mgr = Manager::new(rt.handle().clone(), data_dir.clone())?;
     // yt-dlp and ffmpeg: put back if missing, update silently once a day
-    swiftget_engine::tools::spawn_updater(rt.handle(), mgr.client(), data_dir.clone());
+    if !cfg!(feature = "design-preview") {
+        swiftget_engine::tools::spawn_updater(rt.handle(), mgr.client(), data_dir.clone());
+    }
 
     let main = MainWindow::new()?;
     let add = AddDialog::new()?;
@@ -323,7 +338,7 @@ fn main() -> anyhow::Result<()> {
     {
         // first run: start with Windows, like other download managers
         let mut s = mgr.settings();
-        if !s.autostart_set {
+        if !cfg!(feature = "design-preview") && !s.autostart_set {
             // the installer already asked; a copy run without it starts with Windows
             if !autostart::installed_by_setup() {
                 autostart::set(true);

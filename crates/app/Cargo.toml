@@ -7,6 +7,7 @@ description = "KeRo Smarter Download – download manager (desktop app)"
 build = "build.rs"
 
 [features]
+design-preview = ["swiftget-engine/design-preview"]
 legacy-win7 = ["swiftget-engine/legacy-win7"]
 
 [dependencies]

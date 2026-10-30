@@ -101,6 +101,11 @@ pub struct Manager {
 /// (%APPDATA%\KeRo\KeRoDownload\data on Windows). The list and settings of
 /// the earlier "SwiftGet" name are carried over the first time.
 pub fn default_data_dir() -> PathBuf {
+    if cfg!(feature = "design-preview") {
+        return directories::ProjectDirs::from("com", "KeRo", "KeRoDesignPreview")
+            .map(|p| p.data_dir().to_path_buf())
+            .unwrap_or_else(|| PathBuf::from("kero-design-preview-data"));
+    }
     let dir = directories::ProjectDirs::from("com", "KeRo", "KeRoDownload")
         .map(|p| p.data_dir().to_path_buf())
         .unwrap_or_else(|| PathBuf::from("kero-data"));

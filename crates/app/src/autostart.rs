@@ -34,6 +34,9 @@ mod imp {
     }
 
     pub fn set(enabled: bool) -> bool {
+        if cfg!(feature = "design-preview") {
+            return false;
+        }
         if enabled {
             let Ok(exe) = std::env::current_exe() else {
                 return false;

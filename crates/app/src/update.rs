@@ -51,6 +51,9 @@ fn apply_as(setup: PathBuf, sha256: String, visible: bool) {
 }
 
 pub fn spawn(ctx: &Ctx) {
+    if cfg!(feature = "design-preview") {
+        return;
+    }
     // leftovers of an update that is installed now
     if let Ok(rd) = std::fs::read_dir(update_dir()) {
         for e in rd.flatten() {
@@ -130,6 +133,10 @@ fn size_text(n: u64) -> String {
 /// Help > Check for updates: look now instead of waiting for the next check,
 /// in the update window.
 pub fn check_now(ui: &Ui) {
+    if cfg!(feature = "design-preview") {
+        message("Design preview: application updates are disabled.");
+        return;
+    }
     let Some(d) = ui.updater.upgrade() else {
         return;
     };

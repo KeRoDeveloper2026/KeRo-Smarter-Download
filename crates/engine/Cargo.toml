@@ -6,6 +6,7 @@ license.workspace = true
 description = "Download engine: multi-connection segmented downloads, resume, HLS, queue and scheduler"
 
 [features]
+design-preview = []
 legacy-win7 = ["dep:windows_i686_msvc_048", "dep:windows_x86_64_msvc_048"]
 
 [dependencies]
