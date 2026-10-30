@@ -2636,12 +2636,12 @@ export component DetailsDialog inherits ThemedWindow {
                         text: "KeRo"; color: #ecf7ff;
                         font-size: 32px; font-weight: 800;
                         vertical-alignment: center;
-                        horizontal-alignment: Theme.rtl ? right : left;
+                        horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left;
                     }
                     Text {
                         text: "SMARTER DOWNLOAD"; color: #16d6ff;
                         font-size: 12px; font-weight: 600;
-                        horizontal-alignment: Theme.rtl ? right : left;
+                        horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left;
                     }
                 }
                 Rectangle { horizontal-stretch: 1; }
@@ -2661,7 +2661,7 @@ export component DetailsDialog inherits ThemedWindow {
                     text: root.name; color: #f3f9ff;
                     font-size: 20px * Theme.font-scale; font-weight: 700;
                     overflow: elide;
-                    horizontal-alignment: Theme.rtl ? right : left;
+                    horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left;
                 }
                 Text {
                     text: root.url; color: #04c8ff;
@@ -2682,7 +2682,7 @@ export component DetailsDialog inherits ThemedWindow {
                 Rectangle {
                     x: Theme.rtl ? parent.width - self.width - 3px : 3px;
                     y: 3px; height: parent.height - 6px;
-                    width: max(0px, (parent.width - 6px) * clamp(root.progress, 0, 1));
+                    width: max(0px, (parent.width - 6px) * max(0, min(root.progress, 1)));
                     background: @linear-gradient(0deg, #0471e5 0%, #05d9f6 100%);
                     border-radius: 10px;
                 }
@@ -2707,7 +2707,7 @@ export component DetailsDialog inherits ThemedWindow {
             color: root.state == 4 ? #ff8a9a : #a6c4df;
             font-size: 11px * Theme.font-scale;
             wrap: word-wrap;
-            horizontal-alignment: Theme.rtl ? right : left;
+            horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left;
         }
         HRow {
             spacing: 8px;
@@ -2873,7 +2873,7 @@ export component DetailsDialog inherits ThemedWindow {
                         HRow {
                             Text { text: @tr("N."); width: 38px; color: #b9d9f1; horizontal-alignment: center; vertical-alignment: center; }
                             Text { text: @tr("Downloaded"); width: 120px; color: #b9d9f1; horizontal-alignment: center; vertical-alignment: center; }
-                            Text { text: @tr("Info"); horizontal-stretch: 1; color: #b9d9f1; horizontal-alignment: Theme.rtl ? right : left; vertical-alignment: center; }
+                            Text { text: @tr("Info"); horizontal-stretch: 1; color: #b9d9f1; horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left; vertical-alignment: center; }
                         }
                     }
                     ListView {
@@ -2883,7 +2883,7 @@ export component DetailsDialog inherits ThemedWindow {
                             HRow {
                                 Text { text: s.number; width: 38px; color: #dbeeff; horizontal-alignment: center; vertical-alignment: center; }
                                 Text { text: s.downloaded; width: 120px; color: #dbeeff; horizontal-alignment: center; vertical-alignment: center; overflow: elide; }
-                                Text { text: s.info; horizontal-stretch: 1; color: s.busy ? #00ceff : #afc4d7; horizontal-alignment: Theme.rtl ? right : left; vertical-alignment: center; overflow: elide; }
+                                Text { text: s.info; horizontal-stretch: 1; color: s.busy ? #00ceff : #afc4d7; horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left; vertical-alignment: center; overflow: elide; }
                             }
                         }
                     }

@@ -197,6 +197,10 @@ fn install_crash_log() {
 }
 
 fn main() -> anyhow::Result<()> {
+    #[cfg(feature = "design-preview")]
+    if std::env::args().any(|a| a == "--design-preview-showcase") {
+        return show_design_preview_sample();
+    }
     install_crash_log();
     // started by Windows at sign-in: stay next to the clock, no window
     let background = std::env::args().any(|a| a == "--background");
@@ -209,6 +213,8 @@ fn main() -> anyhow::Result<()> {
             temp_dir: Some(data_dir.join("Temp")),
             language: "ar".into(),
             autostart_set: true,
+            clipboard_monitor: false,
+            extension_prompted: true,
             ..Settings::default()
         };
         preview_settings.save(&data_dir.join("settings.json"))?;
@@ -3798,4 +3804,58 @@ mod tests {
         assert_eq!(l.len(), 3);
         assert!(expand_pattern("https://example.com/x.pdf", false, "1", "2", 1).is_err());
     }
+}
+
+// Deterministic native-window render for CI inspection. Only the preview build
+// exposes this mode; normal startup still uses live engine data and callbacks.
+#[cfg(feature = "design-preview")]
+fn show_design_preview_sample() -> anyhow::Result<()> {
+    i18n::apply("ar");
+    let d = DetailsDialog::new()?;
+    set_theme_of(d.global::<Theme>(), &Look::of(&Settings::default()));
+    d.set_name("DESIGN SAMPLE - safari-5-34-57-2.exe".into());
+    d.set_url("https://example.com/design-sample.exe".into());
+    d.set_percent("91.66%".into());
+    d.set_progress(0.9166);
+    d.set_downloaded("33.65 MB".into());
+    d.set_size("36.71 MB".into());
+    d.set_speed("1.14 MB/s".into());
+    d.set_eta("2s".into());
+    d.set_status(t("Receiving data…").into());
+    d.set_resumable(t("Yes").into());
+    d.set_resumable_ok(true);
+    d.set_kind("exe".into());
+    d.set_state(1);
+    d.set_segs(ModelRc::new(VecModel::from(vec![
+        SegView {
+            busy: true,
+            start: 0.0,
+            done: 0.30,
+            number: "1".into(),
+            downloaded: "1.03 MB".into(),
+            info: t("Receiving data…").into(),
+        },
+        SegView {
+            busy: false,
+            start: 0.333,
+            done: 0.60,
+            number: "2".into(),
+            downloaded: "815.66 KB".into(),
+            info: t("Completed").into(),
+        },
+        SegView {
+            busy: true,
+            start: 0.666,
+            done: 0.94,
+            number: "3".into(),
+            downloaded: "359.10 KB".into(),
+            info: t("Receiving data…").into(),
+        },
+    ])));
+    d.window().set_size(slint::LogicalSize::new(780.0, 640.0));
+    d.on_close_clicked(|| {
+        let _ = slint::quit_event_loop();
+    });
+    d.run()?;
+    Ok(())
 }

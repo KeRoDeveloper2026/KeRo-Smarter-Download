@@ -34,6 +34,15 @@ jobs:
         env:
           RUSTFLAGS: -C target-feature=+crt-static
         run: cargo test --locked -p swiftget-engine --features design-preview --target x86_64-pc-windows-msvc
+      - name: Native window render and isolated startup smoke check
+        shell: pwsh
+        run: ./tools/test-design-preview.ps1
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: KeRo-download-window-diagnostics
+          path: dist-design-preview/diagnostics
+          if-no-files-found: ignore
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: KeRo-download-window-preview-tested
