@@ -1,0 +1,83 @@
+// Static vector skin: no blur, drop shadows, animations or polling timers.
+import { Theme } from "common.slint";
+
+export component ProgressAction inherits Rectangle {
+    in property <string> text;
+    in property <string> glyph;
+    in property <bool> danger;
+    in property <bool> enabled: true;
+    in property <bool> selected;
+    out property <bool> hovered: hit.has-hover;
+    callback clicked();
+    min-width: 84px;
+    min-height: 44px;
+    border-radius: 6px;
+    border-width: 1px;
+    border-color: !root.enabled ? #2b4159 : root.danger ? #f16a7b : #06cfff;
+    background: !root.enabled ? #0b1b2d : hit.pressed ? #164c77 : root.danger ? #661f36 : root.selected || hit.has-hover ? #0c426f : #082c4c;
+    VerticalLayout {
+        padding: 5px;
+        spacing: 1px;
+        if root.glyph != "": Text {
+            text: root.glyph;
+            font-size: 20px;
+            font-weight: 700;
+            color: root.enabled ? #d8faff : #59728b;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+        }
+        Text {
+            text: root.text;
+            color: root.enabled ? #f0f7ff : #59728b;
+            font-size: 12px * Theme.font-scale;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+            overflow: elide;
+        }
+    }
+    hit := TouchArea {
+        enabled: root.enabled;
+        mouse-cursor: pointer;
+        clicked => { root.clicked(); }
+    }
+    // Preserve keyboard activation and a visible focus indicator.
+    focus := FocusScope {
+        enabled: root.enabled;
+        key-pressed(event) => {
+            if (event.text == " " || event.text == "\n") { root.clicked(); return accept; }
+            return reject;
+        }
+    }
+    if focus.has-focus: Rectangle {
+        x: 3px; y: 3px;
+        width: parent.width - 6px; height: parent.height - 6px;
+        border-width: 1px; border-color: #ffdb76; border-radius: 4px;
+        background: transparent;
+    }
+}
+
+export component ProgressMetric inherits Rectangle {
+    in property <string> label;
+    in property <string> value;
+    in property <bool> good;
+    background: #061d34;
+    border-width: 1px;
+    border-color: #153f60;
+    border-radius: 5px;
+    min-height: 54px;
+    VerticalLayout {
+        padding: 7px;
+        spacing: 2px;
+        Text {
+            text: root.label; color: #9cb9d3;
+            font-size: 11px * Theme.font-scale;
+            horizontal-alignment: center;
+        }
+        Text {
+            text: root.value; color: root.good ? #40e8a6 : #edf7ff;
+            font-size: 16px * Theme.font-scale;
+            font-weight: 600; horizontal-alignment: center;
+            overflow: elide;
+        }
+    }
+}

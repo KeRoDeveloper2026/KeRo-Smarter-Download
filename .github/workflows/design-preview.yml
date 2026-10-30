@@ -1,0 +1,42 @@
+name: Download window design preview - artifacts only
+on:
+  push:
+    branches: [preview/download-window-design]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows-preview:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+        with:
+          toolchain: 1.99.1
+          targets: x86_64-pc-windows-msvc
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          key: platform-Win10_11-x64-${{ hashFiles('tools/prepare-win7.py') }}
+          cache-on-failure: true
+      - name: Browser integration regression tests
+        run: node tools/test-extensions.mjs
+      - name: Build and package portable preview
+        shell: pwsh
+        run: ./tools/build-design-preview.ps1
+      # Preserve a successful build before running later checks.
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: KeRo-download-window-preview-unverified
+          path: dist-design-preview/*.zip*
+          if-no-files-found: error
+          retention-days: 14
+      - name: Engine regression tests
+        env:
+          RUSTFLAGS: -C target-feature=+crt-static
+        run: cargo test --locked -p swiftget-engine --target x86_64-pc-windows-msvc
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: KeRo-download-window-preview-tested
+          path: dist-design-preview/*.zip*
+          if-no-files-found: error
+          retention-days: 14

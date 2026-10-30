@@ -3288,6 +3288,24 @@ pub(crate) fn open_progress(ui: &Ui, id: u64) {
     let Ok(badge) = FloatingDownload::new() else {
         return;
     };
+    {
+        let mgr = ui.ctx.mgr.clone();
+        d.on_open_folder(move || {
+            if let Some(v) = mgr.get(id) {
+                reveal_in_folder(&v);
+            }
+        });
+    }
+    {
+        let mgr = ui.ctx.mgr.clone();
+        d.on_copy_link(move || {
+            if let Some(v) = mgr.get(id) {
+                if let Ok(mut clipboard) = arboard::Clipboard::new() {
+                    let _ = clipboard.set_text(v.url.clone());
+                }
+            }
+        });
+    }
     let settings = ui.ctx.mgr.settings();
     set_theme_of(d.global::<Theme>(), &Look::of(&settings));
     // the tabs' controls are set once, so typing in them isn't overwritten

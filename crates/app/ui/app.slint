@@ -4,6 +4,7 @@
 
 import { Button, LineEdit, SpinBox, ComboBox, ListView, TabWidget, TextEdit, Palette } from "std-widgets.slint";
 import { ToolTip, DownloadRow, QueueRow, SegView, Cols, ColDef, CatRow, PairRow, LinkRow, Theme, ThemedWindow, CaptionButton, P, Icon, G, TypeIcon, BigTypeIcon, ToolBtn, ToolSeparator, TreeItem, HeaderCell, Cell, MenuEntry, MenuSep, MenuLabel, Glyph, HRow, CheckBox } from "common.slint";
+import { ProgressAction, ProgressMetric } from "progress-style.slint";
 export { DownloadRow, QueueRow, SegView, Cols, ColDef, CatRow, PairRow, LinkRow, Theme }
 export { FloatingDownload } from "floating.slint";
 export { BrowserRow } from "dialogs.slint";
@@ -2541,8 +2542,8 @@ export component DetailsDialog inherits ThemedWindow {
     in property <bool> front;
     always-on-top: root.front;
     title: root.percent + " " + root.name;
-    preferred-width: 560px;
-    min-width: 520px;
+    preferred-width: 780px;
+    min-width: 700px;
     // its own title bar (with "hide next to the clock" beside minimize)
     no-frame: true;
 
@@ -2571,6 +2572,8 @@ export component DetailsDialog inherits ThemedWindow {
     in-out property <bool> complete-dialog: true;
     in-out property <bool> force-close;
 
+    callback open-folder();
+    callback copy-link();
     callback pause();
     callback resume();
     callback cancel-download();
@@ -2588,267 +2591,148 @@ export component DetailsDialog inherits ThemedWindow {
     out property <length> content-height: outer.preferred-height;
     callback details-toggled();
 
-    property <bool> tray-tip;
-    tip-timer := Timer {
-        interval: 600ms;
-        running: tray-btn.hovered && !root.tray-tip;
-        triggered => {
-            root.tray-tip = true;
-        }
-    }
 
-    Rectangle {
-        border-width: 1px;
-        border-color: Theme.line;
+    background: #031326;
+    // Angular frame is a static vector; only download data invalidates the UI.
+    Path {
+        width: parent.width; height: parent.height;
+        viewbox-width: 780; viewbox-height: 620;
+        commands: "M 20 2 L 190 2 L 204 14 L 746 14 L 778 46 L 778 558 L 746 590 L 560 590 L 545 608 L 38 608 L 2 572 L 2 40 Z";
+        fill: #04182c; stroke: #008ddd; stroke-width: 2px;
+    }
+    Path {
+        width: parent.width; height: parent.height;
+        viewbox-width: 780; viewbox-height: 620;
+        commands: "M 26 9 L 185 9 L 199 21 L 741 21 L 771 50 M 771 565 L 742 583 L 568 583 M 39 600 L 9 569 L 9 48";
+        stroke: #13e3ff; stroke-width: 2px;
+    }
+    Path {
+        width: parent.width; height: parent.height;
+        viewbox-width: 780; viewbox-height: 620;
+        commands: "M 388 21 L 539 21 L 555 37 M 9 165 L 9 282 M 48 600 L 122 600 M 636 583 L 714 583";
+        stroke: #edc15d; stroke-width: 4px;
     }
     outer := VerticalLayout {
-      padding: 1px;
-      spacing: 0px;
-      Rectangle {
-        height: 30px;
-        background: Theme.panel;
-        HRow {
-            spacing: 0px;
-            Rectangle {
-                horizontal-stretch: 1;
-                drag := TouchArea {
-                    pointer-event(ev) => {
-                        if (ev.button == PointerEventButton.left && ev.kind == PointerEventKind.down) {
-                            root.start-drag();
-                        }
-                    }
-                }
-                HRow {
-                    padding-left: Theme.rtl ? (0px) : (8px);
-                    padding-right: Theme.rtl ? (8px) : (0px);
-                    spacing: 7px;
-                    Rectangle {
-                        width: 16px;
-                        Image {
-                            source: @image-url("icon-window.png");
-                            width: 16px;
-                            height: 16px;
-                            y: 7px;
-                        }
-                    }
-                    Text {
-                        horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left;
-                        text: root.title;
-                        vertical-alignment: center;
-                        overflow: elide;
-                        color: Theme.text;
-                        horizontal-stretch: 1;
-                    }
-                }
-            }
-            tray-btn := CaptionButton {
-                kind: "tray";
-                visible: root.state != 3;
-                width: root.state != 3 ? 44px : 0px;
-                changed hovered => {
-                    if (!self.hovered) {
-                        root.tray-tip = false;
-                    }
-                }
-                clicked => {
-                    root.tray-tip = false;
-                    root.hide-to-tray();
-                }
-            }
-            Rectangle {
-                width: 44px;
-                Text {
-                    text: "◉";
-                    color: #00d9ff;
-                    font-size: 21px;
-                    horizontal-alignment: center;
-                    vertical-alignment: center;
-                }
-                TouchArea { clicked => { root.float-download(); } }
-
-            }
-            CaptionButton {
-                kind: "min";
-                clicked => {
-                    root.minimize();
-                }
-            }
-            CaptionButton {
-                kind: "close";
-                clicked => {
-                    root.close-clicked();
-                }
-            }
-        }
-      }
-      VerticalLayout {
-        padding: 10px;
-        spacing: 0px;
-        HRow {
-            spacing: 2px;
-            TabButton {
-                text: @tr("Download status");
-                active: root.tab == 0;
-                clicked => {
-                    root.tab = 0;
-                }
-            }
-            TabButton {
-                text: @tr("Speed Limiter");
-                active: root.tab == 1;
-                clicked => {
-                    root.tab = 1;
-                }
-            }
-            TabButton {
-                text: @tr("Options on completion");
-                active: root.tab == 2;
-                clicked => {
-                    root.tab = 2;
-                }
-            }
-            Rectangle {
-                horizontal-stretch: 1;
-            }
-        }
+        padding: 18px;
+        spacing: 9px;
         Rectangle {
-            background: Theme.panel;
-            border-width: 1px;
-            border-color: Theme.line;
-            min-height: 176px;
-            if root.tab == 0: VerticalLayout {
-                padding: 10px;
-                spacing: 6px;
-                alignment: start;
-                HRow {
-                    spacing: 8px;
-                    TypeIcon {
-                        kind: root.kind;
-                        width: 20px;
-                        height: 20px;
-                    }
-                    Text {
-                        horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left;
-                        text: root.url;
-                        font-size: 11px * Theme.font-scale;
-                        overflow: elide;
-                        color: Theme.accent;
-                        vertical-alignment: center;
-                        horizontal-stretch: 1;
-                    }
+            height: 68px;
+            // Dragging is limited to the title area, never the download controls.
+            TouchArea {
+                pointer-event(ev) => {
+                    if (ev.button == PointerEventButton.left && ev.kind == PointerEventKind.down) { root.start-drag(); }
                 }
-                Rectangle {
-                    height: 1px;
-                    background: Theme.grid;
+            }
+            HRow {
+                spacing: 8px;
+                Image {
+                    source: @image-url("kero-logo.png");
+                    width: 64px; height: 64px;
+                    image-fit: contain;
                 }
                 VerticalLayout {
-                    spacing: 3px;
-                    HRow {
-                        spacing: 6px;
-                        Text {
-                            horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left;
-                            text: @tr("Status");
-                            color: Theme.muted;
-                            width: 125px;
-                        }
-                        Text {
-                            horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left;
-                            text: root.status;
-                            color: root.state == 4 ? Theme.err : Theme.text;
-                            horizontal-stretch: 1;
-                            overflow: elide;
-                        }
+                    spacing: 0px;
+                    Text {
+                        text: "KeRo"; color: #ecf7ff;
+                        font-size: 32px; font-weight: 800;
+                        vertical-alignment: center;
+                        horizontal-alignment: Theme.rtl ? right : left;
                     }
-                    HRow {
-                        spacing: 6px;
-                        Text {
-                            horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left;
-                            text: @tr("File size");
-                            color: Theme.muted;
-                            width: 125px;
-                        }
-                        Text {
-                            horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left;
-                            text: root.size;
-                            color: Theme.text;
-                            horizontal-stretch: 1;
-                            overflow: elide;
-                        }
-                    }
-                    HRow {
-                        spacing: 6px;
-                        Text {
-                            horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left;
-                            text: @tr("Downloaded");
-                            color: Theme.muted;
-                            width: 125px;
-                        }
-                        Text {
-                            horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left;
-                            text: root.downloaded;
-                            color: Theme.text;
-                            horizontal-stretch: 1;
-                            overflow: elide;
-                        }
-                    }
-                    HRow {
-                        spacing: 6px;
-                        Text {
-                            horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left;
-                            text: @tr("Transfer rate");
-                            color: Theme.muted;
-                            width: 125px;
-                        }
-                        Text {
-                            horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left;
-                            text: root.speed;
-                            color: Theme.text;
-                            horizontal-stretch: 1;
-                            overflow: elide;
-                        }
-                    }
-                    HRow {
-                        spacing: 6px;
-                        Text {
-                            horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left;
-                            text: @tr("Time left");
-                            color: Theme.muted;
-                            width: 125px;
-                        }
-                        Text {
-                            horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left;
-                            text: root.eta;
-                            color: Theme.text;
-                            horizontal-stretch: 1;
-                            overflow: elide;
-                        }
-                    }
-                    HRow {
-                        spacing: 6px;
-                        Text {
-                            horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left;
-                            text: @tr("Resume capability");
-                            color: Theme.muted;
-                            width: 125px;
-                        }
-                        Text {
-                            horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left;
-                            text: root.resumable;
-                            color: root.resumable-ok ? Theme.ok : Theme.err;
-                            horizontal-stretch: 1;
-                            overflow: elide;
-                        }
+                    Text {
+                        text: "SMARTER DOWNLOAD"; color: #16d6ff;
+                        font-size: 12px; font-weight: 600;
+                        horizontal-alignment: Theme.rtl ? right : left;
                     }
                 }
-                if root.error != "": Text {
-                    horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left;
-                    text: root.error;
-                    color: Theme.err;
-                    wrap: word-wrap;
-                    font-size: 11px * Theme.font-scale;
+                Rectangle { horizontal-stretch: 1; }
+                ProgressAction { text: "◉"; min-width: 35px; clicked => { root.float-download(); } }
+                ProgressAction { text: "↓"; min-width: 35px; clicked => { root.hide-to-tray(); } }
+                ProgressAction { text: "−"; min-width: 35px; clicked => { root.minimize(); } }
+                ProgressAction { text: "×"; min-width: 35px; danger: true; clicked => { root.close-clicked(); } }
+            }
+        }
+        HRow {
+            spacing: 8px;
+            TypeIcon { kind: root.kind; width: 36px; height: 36px; }
+            VerticalLayout {
+                spacing: 4px;
+                horizontal-stretch: 1;
+                Text {
+                    text: root.name; color: #f3f9ff;
+                    font-size: 20px * Theme.font-scale; font-weight: 700;
+                    overflow: elide;
+                    horizontal-alignment: Theme.rtl ? right : left;
+                }
+                Text {
+                    text: root.url; color: #04c8ff;
+                    overflow: elide; font-size: 11px * Theme.font-scale;
+                    horizontal-alignment: left;
                 }
             }
-            if root.tab == 1: VerticalLayout {
+            ProgressAction { text: "↗"; min-width: 36px; clicked => { root.copy-link(); } }
+        }
+        HRow {
+            spacing: 14px;
+            Rectangle {
+                vertical-stretch: 0; min-height: 26px;
+                horizontal-stretch: 1;
+                border-width: 1px; border-color: #00d8ff;
+                border-radius: 13px; background: #08233d;
+                clip: true;
+                Rectangle {
+                    x: Theme.rtl ? parent.width - self.width - 3px : 3px;
+                    y: 3px; height: parent.height - 6px;
+                    width: max(0px, (parent.width - 6px) * clamp(root.progress, 0, 1));
+                    background: @linear-gradient(0deg, #0471e5 0%, #05d9f6 100%);
+                    border-radius: 10px;
+                }
+            }
+            Text {
+                text: root.percent; color: #73e5ff;
+                font-size: 30px * Theme.font-scale; font-weight: 700;
+                min-width: 110px; horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+        }
+        HRow {
+            spacing: 8px;
+            ProgressMetric { label: @tr("Downloaded"); value: root.downloaded; horizontal-stretch: 1; }
+            ProgressMetric { label: @tr("File size"); value: root.size; horizontal-stretch: 1; }
+            ProgressMetric { label: @tr("Transfer rate"); value: root.speed; horizontal-stretch: 1; }
+            ProgressMetric { label: @tr("Time left"); value: root.eta; horizontal-stretch: 1; }
+            ProgressMetric { label: @tr("Resume capability"); value: root.resumable; good: root.resumable-ok; horizontal-stretch: 1; }
+        }
+        Text {
+            text: root.error != "" ? root.error : root.status;
+            color: root.state == 4 ? #ff8a9a : #a6c4df;
+            font-size: 11px * Theme.font-scale;
+            wrap: word-wrap;
+            horizontal-alignment: Theme.rtl ? right : left;
+        }
+        HRow {
+            spacing: 8px;
+            ProgressAction { text: @tr("Pause"); glyph: "Ⅱ"; enabled: root.state == 0 || root.state == 1; horizontal-stretch: 1; clicked => { root.pause(); } }
+            ProgressAction {
+                text: root.state == 3 ? @tr("Close") : @tr("Cancel"); glyph: "×"; danger: true; horizontal-stretch: 1;
+                clicked => { if (root.state == 3) { root.close-window(); } else { root.cancel-download(); } }
+            }
+            ProgressAction { text: @tr("Resume"); glyph: "▷"; enabled: root.state == 2 || root.state == 4; horizontal-stretch: 1; clicked => { root.resume(); } }
+            ProgressAction { text: @tr("Open folder"); glyph: "▱"; horizontal-stretch: 1; clicked => { root.open-folder(); } }
+        }
+        HRow {
+            spacing: 6px;
+            ProgressAction { text: @tr("Download status"); selected: root.tab == 0; horizontal-stretch: 1; min-height: 28px; clicked => { root.tab = 0; } }
+            ProgressAction { text: @tr("Speed Limiter"); selected: root.tab == 1; horizontal-stretch: 1; min-height: 28px; clicked => { root.tab = 1; } }
+            ProgressAction { text: @tr("Options on completion"); selected: root.tab == 2; horizontal-stretch: 1; min-height: 28px; clicked => { root.tab = 2; } }
+            ProgressAction {
+                text: root.show-details ? @tr("<< Hide details") : @tr("Show details >>"); min-height: 28px;
+                clicked => { root.show-details = !root.show-details; root.details-toggled(); }
+            }
+        }
+        if root.tab != 0: Rectangle {
+            background: Theme.panel; border-radius: 5px;
+            border-color: #1a5278; border-width: 1px;
+                        if root.tab == 1: VerticalLayout {
                 padding: 14px;
                 spacing: 12px;
                 alignment: start;
@@ -2957,145 +2841,49 @@ export component DetailsDialog inherits ThemedWindow {
                 }
             }
         }
-        Rectangle {
-            height: 8px;
-        }
-        Rectangle {
-            height: 18px;
-            border-width: 1px;
-            border-color: Theme.line;
-            background: Theme.bar-bg;
-            clip: true;
-            Rectangle {
-                x: Theme.rtl ? parent.width - 1px - self.width : 1px;
-                y: 1px;
-                height: parent.height - 2px;
-                width: (parent.width - 2px) * root.progress;
-                background: @linear-gradient(180deg, #5af4ff 0%, #00a9e8 100%);
-                animate width {
-                    duration: 100ms;
-                    easing: linear;
-                }
-            }
-        }
-        Rectangle {
-            height: 8px;
-        }
-        HRow {
-            spacing: 8px;
-            Button {
-                text: root.show-details ? @tr("<< Hide details") : @tr("Show details >>");
-                clicked => {
-                    root.show-details = !root.show-details;
-                    root.details-toggled();
-                }
-            }
-            Rectangle {
-                horizontal-stretch: 1;
-            }
-            if root.state == 0 || root.state == 1: Button {
-                text: @tr("Pause");
-                clicked => {
-                    root.pause();
-                }
-            }
-            if root.state == 2 || root.state == 4: Button {
-                text: @tr("Resume");
-                primary: true;
-                clicked => {
-                    root.resume();
-                }
-            }
-            Button {
-                text: root.state == 3 ? @tr("Close") : @tr("Cancel");
-                clicked => {
-                    if (root.state == 3) {
-                        root.close-window();
-                    } else {
-                        root.cancel-download();
-                    }
-                }
-            }
-        }
         if root.show-details: VerticalLayout {
             spacing: 6px;
-            padding-top: 8px;
-            Text {
-                horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left;
-                text: @tr("Start positions and download progress by connections");
-                font-size: 11px * Theme.font-scale;
-                color: Theme.muted;
-            }
             Rectangle {
-                height: 20px;
-                border-width: 1px;
-                border-color: Theme.line;
-                background: Theme.panel;
+                height: 17px;
+                background: #081f36;
+                border-color: #15436a; border-width: 1px;
                 clip: true;
+                // Real segment data; no fabricated animated activity.
                 for s in root.segs: Rectangle {
                     x: Theme.rtl ? parent.width - 1px - (parent.width - 2px) * s.start - self.width : 1px + (parent.width - 2px) * s.start;
-                    y: 1px;
-                    width: (parent.width - 2px) * (s.done - s.start);
-                    height: parent.height - 2px;
-                    background: Theme.accent;
-                    animate width {
-                        duration: 100ms;
-                        easing: linear;
-                    }
+                    y: 2px;
+                    width: max(0px, (parent.width - 2px) * (s.done - s.start));
+                    height: parent.height - 4px;
+                    background: #05b8ef;
                 }
                 for s in root.segs: Rectangle {
                     x: Theme.rtl ? parent.width - 2px - (parent.width - 2px) * s.start : 1px + (parent.width - 2px) * s.start;
-                    y: 0;
-                    width: 1px;
-                    height: parent.height;
-                    background: Theme.err;
+                    width: 1px; height: parent.height;
+                    background: #dca647;
                 }
             }
             Rectangle {
-                height: 150px;
-                background: Theme.panel;
-                border-width: 1px;
-                border-color: Theme.line;
+                min-height: 148px; vertical-stretch: 1;
+                background: #031324;
+                border-width: 1px; border-color: #17679a; border-radius: 6px;
                 VerticalLayout {
-                    padding: 1px;
+                    padding: 5px; spacing: 0px;
                     Rectangle {
-                        height: 22px;
-                        background: @linear-gradient(180deg, Theme.header-top 0%, Theme.header-bottom 100%);
+                        height: 26px; background: #0a2b48;
                         HRow {
-                            HeaderCell {
-                                text: @tr("N.");
-                                width: 34px;
-                            }
-                            HeaderCell {
-                                text: @tr("Downloaded");
-                                width: 110px;
-                            }
-                            HeaderCell {
-                                text: @tr("Info");
-                                horizontal-stretch: 1;
-                            }
+                            Text { text: @tr("N."); width: 38px; color: #b9d9f1; horizontal-alignment: center; vertical-alignment: center; }
+                            Text { text: @tr("Downloaded"); width: 120px; color: #b9d9f1; horizontal-alignment: center; vertical-alignment: center; }
+                            Text { text: @tr("Info"); horizontal-stretch: 1; color: #b9d9f1; horizontal-alignment: Theme.rtl ? right : left; vertical-alignment: center; }
                         }
                     }
                     ListView {
                         vertical-stretch: 1;
                         for s in root.segs: Rectangle {
-                            height: 19px;
+                            height: 26px;
                             HRow {
-                                Cell {
-                                    text: s.number;
-                                    width: 34px;
-                                    horizontal-alignment: center;
-                                }
-                                Cell {
-                                    text: " " + s.downloaded;
-                                    width: 110px;
-                                    horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left;
-                                }
-                                Cell {
-                                    text: s.info;
-                                    horizontal-stretch: 1;
-                                    color: s.busy ? Theme.accent : Theme.muted;
-                                }
+                                Text { text: s.number; width: 38px; color: #dbeeff; horizontal-alignment: center; vertical-alignment: center; }
+                                Text { text: s.downloaded; width: 120px; color: #dbeeff; horizontal-alignment: center; vertical-alignment: center; overflow: elide; }
+                                Text { text: s.info; horizontal-stretch: 1; color: s.busy ? #00ceff : #afc4d7; horizontal-alignment: Theme.rtl ? right : left; vertical-alignment: center; overflow: elide; }
                             }
                         }
                     }
@@ -3103,47 +2891,17 @@ export component DetailsDialog inherits ThemedWindow {
             }
         }
     }
-    }
-    // the hint of the tray button
-    if root.tray-tip: Rectangle {
-        x: max(4px, root.width - 89px - tip-text.preferred-width - 16px);
-        y: 32px;
-        width: tip-text.preferred-width + 16px;
-        height: tip-text.preferred-height + 10px;
-        background: Theme.input-bg;
-        border-width: 1px;
-        border-color: Theme.line;
-        border-radius: 3px;
-        drop-shadow-blur: 6px;
-        drop-shadow-color: #00000044;
-        tip-text := Text {
-            horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left;
-            text: @tr("Hide next to the clock");
-            color: Theme.text;
-        }
-    }
-    // a corner to make the window bigger
     Rectangle {
-        x: root.width - 14px;
-        y: root.height - 14px;
-        width: 14px;
-        height: 14px;
+        x: root.width - 14px; y: root.height - 14px;
+        width: 14px; height: 14px;
         TouchArea {
             mouse-cursor: nwse-resize;
             pointer-event(ev) => {
-                if (ev.button == PointerEventButton.left && ev.kind == PointerEventKind.down) {
-                    root.start-resize();
-                }
+                if (ev.button == PointerEventButton.left && ev.kind == PointerEventKind.down) { root.start-resize(); }
             }
         }
-        Path {
-            viewbox-width: 10;
-            viewbox-height: 10;
-            stroke: Theme.muted;
-            stroke-width: 1px;
-            commands: "M 9 3 L 3 9 M 9 6 L 6 9";
-        }
     }
+
 }
 
 export component CompleteDialog inherits ThemedWindow {
