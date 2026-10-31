@@ -36,8 +36,8 @@ python -c "import wave,os; p=os.path.join(os.environ['RUNNER_TEMP'],'trial-smoke
 if($LASTEXITCODE -ne 0){throw 'Audio fixture generation failed'}
 & "$install/tools/ffmpeg.exe" -hide_banner -loglevel error -i "$env:RUNNER_TEMP/trial-smoke.wav" -c:a libmp3lame -y "$env:RUNNER_TEMP/trial-smoke.mp3"
 if($LASTEXITCODE -ne 0 -or (Get-Item "$env:RUNNER_TEMP/trial-smoke.mp3").Length -lt 100){throw 'Installed ffmpeg audio conversion failed'}
-& "$install/tools/ffmpeg.exe" -hide_banner -loglevel error -i "$env:RUNNER_TEMP/trial-smoke.mp3" -c copy -y "$env:RUNNER_TEMP/trial-smoke.mka"
-if($LASTEXITCODE -ne 0 -or (Get-Item "$env:RUNNER_TEMP/trial-smoke.mka").Length -lt 100){throw 'Installed ffmpeg remux failed'}
+& "$install/tools/ffmpeg.exe" -hide_banner -loglevel error -i "$env:RUNNER_TEMP/trial-smoke.mp3" -c copy -f matroska -y "$env:RUNNER_TEMP/trial-smoke.mkv"
+if($LASTEXITCODE -ne 0 -or (Get-Item "$env:RUNNER_TEMP/trial-smoke.mkv").Length -lt 100){throw 'Installed ffmpeg remux failed'}
 $p=Start-Process "$install/KeRoDownloadPreview.exe" -PassThru
 try {
  $ping=$null;$end=(Get-Date).AddSeconds(45)
