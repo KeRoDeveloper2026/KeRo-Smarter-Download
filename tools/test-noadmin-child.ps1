@@ -17,8 +17,12 @@ try {
     $principal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
     if ($principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { throw 'Test user unexpectedly has administrator rights' }
     $result.standard_user=$true
-    $local = [Environment]::GetFolderPath('LocalApplicationData')
-    $roaming = [Environment]::GetFolderPath('ApplicationData')
+    $local = [Environment]::GetFolderPath([Environment+SpecialFolder]::LocalApplicationData, [Environment+SpecialFolderOption]::Create)
+    $roaming = [Environment]::GetFolderPath([Environment+SpecialFolder]::ApplicationData, [Environment+SpecialFolderOption]::Create)
+    if (-not $local -or -not $roaming) { throw 'Windows known folders are unavailable in this noninteractive test profile; manual VM validation is required.' }
+    $env:TEMP=Join-Path $local 'Temp'
+    $env:TMP=$env:TEMP
+    New-Item -ItemType Directory -Force $env:TEMP | Out-Null
     $install = Join-Path $local 'Programs/KeRo Smarter Download'
     $data = Join-Path $roaming 'KeRo/KeRoDownload/data'
     if (Test-Path $install) { throw 'Fresh standard-user profile already has an installation' }
@@ -26,6 +30,13 @@ try {
     $exe = Join-Path $install 'KeRoDownload.exe'
     if (-not (Test-Path $exe) -or (Get-FileHash $exe).Hash -ne $ExpectedAppHash) { throw 'Fresh install path or binary mismatch' }
     $result.fresh_install=$true
+    $result.helper_smoke=@{}
+    foreach($tool in @('ffmpeg','yt-dlp','aria2c')){
+        $argument=if($tool -eq 'ffmpeg'){'-version'}else{'--version'}
+        $toolPath=Join-Path $install "tools/$tool.exe"
+        $hp=Start-Process $toolPath -ArgumentList $argument -PassThru -WindowStyle Hidden -RedirectStandardOutput ($Output+".$tool.txt") -RedirectStandardError ($Output+".$tool.stderr.txt")
+        if(-not $hp.WaitForExit(30000)){Stop-Process -Id $hp.Id -Force -ErrorAction SilentlyContinue; $result.helper_smoke[$tool]='TIMEOUT'}else{$hp.Refresh();$result.helper_smoke[$tool]=$hp.ExitCode}
+    }
     New-Item -ItemType Directory -Force $data | Out-Null
     @{version=4;browser_port=9614;language='ar';autostart_set=$true;clipboard_monitor=$false;extension_prompted=$true;last_version='1.1.4'} | ConvertTo-Json | Set-Content "$data/settings.json" -Encoding utf8
     $app = Start-Process $exe -PassThru
@@ -59,6 +70,6 @@ try {
     foreach($f in $protected){if(-not(Test-Path $f)){throw 'Uninstall removed retained user data'}}
     $result.uninstall=$true
     $result.notes += 'Host has development tools/runtimes. This is a non-admin account test, not a clean Windows 7/10/11 VM certification.'
-} catch { $result.error=$_.Exception.Message }
+} catch { $result.error=$_.Exception.Message; $result.error_location=$_.InvocationInfo.PositionMessage }
 finally { Stop-OwnApp; $result | ConvertTo-Json -Depth 8 | Set-Content $Output -Encoding utf8 }
 if ($result.error) { exit 1 }

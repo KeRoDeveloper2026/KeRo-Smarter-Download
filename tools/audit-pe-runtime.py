@@ -121,7 +121,7 @@ def embedded_files(data):
 
 def audit(stage, legacy):
     stage = Path(stage)
-    report, errors = [], []
+    report, errors, main_errors = [], [], []
     main_found = False
     for path in sorted(stage.rglob('*')):
         if not path.is_file() or path.suffix.lower() not in ('.exe', '.dll', '.pyd'):
@@ -142,13 +142,16 @@ def audit(stage, legacy):
                 embedded_found = member != '<outer>' and any(PurePosixPath(n).name.lower() == dll for n in embedded)
                 resolution[dll] = 'app-local' if local_found else 'embedded' if embedded_found else 'Windows 10/11 UCRT' if not legacy and UCRT.fullmatch(dll) else 'UNRESOLVED'
                 if main or resolution[dll] == 'UNRESOLVED':
-                    errors.append(f'{path.name}:{member} imports {dll} ({resolution[dll]})')
+                    message=f'{path.name}:{member} imports {dll} ({resolution[dll]})'
+                    errors.append(message)
+                    if main: main_errors.append(message)
             report.append({'file': str(path.relative_to(stage)), 'member': member, 'machine': hex(machine),
                            'sha256': hashlib.sha256(binary).hexdigest(), 'imports': imports,
                            'runtime_resolution': resolution, 'pyinstaller_container': container})
     if not main_found:
         errors.append('Main application was not inspected')
-    return {'legacy_windows7': legacy, 'binaries': report, 'errors': errors,
+        main_errors.append('Main application was not inspected')
+    return {'legacy_windows7': legacy, 'binaries': report, 'errors': errors, 'main_errors': main_errors,
             'limitations': 'Direct/delay imports and recognized PyInstaller PE members only. Dynamic LoadLibrary choices, unsupported packers, optional features and actual clean-OS behavior require a clean Windows VM test.'}
 
 
@@ -157,9 +160,13 @@ if __name__ == '__main__':
     parser.add_argument('stage')
     parser.add_argument('--legacy-win7', action='store_true')
     parser.add_argument('--output', required=True)
+    parser.add_argument('--allow-helper-prerequisites', action='store_true', help='Trial only: retain helper prerequisite warnings while still rejecting every main-app runtime dependency')
     args = parser.parse_args()
     result = audit(args.stage, args.legacy_win7)
+    result['helper_prerequisites_accepted_for_trial'] = args.allow_helper_prerequisites
     Path(args.output).write_text(json.dumps(result, indent=2), encoding='utf-8')
     print(f"Inspected {len(result['binaries'])} outer/embedded PE binaries; {len(result['errors'])} unresolved/main-runtime dependencies")
-    if result['errors']:
+    if result['main_errors'] or (result['errors'] and not args.allow_helper_prerequisites):
         raise SystemExit('\n'.join(result['errors']))
+    if result['errors']:
+        print('WARNING: existing helper OS/runtime prerequisites remain; consult the report before testing on a clean OS.')

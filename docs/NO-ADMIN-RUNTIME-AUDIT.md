@@ -124,3 +124,25 @@ it: the AppId is intentionally unchanged and it can upgrade that user's install.
 
 Per-platform build, dumpbin, embedded-runtime and account-test reports accompany
 successful trial installers. Failures and unverified items must remain explicit.
+
+## Confirmed trial finding: existing Win7 x86 yt-dlp prerequisite
+
+The preserved Win7 x86 helper contains embedded Python/extension PE binaries
+that import Universal CRT API-set DLLs not present in that helper bundle. Bare
+Windows 7 SP1 does not include the Windows 10 Universal CRT. This is distinct
+from the main KeRo executable, which must still pass the strict static-CRT gate.
+The helper bytes are not altered. The Win7 x86 trial may be packaged with a
+clearly recorded helper-prerequisite warning; no OS update or redist installer
+is started. An updated Win7 VM must be tested separately from bare SP1.
+
+Microsoft's Universal CRT update information:
+https://support.microsoft.com/en-us/servicing/os/windows/2020/04/update-for-universal-c-runtime-in-windows
+
+The default packaging gate remains strict. Only explicit trial verification can
+accept recorded helper prerequisites; a main-app runtime dependency always
+fails. Packed x86 yt-dlp bootloaders may be unreadable by dumpbin (LNK1106); the
+independent PE/CArchive audit is used instead, with the original dumpbin error
+saved in the reports. No helper file is patched to make the audit pass.
+
+Build-machine provisioning (MSVC Build Tools/Rust) is separate from end-user
+installation. The delivered installer never runs BUILD.bat or installs a compiler.

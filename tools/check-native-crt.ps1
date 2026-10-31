@@ -1,4 +1,4 @@
-param([Parameter(Mandatory)][string]$Stage, [switch]$LegacyWindows7, [string]$ReportDir)
+param([Parameter(Mandatory)][string]$Stage, [switch]$LegacyWindows7, [switch]$AllowHelperPrerequisites, [string]$ReportDir)
 $ErrorActionPreference = 'Stop'
 $Stage = (Resolve-Path $Stage).Path
 $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
@@ -21,6 +21,7 @@ foreach ($file in Get-ChildItem $Stage -Recurse -File | Where-Object { $_.Extens
             $output = if ($ReportDir) { Join-Path $ReportDir 'fallback-pe-runtime-audit.json' } else { [IO.Path]::GetTempFileName() }
             $extra = @()
             if ($LegacyWindows7) { $extra += '--legacy-win7' }
+            if ($AllowHelperPrerequisites) { $extra += '--allow-helper-prerequisites' }
             & $python.Source (Join-Path $PSScriptRoot 'audit-pe-runtime.py') $Stage @extra --output $output
             if ($LASTEXITCODE -ne 0) { throw 'Equivalent PE audit failed; the installer was not built.' }
             if (-not $ReportDir) { Remove-Item $output -Force }
@@ -37,7 +38,10 @@ foreach ($file in Get-ChildItem $Stage -Recurse -File | Where-Object { $_.Extens
         ($main -or $LegacyWindows7 -or $_ -notmatch '^(api-ms-win-crt-.*|ucrtbase)\.dll$')
     })
     if ($main -and $runtime.Count) { throw "KeRoDownload.exe still imports a dynamic VC/UCRT runtime: $($runtime -join ', '). No installer was built." }
-    if ($missing.Count) { throw "Helper $($file.Name) requires an unbundled runtime: $($missing -join ', '). Bundling was not changed." }
+    if ($missing.Count) {
+        $detail="Helper $($file.Name) requires an unbundled runtime: $($missing -join ', '). Bundling was not changed."
+        if ($AllowHelperPrerequisites) { Write-Warning $detail } else { throw $detail }
+    }
     if ($ReportDir) { $text | Set-Content (Join-Path $ReportDir ($file.Name + '.dependents.txt')) }
     $results += [ordered]@{file=$file.FullName; dependencies=$dlls; runtime_imports=$runtime; main=$main}
 }
