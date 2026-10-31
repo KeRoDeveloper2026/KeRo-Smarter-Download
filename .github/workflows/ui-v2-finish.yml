@@ -1,4 +1,5 @@
 name: Final UI v2 localization and unclipped renders
+# Caption size uses compatible equal min/max constraints.
 on:
   push:
     branches: [preview/ui-reference-trial]

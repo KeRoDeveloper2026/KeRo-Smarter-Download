@@ -2634,12 +2634,12 @@ export component DetailsDialog inherits ThemedWindow {
                     Rectangle { height: 2px; background: @linear-gradient(90deg, #00d9ff 0%, #006bff 55%, #061428 100%); }
                 }
                 Rectangle { horizontal-stretch: 1; }
-                ProgressAction { text: "⌖"; selected: root.pinned; width: 34px; height: 32px; min-width: 34px; min-height: 32px; vertical-stretch: 0; clicked => { root.pinned = !root.pinned; } }
-                ProgressAction { text: "◉"; width: 34px; height: 32px; min-width: 34px; min-height: 32px; vertical-stretch: 0; clicked => { root.float-download(); } }
-                ProgressAction { text: "↓"; width: 34px; height: 32px; min-width: 34px; min-height: 32px; vertical-stretch: 0; clicked => { root.hide-to-tray(); } }
-                ProgressAction { text: "−"; width: 34px; height: 32px; min-width: 34px; min-height: 32px; vertical-stretch: 0; clicked => { root.minimize(); } }
-                ProgressAction { text: "□"; width: 34px; height: 32px; min-width: 34px; min-height: 32px; vertical-stretch: 0; clicked => { root.maximize(); } }
-                ProgressAction { text: "×"; width: 34px; height: 32px; min-width: 34px; min-height: 32px; vertical-stretch: 0; danger: true; clicked => { root.close-clicked(); } }
+                ProgressAction { text: "⌖"; selected: root.pinned; min-width: 34px; max-width: 34px; min-height: 32px; max-height: 32px; vertical-stretch: 0; clicked => { root.pinned = !root.pinned; } }
+                ProgressAction { text: "◉"; min-width: 34px; max-width: 34px; min-height: 32px; max-height: 32px; vertical-stretch: 0; clicked => { root.float-download(); } }
+                ProgressAction { text: "↓"; min-width: 34px; max-width: 34px; min-height: 32px; max-height: 32px; vertical-stretch: 0; clicked => { root.hide-to-tray(); } }
+                ProgressAction { text: "−"; min-width: 34px; max-width: 34px; min-height: 32px; max-height: 32px; vertical-stretch: 0; clicked => { root.minimize(); } }
+                ProgressAction { text: "□"; min-width: 34px; max-width: 34px; min-height: 32px; max-height: 32px; vertical-stretch: 0; clicked => { root.maximize(); } }
+                ProgressAction { text: "×"; min-width: 34px; max-width: 34px; min-height: 32px; max-height: 32px; vertical-stretch: 0; danger: true; clicked => { root.close-clicked(); } }
             }
         }
         Rectangle {
