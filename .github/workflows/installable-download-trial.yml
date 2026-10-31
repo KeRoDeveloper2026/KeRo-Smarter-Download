@@ -1,0 +1,45 @@
+name: Installable download design trial
+on:
+  push:
+    branches: [preview/installable-download-trial]
+    paths: [.github/workflows/installable-download-trial.yml, tools/Trial.iss, tools/package-design-installer.ps1, tools/test-design-installer.ps1]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  package:
+    runs-on: windows-2022
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: KeRo-download-window-preview-tested
+          run-id: 41072326624
+          github-token: ${{ github.token }}
+          path: retained-preview
+      - name: Package retained binary with complete existing helpers
+        shell: pwsh
+        run: ./tools/package-design-installer.ps1
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: installable-design-candidate-retained
+          path: dist-trial
+          retention-days: 14
+      - name: Install, launch and verify installed components
+        shell: pwsh
+        run: ./tools/test-design-installer.ps1
+      - name: Prepare trial ZIP
+        shell: pwsh
+        run: |
+          $out='KeRo-Download-Preview-Installable-Win10_11-x64.zip'
+          Compress-Archive -Path dist-trial/* -DestinationPath $out
+          (Get-FileHash $out).Hash.ToLower() | Set-Content "$out.sha256"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: installable-design-trial-results
+          path: |
+            KeRo-Download-Preview-Installable-Win10_11-x64.zip*
+            dist-trial/verification
+          retention-days: 14
