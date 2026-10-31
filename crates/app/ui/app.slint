@@ -2706,8 +2706,8 @@ export component DetailsDialog inherits ThemedWindow {
                         model: [@tr("Unlimited"), "128 KB/s", "512 KB/s", "1 MB/s", "2 MB/s", @tr("Custom")];
                         current-index: !root.limit-on ? 0 : root.limit-kb == 128 ? 1 : root.limit-kb == 512 ? 2 : root.limit-kb == 1024 ? 3 : root.limit-kb == 2048 ? 4 : 5;
                         selected(v) => {
-                            if (v == 5) { root.limit-on = true; root.limit-changed(); root.tab = 1; }
-                            else { root.limit-on = v != 0; root.limit-kb = v == 1 ? 128 : v == 2 ? 512 : v == 3 ? 1024 : v == 4 ? 2048 : root.limit-kb; root.limit-changed(); }
+                            if (self.current-index == 5) { root.limit-on = true; root.limit-changed(); root.tab = 1; }
+                            else { root.limit-on = self.current-index != 0; root.limit-kb = self.current-index == 1 ? 128 : self.current-index == 2 ? 512 : self.current-index == 3 ? 1024 : self.current-index == 4 ? 2048 : root.limit-kb; root.limit-changed(); }
                         }
                     }
                 }
@@ -2741,7 +2741,7 @@ export component DetailsDialog inherits ThemedWindow {
                 ComboBox {
                     model: [@tr("KeRo cyan"), @tr("Purple"), @tr("Emerald"), @tr("Gold"), @tr("Rose"), @tr("Custom colors")];
                     current-index <=> root.color-preset;
-                    selected(v) => { root.colors-preset(v); }
+                    selected(v) => { root.colors-preset(root.color-preset); }
                 }
                 HRow {
                     spacing: 7px;

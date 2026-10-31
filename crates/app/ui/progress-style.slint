@@ -56,7 +56,7 @@ export component ProgressAction inherits Rectangle {
     focus := FocusScope {
         enabled: root.enabled;
         key-pressed(event) => {
-            if (event.text == " " || (event.text == "\n" || event.text == "\r")) { root.clicked(); return accept; }
+            if (event.text == " " || event.text == "\n") { root.clicked(); return accept; }
             return reject;
         }
     }

@@ -122,6 +122,10 @@ fn lookup(en: &str) -> Option<&'static str> {
 }
 
 const AR: &[(&str, &str)] = &[
+    ("Enter colors as #RRGGBB, then apply.", "أدخل الألوان بصيغة #RRGGBB ثم اضغط تطبيق."),
+    ("Invalid color. Use #RRGGBB, for example #00D9FF.", "لون غير صالح. استخدم #RRGGBB، مثل #00D9FF."),
+    ("Could not save colors", "تعذّر حفظ الألوان"),
+    ("Colors saved", "تم حفظ الألوان"),
     ("Settings could not be saved securely. The previous file was kept. Check Windows data protection and folder access, then try again.", "تعذّر حفظ الإعدادات بأمان. تم الاحتفاظ بالملف السابق. تحقّق من حماية بيانات Windows وصلاحية الكتابة في المجلد، ثم حاول مجددًا."),
     ("The download list could not be saved securely. The previous file was kept. Downloads can continue, but recent changes may not survive a restart. Check Windows data protection and folder access.", "تعذّر حفظ قائمة التنزيلات بأمان. تم الاحتفاظ بالملف السابق. يمكن متابعة التنزيل، لكن قد لا تُحفظ التغييرات الأخيرة بعد إعادة التشغيل. تحقّق من حماية بيانات Windows وصلاحية الكتابة في المجلد."),
     ("The download list could not be saved securely. The previous file was kept. Recent changes may not survive a restart. Check Windows data protection and folder access.", "تعذّر حفظ قائمة التنزيلات بأمان. تم الاحتفاظ بالملف السابق، وقد لا تُحفظ التغييرات الأخيرة بعد إعادة التشغيل. تحقّق من حماية بيانات Windows وصلاحية الكتابة في المجلد."),
