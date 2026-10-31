@@ -56,11 +56,12 @@ if ((Get-FileHash $installedExe).Hash -ne (Get-FileHash build-cache/stage/KeRoDo
 $version = (Get-Item $installedExe).VersionInfo.ProductVersion
 if (-not $version.StartsWith('1.1.4')) { throw 'Candidate application has wrong version' }
 $manifest = Get-Content (Join-Path $installDir 'extension/manifest.json') -Raw | ConvertFrom-Json
-if ($manifest.version -ne '1.1.1') { throw 'Unexpected bundled browser extension version' }
+$expectedExtension = (Get-Content extension/manifest.json -Raw | ConvertFrom-Json).version
+if ($manifest.version -ne $expectedExtension) { throw 'Unexpected bundled browser extension version' }
 foreach ($legal in @('LICENSE', 'COPYRIGHT', 'THIRD-PARTY-NOTICES.txt')) {
     if (-not (Test-Path (Join-Path $installDir $legal))) { throw 'Missing installed legal file' }
 }
 $protocol = (Get-ItemProperty 'HKCU:/Software/Classes/kero-download/shell/open/command').'(default)'
 if (-not $protocol.Contains($installedExe) -or -not $protocol.Contains('--from-browser')) { throw 'Browser protocol registration is incorrect' }
-[IO.File]::WriteAllText("$PWD/dist/UPGRADE-$Platform.txt", "PASS: verified v1.1.3 installer upgraded to candidate v1.1.4 on Windows Server 2022.`nExisting CI settings/history (or synthetic canaries when absent) and a partial download were preserved byte-for-byte. Installed EXE matches candidate; version, extension 1.1.1, legal files and protocol registration checked.`nApplication UI, actual download resume and Windows 7 runtime were not exercised by this installer check. Engine tests are reported separately in the workflow.`n")
+[IO.File]::WriteAllText("$PWD/dist/UPGRADE-$Platform.txt", "PASS: verified v1.1.3 installer upgraded to candidate v1.1.4 on Windows Server 2022.`nExisting CI settings/history (or synthetic canaries when absent) and a partial download were preserved byte-for-byte. Installed EXE matches candidate; version, current source extension, legal files and protocol registration checked.`nApplication UI, actual download resume and Windows 7 runtime were not exercised by this installer check. Engine tests are reported separately in the workflow.`n")
 Write-Host 'Installer upgrade preservation checks passed'
