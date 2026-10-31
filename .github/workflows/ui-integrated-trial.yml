@@ -2,6 +2,7 @@ name: UI reference v2 installer trial - no release
 on:
   push:
     branches: [preview/ui-reference-trial]
+    paths: [crates/**, extension/**, extension-firefox/**, tools/build-design-preview.ps1]
 permissions:
   contents: read
   actions: read

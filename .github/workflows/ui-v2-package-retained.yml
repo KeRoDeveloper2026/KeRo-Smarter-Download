@@ -1,0 +1,50 @@
+name: Package and inspect retained UI v2 native build
+on:
+  push:
+    branches: [preview/ui-reference-trial]
+    paths: [.github/workflows/ui-v2-package-retained.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  package:
+    runs-on: windows-2022
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: ui-v2-retained-native-preview
+          run-id: 41204919561
+          github-token: ${{ github.token }}
+          path: dist-design-preview
+      - name: Assemble separate installer from retained successful build
+        shell: pwsh
+        run: ./tools/package-design-installer.ps1
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ui-v2-retained-installer
+          path: dist-trial
+          retention-days: 14
+      - name: Installed app and helper integration checks
+        shell: pwsh
+        run: ./tools/test-design-installer.ps1
+      - name: Capture actual native window with labeled QA states
+        shell: pwsh
+        run: ./tools/capture-ui-v2.ps1
+      - name: Prepare complete trial ZIP
+        shell: pwsh
+        run: |
+          $out='KeRo-UI-Reference-v2-Installable-Win10_11-x64.zip'
+          Compress-Archive -Path dist-trial/* -DestinationPath $out
+          (Get-FileHash $out).Hash.ToLower() | Set-Content "$out.sha256"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: ui-v2-trial-results
+          path: |
+            KeRo-UI-Reference-v2-Installable-Win10_11-x64.zip*
+            dist-trial/verification
+            dist-trial/UI-previews
+          if-no-files-found: ignore
+          retention-days: 14
