@@ -2,7 +2,7 @@ name: No-admin and static-runtime installer previews - no publication
 on:
   push:
     branches: [preview/noadmin-static-runtime]
-    paths: [.github/workflows/noadmin-runtime-preview.yml]
+    paths: ["crates/**", ".cargo/config.toml", "installer/**"]
   workflow_dispatch:
 permissions:
   contents: read
@@ -75,7 +75,8 @@ jobs:
         shell: pwsh
         run: |
           ./tools/check-native-crt.ps1 -Stage build-cache/stage -LegacyWindows7:$${{ matrix.legacy }} -ReportDir 'dist/runtime-${{ matrix.platform }}'
-          $extra = if ('${{ matrix.legacy }}' -eq 'true') { @('--legacy-win7') } else { @() }
+          $extra = @()
+          if ('${{ matrix.legacy }}' -eq 'true') { $extra += '--legacy-win7' }
           python tools/audit-pe-runtime.py build-cache/stage @extra --output 'dist/runtime-${{ matrix.platform }}/pe-runtime-audit.json'
           if ($LASTEXITCODE -ne 0) { throw 'Embedded/native runtime audit failed; helper bundling was not changed' }
       - name: Build non-elevating installer
