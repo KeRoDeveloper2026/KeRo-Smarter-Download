@@ -2629,7 +2629,7 @@ export component DetailsDialog inherits ThemedWindow {
         Rectangle {
             height: 84px;
             TouchArea {
-                width: parent.width - 310px; height: parent.height;
+                width: parent.width - 330px; height: parent.height;
                 pointer-event(ev) => {
                     if (ev.button == PointerEventButton.left && ev.kind == PointerEventKind.down) { root.start-drag(); }
                 }
@@ -2730,17 +2730,14 @@ export component DetailsDialog inherits ThemedWindow {
             ProgressAction { text: @tr("Download status"); selected: root.tab == 0; horizontal-stretch: 1; min-height: 25px; clicked => { root.tab = 0; } }
             ProgressAction { text: @tr("Speed Limiter"); selected: root.tab == 1; horizontal-stretch: 1; min-height: 25px; clicked => { root.tab = 1; } }
             ProgressAction { text: @tr("Options on completion"); selected: root.tab == 2; horizontal-stretch: 1; min-height: 25px; clicked => { root.tab = 2; } }
+            ProgressAction { text: @tr("Window colors"); selected: root.show-colors; min-height: 25px; clicked => { root.show-colors = !root.show-colors; } }
             ProgressAction { text: root.show-details ? @tr("<< Hide details") : @tr("Show details >>"); min-height: 25px; clicked => { root.show-details = !root.show-details; root.details-toggled(); } }
-        }
-        HRow {
-            spacing: 8px;
-            ProgressAction { text: @tr("Window colors"); glyph: "edit"; min-height: 34px; clicked => { root.show-colors = !root.show-colors; } }
-            Text { text: @tr("Colors apply to download windows only"); color: #9cb9d3; vertical-alignment: center; horizontal-stretch: 1; }
         }
         if root.show-colors: Rectangle {
             background: ProgressPalette.panel; border-color: ProgressPalette.line; border-width: 1px; border-radius: 8px;
             VerticalLayout {
                 padding: 9px; spacing: 7px;
+                Text { text: @tr("Colors apply to download windows only"); color: #9cb9d3; }
                 ComboBox {
                     model: [@tr("KeRo cyan"), @tr("Purple"), @tr("Emerald"), @tr("Gold"), @tr("Rose"), @tr("Custom colors")];
                     current-index <=> root.color-preset;
@@ -2759,7 +2756,7 @@ export component DetailsDialog inherits ThemedWindow {
                 Text { text: root.color-message; color: #eaf4ff; wrap: word-wrap; }
             }
         }
-        if root.tab != 0: Rectangle {
+        if root.tab != 0 && !root.show-colors: Rectangle {
             background: ProgressPalette.panel; border-radius: 5px;
             border-color: ProgressPalette.line; border-width: 1px;
                         if root.tab == 1: VerticalLayout {
@@ -2871,7 +2868,7 @@ export component DetailsDialog inherits ThemedWindow {
                 }
             }
         }
-        if root.show-details: VerticalLayout {
+        if root.show-details && !root.show-colors: VerticalLayout {
             spacing: 7px;
             Rectangle {
                 height: 32px; background: ProgressPalette.surface; border-width: 1px; border-color: ProgressPalette.line; border-radius: 6px;
