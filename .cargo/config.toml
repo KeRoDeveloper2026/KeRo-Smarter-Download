@@ -9,3 +9,12 @@ rustflags = ["-C", "target-feature=+crt-static"]
 
 [target.aarch64-pc-windows-msvc]
 rustflags = ["-C", "target-feature=+crt-static"]
+
+# Tier-3 Windows 7 targets are built with the pinned nightly and build-std.
+# Keep these defaults for local builds; CI's encoded flags also retain the
+# older import-library path and windows_slim_errors compatibility settings.
+[target.x86_64-win7-windows-msvc]
+rustflags = ["-C", "target-feature=+crt-static"]
+
+[target.i686-win7-windows-msvc]
+rustflags = ["-C", "target-feature=+crt-static"]

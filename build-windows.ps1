@@ -201,12 +201,8 @@ if (-not (Test-Path "$cache\aria2c.exe")) {
         Write-Host "Could not download aria2 now ($($_.Exception.Message)). KeRo Smarter Download gets it by itself later." -ForegroundColor Yellow
     }
 }
-# Visual C++ runtime: the program already carries it (static CRT, see
-# .cargo\config.toml). Optional: put Microsoft's vc_redist.x64.exe into
-# build-cache yourself and the installer also installs it where it is missing.
-$redist = Join-Path $cache "redist"
-New-Item -ItemType Directory -Force $redist | Out-Null
-if (Test-Path "$cache\vc_redist.x64.exe") { Copy-Item "$cache\vc_redist.x64.exe" $redist -Force }
+# This per-user installer never starts vc_redist or requests elevation.
+# The application is linked with static CRT; verify the staged PE below.
 Copy-Item "LICENSE", "COPYRIGHT", "THIRD-PARTY-NOTICES.txt" $stage -Force
 # the Firefox add-on signed by Mozilla for this version (stays in Firefox for good)
 $extVersion = (Get-Content (Join-Path $PSScriptRoot "extension\manifest.firefox.json") -Raw | ConvertFrom-Json).version
@@ -222,6 +218,9 @@ if (-not (Test-Path $ffmpegStaged -PathType Leaf)) { Fail "tools\ffmpeg.exe is m
 & $ffmpegStaged -version | Out-Null
 if ($LASTEXITCODE -ne 0) { Fail "The staged ffmpeg.exe does not run on this machine. Replace it and rebuild." }
 Copy-Item "REPAIR-FFMPEG.bat", "repair-ffmpeg.ps1" $stage -Force
+
+& (Join-Path $PSScriptRoot 'tools/check-native-crt.ps1') -Stage $stage
+if (-not $?) { Fail 'The staged binaries failed the runtime dependency check.' }
 
 # ---------------------------------------------------------------- 4b. signing (optional)
 # With a code signing certificate antivirus programs and Windows SmartScreen

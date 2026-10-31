@@ -258,6 +258,7 @@ jobs:
           if ((Get-FileHash $a2.FullName -Algorithm SHA256).Hash -ne "BE2099C214F63A3CB4954B09A0BECD6E2E34660B886D4C898D260FEBFE9D70C2") { throw "aria2c.exe does not match its SHA-256" }
           Copy-Item $a2.FullName "$p/tools/"
           Copy-Item (Get-ChildItem aria2-tmp -Recurse -Filter COPYING | Select-Object -First 1).FullName "$p/tools/aria2-COPYING.txt"
+          ./tools/check-native-crt.ps1 -Stage $p -ReportDir dist/runtime-Win10_11-x64
           choco install innosetup -y --no-progress
           & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /Q "/DMyAppVersion=$version" installer\KeRo.iss
           if ($LASTEXITCODE -ne 0) { throw "Inno Setup failed" }

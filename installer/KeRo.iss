@@ -27,6 +27,10 @@ DefaultDirName={localappdata}\Programs\KeRo Smarter Download
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 PrivilegesRequired=lowest
+; No /ALLUSERS override or privilege-selection dialog.
+PrivilegesRequiredOverridesAllowed=
+; Retain the existing per-user installation directory on upgrades.
+UsePreviousAppDir=yes
 OutputDir=..\dist
 #ifdef OutputName
 OutputBaseFilename={#OutputName}
@@ -81,13 +85,6 @@ Source: "{#Stage}\repair-ffmpeg.ps1"; DestDir: "{app}"; Flags: ignoreversion ski
 Source: "{#Stage}\extension\*"; DestDir: "{app}\extension"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#Stage}\extension-firefox\*"; DestDir: "{app}\extension-firefox"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#Stage}\kero-download-firefox.xpi"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
-; system runtime files, installed only when they are missing (see [Code])
-#ifndef AppX86
-#ifexist "..\build-cache\redist\vc_redist.x64.exe"
-  #define HaveRedist
-Source: "..\build-cache\redist\vc_redist.x64.exe"; DestDir: "{tmp}"; Flags: dontcopy
-#endif
-#endif
 
 [InstallDelete]
 ; older versions kept the helpers next to the program
@@ -132,49 +129,25 @@ begin
   Result := ExpandConstant('{param:AUTOUPDATE|0}') = '1';
 end;
 
-{ the Visual C++ 2015-2022 runtime (vcruntime140.dll) }
-function RuntimeMissing: Boolean;
-var
-  Installed: Cardinal;
-begin
-  Result := True;
-  if RegQueryDWordValue(HKLM64, 'SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64', 'Installed', Installed) and (Installed = 1)
-     and FileExists(ExpandConstant('{sys}\vcruntime140.dll'))
-     and FileExists(ExpandConstant('{sys}\vcruntime140_1.dll'))
-     and FileExists(ExpandConstant('{sys}\msvcp140.dll')) then
-    Result := False;
-end;
-
-procedure InstallRuntime;
-var
-  Code: Integer;
-begin
-#ifdef HaveRedist
-  if not RuntimeMissing then exit;
-  { an automatic update must not show any window }
-  if WizardSilent then exit;
-  try
-    ExtractTemporaryFile('vc_redist.x64.exe');
-  except
-    exit;
-  end;
-  WizardForm.StatusLabel.Caption := 'Installing required system files...';
-  { needs administrator rights: Windows asks once. If that is refused the
-    program still works, it carries its own copy of these files. }
-  ShellExec('runas', ExpandConstant('{tmp}\vc_redist.x64.exe'), '/install /quiet /norestart', '', SW_HIDE, ewWaitUntilTerminated, Code);
-#endif
-end;
-
-procedure CurStepChanged(CurStep: TSetupStep);
-begin
-  if CurStep = ssPostInstall then
-    InstallRuntime;
-end;
+{ No redistributable installer is run: packaging checks the built application
+  and helper dependencies first. Never elevate from a per-user installation. }
 
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 var
   Code: Integer;
+  ProbePath: String;
 begin
+  Result := '';
+  if DirExists(ExpandConstant('{app}')) then begin
+    ProbePath := ExpandConstant('{app}\kero-install-access.tmp');
+    while FileExists(ProbePath) do
+      ProbePath := ProbePath + '.tmp';
+    if not SaveStringToFile(ProbePath, '', False) then begin
+      Result := 'This installation folder is not writable by your account. No administrator prompt will be requested. Select a writable per-user folder. An older all-users installation must be managed separately by its administrator; it will not be moved automatically.';
+      exit;
+    end;
+    DeleteFile(ProbePath);
+  end;
   { the running program locks its files: close it (it saves everything and
     the downloads go on after the update) }
   Exec(ExpandConstant('{cmd}'), '/C taskkill /IM {#MyAppExe} >nul 2>&1', '', SW_HIDE, ewWaitUntilTerminated, Code);

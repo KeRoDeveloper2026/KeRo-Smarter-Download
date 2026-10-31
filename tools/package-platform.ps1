@@ -73,6 +73,8 @@ foreach ($tool in @('ffmpeg', 'yt-dlp', 'aria2c')) {
     & "$stage/tools/$tool.exe" $arg
     if ($LASTEXITCODE -ne 0) { throw "$tool smoke test failed on the build host" }
 }
+& ./tools/check-native-crt.ps1 -Stage $stage -LegacyWindows7:$Legacy -ReportDir "dist/runtime-$Platform"
+
 $description = if ($Legacy) { 'EXPERIMENTAL: built for Windows 7 SP1; runtime testing on Windows 7 is still required. Engine and helper smoke tests run on Windows Server 2022 only. Community yt-dlp build is pinned; automatic replacement with upstream yt-dlp is disabled.' } else { "$Platform build for Windows 10/11. Engine and helper smoke tests run on Windows Server 2022." }
 [IO.File]::WriteAllText("$PWD/dist/BUILD-INFO-$Platform.txt", "KeRo Smarter Download $version`nSource: $env:GITHUB_SHA`nTarget: $Target`n$description`n")
 $label = if ($Legacy) { $Platform.Replace('Win7-', 'Win7-Experimental-') } else { $Platform }
