@@ -21,7 +21,9 @@ Copy-Item tools/test-noadmin-child.ps1 "$shared/test.ps1"
 $hash=(Get-FileHash build-cache/stage/KeRoDownload.exe).Hash
 try {
     $args=@('-NoProfile','-ExecutionPolicy','Bypass','-File',"$shared/test.ps1",'-Candidate',"$shared/candidate.exe",'-Previous',"$shared/previous.exe",'-Output',"$shared/result.json",'-ExpectedAppHash',$hash)
-    $p=Start-Process "$env:WINDIR/System32/WindowsPowerShell/v1.0/powershell.exe" -Credential $credential -LoadUserProfile -ArgumentList $args -WorkingDirectory $shared -PassThru -Wait
+    $p=Start-Process "$env:WINDIR/System32/WindowsPowerShell/v1.0/powershell.exe" -Credential $credential -LoadUserProfile -ArgumentList $args -WorkingDirectory $shared -PassThru
+    if(-not $p.WaitForExit(360000)){Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue;throw 'Standard-user test exceeded six minutes'}
+    $p.Refresh()
     if(-not(Test-Path "$shared/result.json")){throw 'Standard-user process did not produce a report'}
     Copy-Item "$shared/result.json" "dist/NONADMIN-$Platform.json"
     Get-ChildItem "$shared/*.log" | Copy-Item -Destination dist

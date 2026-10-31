@@ -1,0 +1,108 @@
+name: Resume x86 runtime audit from retained applications - no rebuild
+on:
+  push:
+    branches: [preview/noadmin-static-runtime]
+    paths: [.github/workflows/noadmin-x86-resume.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  build:
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: Win10_11-x86
+            target: i686-pc-windows-msvc
+            toolchain: 1.99.1
+            legacy: false
+          - platform: Win7-x86
+            target: i686-win7-windows-msvc
+            toolchain: nightly-2026-10-29
+            legacy: true
+    env:
+      RUSTFLAGS: -C target-feature=+crt-static
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+        with:
+          toolchain: ${{ matrix.toolchain }}
+          components: rust-src
+      - name: Install standard target
+        if: ${{ !matrix.legacy }}
+        run: rustup target add ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          key: platform-${{ matrix.platform }}-${{ hashFiles('tools/prepare-win7.py') }}
+          cache-on-failure: true
+      - name: Preserve legacy compatibility flags
+        if: matrix.legacy
+        shell: pwsh
+        run: |
+          cargo fetch --locked --target ${{ matrix.target }}
+          if ($LASTEXITCODE -ne 0) { throw 'Dependency fetch failed' }
+          $root = $env:CARGO_HOME
+          $package = if ('${{ matrix.target }}'.StartsWith('i686')) { 'windows_i686_msvc' } else { 'windows_x86_64_msvc' }
+          $imports = (Resolve-Path "$root/registry/src/*/$package-0.48.5/lib" | Select-Object -First 1).Path
+          python tools/prepare-win7.py --cargo-root "$root"
+          if ($LASTEXITCODE -ne 0) { throw 'Legacy compatibility preparation failed' }
+          "CARGO_ENCODED_RUSTFLAGS=-C$([char]31)target-feature=+crt-static$([char]31)-Lnative=$imports$([char]31)--cfg$([char]31)windows_slim_errors" | Out-File $env:GITHUB_ENV -Append
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: noadmin-app-${{ matrix.platform }}
+          run-id: 41197129049
+          github-token: ${{ github.token }}
+          path: target/${{ matrix.target }}/release
+      - name: Reuse identical bundled helpers from current release
+        shell: pwsh
+        run: ./tools/prepare-noadmin-stage.ps1 -Platform '${{ matrix.platform }}' -Target '${{ matrix.target }}'
+      - name: Audit native and embedded runtime dependencies
+        shell: pwsh
+        run: |
+          ./tools/check-native-crt.ps1 -Stage build-cache/stage -LegacyWindows7:$${{ matrix.legacy }} -ReportDir 'dist/runtime-${{ matrix.platform }}'
+          $extra = @()
+          if ('${{ matrix.legacy }}' -eq 'true') { $extra += '--legacy-win7' }
+          python tools/audit-pe-runtime.py build-cache/stage @extra --output 'dist/runtime-${{ matrix.platform }}/pe-runtime-audit.json'
+          if ($LASTEXITCODE -ne 0) { throw 'Embedded/native runtime audit failed; helper bundling was not changed' }
+      - name: Build non-elevating installer
+        shell: pwsh
+        run: |
+          choco install innosetup -y --no-progress
+          $defines=@('/DMyAppVersion=1.1.4','/DOutputName=KeRoDownload-v1.1.4-NoAdmin-Preview-${{ matrix.platform }}')
+          if ('${{ matrix.target }}'.StartsWith('i686')) { $defines+='/DAppX86' }
+          if ('${{ matrix.legacy }}' -eq 'true') { $defines+='/DLegacyWin7' }
+          & "${env:ProgramFiles(x86)}/Inno Setup 6/ISCC.exe" /Q @defines installer/KeRo.iss
+          if ($LASTEXITCODE -ne 0) { throw 'Installer compilation failed' }
+          $setup=Get-ChildItem 'dist/*NoAdmin*-${{ matrix.platform }}.exe' | Select-Object -First 1
+          "$((Get-FileHash $setup.FullName -Algorithm SHA256).Hash.ToLower())  $($setup.Name)" | Set-Content ($setup.FullName+'.sha256')
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: noadmin-candidate-${{ matrix.platform }}
+          path: |
+            dist/*NoAdmin*.exe*
+            dist/runtime-*/
+            dist/HELPER-HASHES-*.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Run existing engine tests without fail-fast
+        shell: pwsh
+        run: |
+          $extra = if ('${{ matrix.legacy }}' -eq 'true') { @('-Z','build-std=std,panic_abort','--features','legacy-win7') } else { @() }
+          cargo test --locked -p swiftget-engine --no-fail-fast --target ${{ matrix.target }} @extra
+          if ($LASTEXITCODE -ne 0) { throw 'Engine tests failed' }
+      - name: Standard-user install, upgrade, silent installer and uninstall
+        shell: pwsh
+        run: ./tools/test-noadmin-host.ps1 -Platform '${{ matrix.platform }}'
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: noadmin-reports-${{ matrix.platform }}
+          path: |
+            dist/runtime-*/
+            dist/NONADMIN-*.json
+            dist/*.log
+            dist/HELPER-HASHES-*.json
+          if-no-files-found: ignore
+          retention-days: 14

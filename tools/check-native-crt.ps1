@@ -7,9 +7,28 @@ $dumpbin = Get-ChildItem "$vs/VC/Tools/MSVC/*/bin/Hostx64/x64/dumpbin.exe" | Sor
 if (-not $dumpbin) { throw 'dumpbin was not found; the runtime check cannot be skipped.' }
 if ($ReportDir) { New-Item -ItemType Directory -Force $ReportDir | Out-Null }
 $results = @()
+$fallbackDone = $false
 foreach ($file in Get-ChildItem $Stage -Recurse -File | Where-Object { $_.Extension -in '.exe', '.dll', '.pyd' }) {
     $text = (& $dumpbin /NOLOGO /DEPENDENTS $file.FullName 2>&1 | Out-String)
-    if ($LASTEXITCODE -ne 0) { throw "PE dependency inspection failed: $($file.Name)" }
+    $main = $file.FullName -eq (Join-Path $Stage 'KeRoDownload.exe')
+    if ($LASTEXITCODE -ne 0) {
+        if ($ReportDir) { $text | Set-Content (Join-Path $ReportDir ($file.Name + '.dumpbin-error.txt')) }
+        if ($main) { throw "Main application PE inspection failed: $text" }
+        Write-Warning "dumpbin could not inspect $($file.Name): $text"
+        if (-not $fallbackDone) {
+            $python = Get-Command python -ErrorAction SilentlyContinue
+            if (-not $python) { throw 'Python 3 is required to inspect this packed helper; the dependency check cannot be skipped.' }
+            $output = if ($ReportDir) { Join-Path $ReportDir 'fallback-pe-runtime-audit.json' } else { [IO.Path]::GetTempFileName() }
+            $extra = @()
+            if ($LegacyWindows7) { $extra += '--legacy-win7' }
+            & $python.Source (Join-Path $PSScriptRoot 'audit-pe-runtime.py') $Stage @extra --output $output
+            if ($LASTEXITCODE -ne 0) { throw 'Equivalent PE audit failed; the installer was not built.' }
+            if (-not $ReportDir) { Remove-Item $output -Force }
+            $fallbackDone = $true
+        }
+        $results += [ordered]@{file=$file.FullName;main=$false;inspection='Equivalent PE parser; see fallback report. dumpbin did not support this helper.'}
+        continue
+    }
     $dlls = @([regex]::Matches($text, '(?im)^\s+([^\s\\/:]+\.dll)\s*$') | ForEach-Object { $_.Groups[1].Value.ToLower() } | Sort-Object -Unique)
     $runtime = @($dlls | Where-Object { $_ -match '^(vcruntime\d.*|msvcp\d.*|msvcr\d.*|api-ms-win-crt-.*|ucrtbase(d)?)\.dll$' })
     $main = $file.FullName -eq (Join-Path $Stage 'KeRoDownload.exe')

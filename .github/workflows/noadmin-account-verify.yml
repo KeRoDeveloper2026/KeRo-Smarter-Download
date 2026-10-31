@@ -1,0 +1,77 @@
+name: Verify retained x64 installers under standard accounts - no rebuild
+on:
+  push:
+    branches: [preview/noadmin-static-runtime]
+    paths: [.github/workflows/noadmin-account-verify.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  stop-obsolete-harness:
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - name: Stop only obsolete standard-user waits after engine tests finish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for run in 41197129049 41198044080; do
+            for attempt in $(seq 1 40); do
+              state=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run" --jq '.status')
+              test "$state" = in_progress || break
+              branch=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run" --jq '.head_branch')
+              test "$branch" = preview/noadmin-static-runtime
+              step=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run/jobs" --jq '[.jobs[] | select(.status=="in_progress") | .steps[] | select(.status=="in_progress") | .name] | join("|")')
+              if [[ "$step" == *"Standard-user install, upgrade, silent installer and uninstall"* ]]; then
+                gh api --method POST "repos/$GITHUB_REPOSITORY/actions/runs/$run/cancel"
+                break
+              fi
+              sleep 15
+            done
+          done
+  verify:
+    runs-on: windows-2022
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: Win10_11-x64
+            target: x86_64-pc-windows-msvc
+            candidate_run: 41197129049
+          - platform: Win7-x64
+            target: x86_64-win7-windows-msvc
+            candidate_run: 41198044080
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: noadmin-app-${{ matrix.platform }}
+          run-id: 41197129049
+          github-token: ${{ github.token }}
+          path: target/${{ matrix.target }}/release
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: noadmin-candidate-${{ matrix.platform }}
+          run-id: ${{ matrix.candidate_run }}
+          github-token: ${{ github.token }}
+          path: dist
+      - name: Restore matching previous installer fixture without rebuilding
+        shell: pwsh
+        run: ./tools/prepare-noadmin-stage.ps1 -Platform '${{ matrix.platform }}' -Target '${{ matrix.target }}'
+      - name: Verify standard-user install, launch, upgrade and uninstall
+        timeout-minutes: 8
+        shell: pwsh
+        run: ./tools/test-noadmin-host.ps1 -Platform '${{ matrix.platform }}'
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: noadmin-account-verified-${{ matrix.platform }}
+          path: |
+            dist/NONADMIN-*.json
+            dist/*.log
+          if-no-files-found: ignore
+          retention-days: 14

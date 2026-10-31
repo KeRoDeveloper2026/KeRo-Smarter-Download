@@ -4,7 +4,9 @@ $result = [ordered]@{standard_user=$false; fresh_install=$false; launch=$false; 
 function Install-Setup([string]$Setup,[string]$Label,[bool]$Auto=$false) {
     $args = @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-','/TASKS=',('/LOG="'+$Output+'.'+$Label+'.log"'))
     if ($Auto) { $args += '/AUTOUPDATE=1' }
-    $p = Start-Process $Setup -ArgumentList $args -Wait -PassThru
+    $p = Start-Process $Setup -ArgumentList $args -PassThru
+    if (-not $p.WaitForExit(120000)) { Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue; throw "Installer parent timeout: $Label" }
+    $p.Refresh()
     if ($p.ExitCode -ne 0) { throw "$Label failed: exit $($p.ExitCode)" }
 }
 function Stop-OwnApp {
