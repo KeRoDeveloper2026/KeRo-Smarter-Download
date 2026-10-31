@@ -22,7 +22,7 @@ foreach($dir in @('extension','extension-firefox')){
 }
 Remove-Item trial-stage/READ-ME-FIRST.txt
 @'
-KeRo Download Preview — UI reference v2 — Windows 10/11 x64 — trial only
+KeRo Download Preview — UI reference v3 — Windows 10/11 x64 — trial only
 
 1. Unzip this package completely, then run the Setup EXE.
 2. Start "KeRo Download Preview" from Desktop or Start Menu.
@@ -37,7 +37,10 @@ KeRo Download Preview — UI reference v2 — Windows 10/11 x64 — trial only
    If port 9615 was changed previously, set it back in app/extension settings.
 7. AppId, install directory, protocol, shortcut and data profile are independent
    from the main app. App/helper automatic updates and autostart stay disabled.
-8. Original floating logo is unchanged. UI v2 is built from the supplied reference brief; the engine remains unchanged.
+8. Window colors: open Window colors in the progress dialog. Choose a preset
+   or enter three #RRGGBB values and Apply colors. Saved for future windows.
+   Vector icons replace font symbols; header drag excludes caption buttons.
+   Original floating logo is unchanged. UI v3 is built from the supplied reference brief; the engine remains unchanged.
 9. This is unsigned test software. SmartScreen may still appear.
 10. Windows Server CI checks do not certify a clean Windows 10/11 VM.
 11. The ZIP also includes extension and extension-firefox folders ready for

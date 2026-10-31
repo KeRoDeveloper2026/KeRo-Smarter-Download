@@ -1437,3 +1437,48 @@ msgstr "مخصص"
 
 msgid "Unknown"
 msgstr "غير معروف"
+
+msgid "Window colors"
+msgstr "ألوان النافذة"
+
+msgid "Colors apply to download windows only"
+msgstr "الألوان تُطبّق على نوافذ التحميل فقط"
+
+msgid "KeRo cyan"
+msgstr "سماوي KeRo"
+
+msgid "Purple"
+msgstr "بنفسجي"
+
+msgid "Emerald"
+msgstr "زمردي"
+
+msgid "Gold"
+msgstr "ذهبي"
+
+msgid "Custom colors"
+msgstr "ألوان مخصصة"
+
+msgid "Accent"
+msgstr "الأساسي"
+
+msgid "Secondary"
+msgstr "الثانوي"
+
+msgid "Background"
+msgstr "الخلفية"
+
+msgid "Apply colors"
+msgstr "تطبيق الألوان"
+
+msgid "Enter colors as #RRGGBB, then apply."
+msgstr "أدخل الألوان بصيغة #RRGGBB ثم اضغط تطبيق."
+
+msgid "Invalid color. Use #RRGGBB, for example #00D9FF."
+msgstr "لون غير صالح. استخدم #RRGGBB، مثل #00D9FF."
+
+msgid "Could not save colors"
+msgstr "تعذّر حفظ الألوان"
+
+msgid "Colors saved"
+msgstr "تم حفظ الألوان"

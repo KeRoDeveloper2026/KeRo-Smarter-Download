@@ -4,8 +4,9 @@
 
 import { Button, LineEdit, SpinBox, ComboBox, ListView, TabWidget, TextEdit, Palette } from "std-widgets.slint";
 import { ToolTip, DownloadRow, QueueRow, SegView, Cols, ColDef, CatRow, PairRow, LinkRow, Theme, ThemedWindow, CaptionButton, P, Icon, G, TypeIcon, BigTypeIcon, ToolBtn, ToolSeparator, TreeItem, HeaderCell, Cell, MenuEntry, MenuSep, MenuLabel, Glyph, HRow, CheckBox } from "common.slint";
-import { ProgressAction, ProgressMetric } from "progress-style.slint";
+import { ProgressAction, ProgressMetric, ProgressPalette } from "progress-style.slint";
 export { DownloadRow, QueueRow, SegView, Cols, ColDef, CatRow, PairRow, LinkRow, Theme }
+export { ProgressPalette } from "progress-style.slint";
 export { FloatingDownload } from "floating.slint";
 export { BrowserRow } from "dialogs.slint";
 export { ConfirmDialog, ColumnsDialog, CategoryDialog, FindDialog, PropertiesDialog, DuplicateDialog, CountdownDialog, SchedulerDialog, GrabberDialog, TipDialog, RefreshDialog, SettingsDialog, PlaylistDialog, TorrentDialog, BrowserDialog, AboutDialog, UpdateDialog, WhatsNewDialog } from "dialogs.slint";
@@ -2539,6 +2540,14 @@ export component BatchDialog inherits ThemedWindow {
 // The per-download progress window (tabs like a classic download manager).
 export component DetailsDialog inherits ThemedWindow {
     in property <bool> front;
+    in-out property <bool> show-colors: false;
+    in-out property <int> color-preset: 0;
+    in-out property <string> accent-hex: "#00D9FF";
+    in-out property <string> secondary-hex: "#006BFF";
+    in-out property <string> surface-hex: "#061428";
+    in-out property <string> color-message;
+    callback colors-preset(int);
+    callback colors-apply();
     in-out property <bool> pinned: false;
     always-on-top: root.front || root.pinned;
     title: root.percent + " " + root.name;
@@ -2600,13 +2609,13 @@ export component DetailsDialog inherits ThemedWindow {
         width: parent.width; height: parent.height;
         viewbox-width: 980; viewbox-height: 720;
         commands: "M 12 100 L 112 16 L 268 16 L 285 32 L 465 32 L 486 52 L 718 52 L 742 36 L 941 36 L 970 65 L 970 656 L 940 690 L 680 690 L 662 704 L 50 704 L 12 666 L 12 464 L 24 447 L 24 260 L 12 246 Z";
-        fill: #061428; stroke: #006bff; stroke-width: 3px;
+        fill: ProgressPalette.surface; stroke: ProgressPalette.secondary; stroke-width: 3px;
     }
     Path {
         width: parent.width; height: parent.height;
         viewbox-width: 980; viewbox-height: 720;
         commands: "M 18 101 L 115 23 L 264 23 L 281 39 L 461 39 L 482 59 L 720 59 L 745 43 L 938 43 L 962 68 L 962 653 L 936 682 L 677 682 L 659 696 L 53 696 L 20 663 L 20 470 L 32 453 L 32 258 L 20 242 Z";
-        fill: transparent; stroke: #00d9ff; stroke-width: 1.5px;
+        fill: transparent; stroke: ProgressPalette.accent; stroke-width: 1.5px;
     }
     Path {
         width: parent.width; height: parent.height;
@@ -2620,6 +2629,7 @@ export component DetailsDialog inherits ThemedWindow {
         Rectangle {
             height: 84px;
             TouchArea {
+                width: parent.width - 310px; height: parent.height;
                 pointer-event(ev) => {
                     if (ev.button == PointerEventButton.left && ev.kind == PointerEventKind.down) { root.start-drag(); }
                 }
@@ -2630,21 +2640,21 @@ export component DetailsDialog inherits ThemedWindow {
                 VerticalLayout {
                     padding-top: 12px; spacing: 0px;
                     Text { text: "KeRo"; color: #eaf6ff; font-size: 38px; font-weight: 800; vertical-alignment: center; }
-                    Text { text: "SMARTER DOWNLOAD"; color: #00d9ff; font-size: 13px; font-weight: 700; }
-                    Rectangle { height: 2px; background: @linear-gradient(90deg, #00d9ff 0%, #006bff 55%, #061428 100%); }
+                    Text { text: "SMARTER DOWNLOAD"; color: ProgressPalette.accent; font-size: 13px; font-weight: 700; }
+                    Rectangle { height: 2px; background: @linear-gradient(90deg, ProgressPalette.accent 0%, ProgressPalette.secondary 55%, ProgressPalette.surface 100%); }
                 }
                 Rectangle { horizontal-stretch: 1; }
-                ProgressAction { text: "⌖"; selected: root.pinned; min-width: 34px; max-width: 34px; min-height: 32px; max-height: 32px; vertical-stretch: 0; clicked => { root.pinned = !root.pinned; } }
-                ProgressAction { text: "◉"; min-width: 34px; max-width: 34px; min-height: 32px; max-height: 32px; vertical-stretch: 0; clicked => { root.float-download(); } }
-                ProgressAction { text: "↓"; min-width: 34px; max-width: 34px; min-height: 32px; max-height: 32px; vertical-stretch: 0; clicked => { root.hide-to-tray(); } }
-                ProgressAction { text: "−"; min-width: 34px; max-width: 34px; min-height: 32px; max-height: 32px; vertical-stretch: 0; clicked => { root.minimize(); } }
-                ProgressAction { text: "□"; min-width: 34px; max-width: 34px; min-height: 32px; max-height: 32px; vertical-stretch: 0; clicked => { root.maximize(); } }
-                ProgressAction { text: "×"; min-width: 34px; max-width: 34px; min-height: 32px; max-height: 32px; vertical-stretch: 0; danger: true; clicked => { root.close-clicked(); } }
+                ProgressAction { text: ""; glyph: "pin"; selected: root.pinned; min-width: 34px; max-width: 34px; min-height: 32px; max-height: 32px; vertical-stretch: 0; clicked => { root.pinned = !root.pinned; } }
+                ProgressAction { text: ""; glyph: "float"; min-width: 34px; max-width: 34px; min-height: 32px; max-height: 32px; vertical-stretch: 0; clicked => { root.float-download(); } }
+                ProgressAction { text: ""; glyph: "down"; min-width: 34px; max-width: 34px; min-height: 32px; max-height: 32px; vertical-stretch: 0; clicked => { root.hide-to-tray(); } }
+                ProgressAction { text: ""; glyph: "minus"; min-width: 34px; max-width: 34px; min-height: 32px; max-height: 32px; vertical-stretch: 0; clicked => { root.minimize(); } }
+                ProgressAction { text: ""; glyph: "maximize"; min-width: 34px; max-width: 34px; min-height: 32px; max-height: 32px; vertical-stretch: 0; clicked => { root.maximize(); } }
+                ProgressAction { text: ""; glyph: "close"; min-width: 34px; max-width: 34px; min-height: 32px; max-height: 32px; vertical-stretch: 0; danger: true; clicked => { root.close-clicked(); } }
             }
         }
         Rectangle {
             min-height: 60px;
-            background: @linear-gradient(90deg, #0b2a48 0%, #061428 100%);
+            background: @linear-gradient(90deg, ProgressPalette.raised 0%, ProgressPalette.surface 100%);
             border-radius: 8px;
             HorizontalLayout {
                 padding: 8px; spacing: 12px;
@@ -2652,21 +2662,21 @@ export component DetailsDialog inherits ThemedWindow {
                 VerticalLayout {
                     spacing: 4px; horizontal-stretch: 1;
                     Text { text: root.name; color: #f3f9ff; font-size: 22px * Theme.font-scale; font-weight: 700; overflow: elide; horizontal-alignment: left; }
-                    Text { text: root.url; color: #00c9ff; overflow: elide; font-size: 12px * Theme.font-scale; horizontal-alignment: left; }
+                    Text { text: root.url; color: ProgressPalette.accent; overflow: elide; font-size: 13px * Theme.font-scale; horizontal-alignment: left; }
                 }
-                ProgressAction { text: "↗"; min-width: 38px; clicked => { root.copy-link(); } }
+                ProgressAction { text: ""; glyph: "copy"; min-width: 38px; max-width: 38px; clicked => { root.copy-link(); } }
             }
         }
         HorizontalLayout {
             spacing: 16px;
             Rectangle {
                 min-height: 34px; horizontal-stretch: 1;
-                border-width: 2px; border-color: #00d9ff; border-radius: 17px;
-                background: #08233d; clip: true;
+                border-width: 2px; border-color: ProgressPalette.accent; border-radius: 17px;
+                background: ProgressPalette.panel; clip: true;
                 Rectangle {
                     x: 4px; y: 4px; height: parent.height - 8px;
                     width: max(0px, (parent.width - 8px) * (root.known-size ? max(0, min(root.progress, 1)) : 0));
-                    background: root.state == 4 ? @linear-gradient(0deg, #9d2649 0%, #ff4b5c 100%) : root.state == 3 ? @linear-gradient(0deg, #078b72 0%, #32f2a6 100%) : @linear-gradient(0deg, #006bff 0%, #00d9ff 64%, #a3faff 100%);
+                    background: root.state == 4 ? @linear-gradient(0deg, #9d2649 0%, #ff4b5c 100%) : root.state == 3 ? @linear-gradient(0deg, #078b72 0%, #32f2a6 100%) : @linear-gradient(0deg, ProgressPalette.secondary 0%, ProgressPalette.accent 64%, #a3faff 100%);
                     border-radius: 13px;
                 }
                 if !root.known-size: Text { text: @tr("Unknown"); color: #8fb0d6; horizontal-alignment: center; vertical-alignment: center; }
@@ -2680,15 +2690,15 @@ export component DetailsDialog inherits ThemedWindow {
             ProgressMetric { label: @tr("Time left"); value: root.eta; horizontal-stretch: 1; }
             ProgressMetric { label: @tr("Resume capability"); value: root.resumable; good: root.resumable-ok; horizontal-stretch: 1; }
         }
-        Text { text: root.error != "" ? root.error : root.status; color: root.state == 4 ? #ff8a9a : #a6c4df; font-size: 11px * Theme.font-scale; wrap: word-wrap; horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left; }
+        Text { text: root.error != "" ? root.error : root.status; color: root.state == 4 ? #ff8a9a : #a6c4df; font-size: 13px * Theme.font-scale; wrap: word-wrap; horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left; }
         HRow {
             spacing: 8px;
-            ProgressAction { text: @tr("Pause"); glyph: "Ⅱ"; enabled: root.state == 0 || root.state == 1; horizontal-stretch: 1; clicked => { root.pause(); } }
-            ProgressAction { text: root.state == 3 ? @tr("Close") : @tr("Cancel"); glyph: "×"; danger: true; horizontal-stretch: 1; clicked => { if (root.state == 3) { root.close-window(); } else { root.cancel-download(); } } }
-            ProgressAction { text: @tr("Resume"); glyph: "▷"; enabled: root.state == 2 || root.state == 4; horizontal-stretch: 1; clicked => { root.resume(); } }
-            ProgressAction { text: @tr("Open folder"); glyph: "▱"; enabled: root.folder-available; horizontal-stretch: 1; clicked => { root.open-folder(); } }
+            ProgressAction { text: @tr("Pause"); glyph: "pause"; enabled: root.state == 0 || root.state == 1; horizontal-stretch: 1; clicked => { root.pause(); } }
+            ProgressAction { text: root.state == 3 ? @tr("Close") : @tr("Cancel"); glyph: "close"; danger: true; horizontal-stretch: 1; clicked => { if (root.state == 3) { root.close-window(); } else { root.cancel-download(); } } }
+            ProgressAction { text: @tr("Resume"); glyph: "play"; enabled: root.state == 2 || root.state == 4; horizontal-stretch: 1; clicked => { root.resume(); } }
+            ProgressAction { text: @tr("Open folder"); glyph: "folder"; enabled: root.folder-available; horizontal-stretch: 1; clicked => { root.open-folder(); } }
             Rectangle {
-                min-width: 165px; horizontal-stretch: 1.5; background: #08233d; border-color: #006bff; border-width: 1px; border-radius: 8px;
+                min-width: 165px; horizontal-stretch: 1.5; background: ProgressPalette.panel; border-color: ProgressPalette.secondary; border-width: 1px; border-radius: 8px;
                 VerticalLayout {
                     padding: 7px; spacing: 4px;
                     Text { text: @tr("Speed Limiter"); color: #cbeaff; horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left; }
@@ -2703,7 +2713,7 @@ export component DetailsDialog inherits ThemedWindow {
                 }
             }
             Rectangle {
-                min-width: 190px; horizontal-stretch: 1.6; background: #08233d; border-color: #006bff; border-width: 1px; border-radius: 8px;
+                min-width: 190px; horizontal-stretch: 1.6; background: ProgressPalette.panel; border-color: ProgressPalette.secondary; border-width: 1px; border-radius: 8px;
                 VerticalLayout {
                     padding: 7px; spacing: 4px;
                     Text { text: @tr("Options on completion"); color: #cbeaff; horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left; }
@@ -2722,9 +2732,36 @@ export component DetailsDialog inherits ThemedWindow {
             ProgressAction { text: @tr("Options on completion"); selected: root.tab == 2; horizontal-stretch: 1; min-height: 25px; clicked => { root.tab = 2; } }
             ProgressAction { text: root.show-details ? @tr("<< Hide details") : @tr("Show details >>"); min-height: 25px; clicked => { root.show-details = !root.show-details; root.details-toggled(); } }
         }
+        HRow {
+            spacing: 8px;
+            ProgressAction { text: @tr("Window colors"); glyph: "edit"; min-height: 34px; clicked => { root.show-colors = !root.show-colors; } }
+            Text { text: @tr("Colors apply to download windows only"); color: #9cb9d3; vertical-alignment: center; horizontal-stretch: 1; }
+        }
+        if root.show-colors: Rectangle {
+            background: ProgressPalette.panel; border-color: ProgressPalette.line; border-width: 1px; border-radius: 8px;
+            VerticalLayout {
+                padding: 9px; spacing: 7px;
+                ComboBox {
+                    model: [@tr("KeRo cyan"), @tr("Purple"), @tr("Emerald"), @tr("Gold"), @tr("Rose"), @tr("Custom colors")];
+                    current-index <=> root.color-preset;
+                    selected(v) => { root.colors-preset(v); }
+                }
+                HRow {
+                    spacing: 7px;
+                    Text { text: @tr("Accent"); color: #eaf4ff; vertical-alignment: center; }
+                    LineEdit { text <=> root.accent-hex; placeholder-text: "#00D9FF"; horizontal-stretch: 1; }
+                    Text { text: @tr("Secondary"); color: #eaf4ff; vertical-alignment: center; }
+                    LineEdit { text <=> root.secondary-hex; placeholder-text: "#006BFF"; horizontal-stretch: 1; }
+                    Text { text: @tr("Background"); color: #eaf4ff; vertical-alignment: center; }
+                    LineEdit { text <=> root.surface-hex; placeholder-text: "#061428"; horizontal-stretch: 1; }
+                    ProgressAction { text: @tr("Apply colors"); min-height: 34px; clicked => { root.colors-apply(); } }
+                }
+                Text { text: root.color-message; color: #eaf4ff; wrap: word-wrap; }
+            }
+        }
         if root.tab != 0: Rectangle {
-            background: Theme.panel; border-radius: 5px;
-            border-color: #1a5278; border-width: 1px;
+            background: ProgressPalette.panel; border-radius: 5px;
+            border-color: ProgressPalette.line; border-width: 1px;
                         if root.tab == 1: VerticalLayout {
                 padding: 14px;
                 spacing: 12px;
@@ -2789,7 +2826,7 @@ export component DetailsDialog inherits ThemedWindow {
                 Text {
                     horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left;
                     text: @tr("Changes apply right away, even while downloading.");
-                    font-size: 11px * Theme.font-scale;
+                    font-size: 13px * Theme.font-scale;
                     color: Theme.muted;
                 }
             }
@@ -2828,7 +2865,7 @@ export component DetailsDialog inherits ThemedWindow {
                 Text {
                     horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left;
                     text: @tr("You get 30 seconds to cancel before the computer shuts down, sleeps or hibernates.");
-                    font-size: 11px * Theme.font-scale;
+                    font-size: 13px * Theme.font-scale;
                     color: Theme.muted;
                     wrap: word-wrap;
                 }
@@ -2837,28 +2874,28 @@ export component DetailsDialog inherits ThemedWindow {
         if root.show-details: VerticalLayout {
             spacing: 7px;
             Rectangle {
-                height: 32px; background: #041020; border-width: 1px; border-color: #164566; border-radius: 6px;
+                height: 32px; background: ProgressPalette.surface; border-width: 1px; border-color: ProgressPalette.line; border-radius: 6px;
                 HRow {
                     padding: 6px; spacing: 12px;
                     Text { text: @tr("Connection activity"); color: #d5e8fa; vertical-alignment: center; }
                     Rectangle {
-                        horizontal-stretch: 1; background: #081f36; clip: true;
+                        horizontal-stretch: 1; background: ProgressPalette.panel; clip: true;
                         // Live byte ranges only; neither random nor time-driven bars.
                         for seg in root.segs: Rectangle {
                             x: (parent.width - 2px) * seg.start; y: 1px;
                             width: max(0px, (parent.width - 2px) * (seg.done - seg.start)); height: parent.height - 2px;
-                            background: seg.busy ? #00d9ff : #006bff;
+                            background: seg.busy ? ProgressPalette.accent : ProgressPalette.secondary;
                         }
                         for seg in root.segs: Rectangle { x: (parent.width - 2px) * seg.start; width: 1px; height: parent.height; background: #ffca52; }
                     }
                 }
             }
             Rectangle {
-                min-height: 142px; vertical-stretch: 1; background: #041325; border-width: 1px; border-color: #167cb0; border-radius: 8px;
+                min-height: 142px; vertical-stretch: 1; background: ProgressPalette.surface; border-width: 1px; border-color: ProgressPalette.line; border-radius: 8px;
                 VerticalLayout {
                     padding: 5px; spacing: 0px;
                     Rectangle {
-                        height: 28px; background: @linear-gradient(0deg, #08213a 0%, #103a60 100%);
+                        height: 28px; background: @linear-gradient(0deg, ProgressPalette.panel 0%, ProgressPalette.raised 100%);
                         HRow {
                             Text { text: @tr("N."); width: 34px; color: #d9edff; horizontal-alignment: center; vertical-alignment: center; }
                             Text { text: @tr("Downloaded"); width: 108px; color: #d9edff; horizontal-alignment: center; vertical-alignment: center; }
@@ -2870,15 +2907,15 @@ export component DetailsDialog inherits ThemedWindow {
                     ListView {
                         vertical-stretch: 1;
                         for seg[index] in root.segs: Rectangle {
-                            height: 29px; background: mod(index, 2) == 0 ? #0b2238 : #06182b;
+                            height: 29px; background: mod(index, 2) == 0 ? ProgressPalette.panel : ProgressPalette.surface;
                             HRow {
                                 Text { text: seg.number; width: 34px; color: #edf7ff; horizontal-alignment: center; vertical-alignment: center; }
                                 Text { text: seg.downloaded; width: 108px; color: #edf7ff; horizontal-alignment: center; vertical-alignment: center; overflow: elide; }
-                                Text { text: seg.info; horizontal-stretch: 1; color: seg.busy ? #00d9ff : #9cb9d3; horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left; vertical-alignment: center; overflow: elide; }
+                                Text { text: seg.info; horizontal-stretch: 1; color: seg.busy ? ProgressPalette.accent : #9cb9d3; horizontal-alignment: Theme.rtl ? TextHorizontalAlignment.right : TextHorizontalAlignment.left; vertical-alignment: center; overflow: elide; }
                                 Rectangle {
                                     width: 145px;
-                                    Rectangle { x: 7px; y: 8px; width: parent.width - 14px; height: 13px; background: #12304a; border-radius: 3px;
-                                        Rectangle { width: parent.width * max(0, min(seg.fraction, 1)); height: parent.height; border-radius: 3px; background: @linear-gradient(90deg, #00d9ff 0%, #006bff 100%); }
+                                    Rectangle { x: 7px; y: 8px; width: parent.width - 14px; height: 13px; background: ProgressPalette.raised; border-radius: 3px;
+                                        Rectangle { width: parent.width * max(0, min(seg.fraction, 1)); height: parent.height; border-radius: 3px; background: @linear-gradient(90deg, ProgressPalette.accent 0%, ProgressPalette.secondary 100%); }
                                     }
                                 }
                             }

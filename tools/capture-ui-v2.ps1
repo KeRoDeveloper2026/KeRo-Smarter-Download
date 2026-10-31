@@ -20,9 +20,10 @@ New-Item -ItemType Directory -Force $out | Out-Null
 $results=@()
 # Disposable CI desktop only: keep unrelated host windows out of cutout corners.
 (New-Object -ComObject Shell.Application).MinimizeAll()
-foreach($state in @('downloading','paused','completed','failed','english')){
+foreach($state in @('downloading','paused','completed','failed','english','purple')){
  $arguments=@('--design-preview-showcase',('--preview-state='+$(if($state -eq 'english'){'downloading'}else{$state})))
  if($state -eq 'english'){$arguments+='--preview-english'}
+ if($state -eq 'purple'){$arguments+='--preview-purple'}
  $p=Start-Process $exe -ArgumentList $arguments -PassThru
  try{
   $deadline=(Get-Date).AddSeconds(35)

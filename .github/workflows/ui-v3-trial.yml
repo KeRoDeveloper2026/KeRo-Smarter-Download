@@ -1,0 +1,54 @@
+name: UI v3 colors and responsive controls trial
+on:
+  push:
+    branches: [preview/ui-v3-colors-trial]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  trial:
+    runs-on: windows-2022
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+        with:
+          toolchain: 1.99.1
+          targets: x86_64-pc-windows-msvc
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          key: platform-Win10_11-x64-${{ hashFiles('tools/prepare-win7.py') }}
+          cache-on-failure: true
+      - name: Compile preview
+        shell: pwsh
+        run: ./tools/build-design-preview.ps1
+      - name: Regression tests
+        env:
+          RUSTFLAGS: -C target-feature=+crt-static
+        run: cargo test --locked -p swiftget-engine -p swiftget --features design-preview --target x86_64-pc-windows-msvc --no-fail-fast
+      - name: Build trial installer
+        shell: pwsh
+        run: ./tools/package-design-installer.ps1
+      - name: Verify installer
+        shell: pwsh
+        run: ./tools/test-design-installer.ps1
+      - name: Capture sample appearances
+        shell: pwsh
+        run: ./tools/capture-ui-v2.ps1
+      - name: Package trial
+        shell: pwsh
+        run: |
+          git diff 8e7302b349ff8dabddb34f054b429f1274e2ac6e HEAD -- crates tools .github/workflows/ui-v3-trial.yml | Out-File dist-trial/UI-v3-source.patch -Encoding utf8
+          git rev-parse HEAD | Set-Content dist-trial/SOURCE-COMMIT.txt
+          Compress-Archive -Path dist-trial/* -DestinationPath KeRo-UI-v3-Colors-Trial-Win10_11-x64.zip
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: ui-v3-trial-results
+          path: |
+            KeRo-UI-v3-Colors-Trial-Win10_11-x64.zip
+            dist-trial/verification
+            dist-trial/UI-previews
+            dist-design-preview/*.zip
+          if-no-files-found: ignore
+          retention-days: 14

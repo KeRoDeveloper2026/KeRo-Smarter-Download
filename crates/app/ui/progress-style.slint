@@ -1,9 +1,19 @@
 // Static vector skin: no blur, drop shadows, animations or polling timers.
-import { Theme } from "common.slint";
+import { Theme, Glyph } from "common.slint";
+
+export global ProgressPalette {
+    in-out property <color> accent: #00d9ff;
+    in-out property <color> secondary: #006bff;
+    in-out property <color> surface: #061428;
+    out property <color> panel: surface.mix(accent, 0.08);
+    out property <color> raised: surface.mix(accent, 0.18);
+    out property <color> line: surface.mix(accent, 0.45);
+}
 
 export component ProgressAction inherits Rectangle {
     in property <string> text;
     in property <string> glyph;
+    forward-focus: focus;
     in property <bool> danger;
     in property <bool> enabled: true;
     in property <bool> selected;
@@ -13,38 +23,40 @@ export component ProgressAction inherits Rectangle {
     min-height: 44px;
     border-radius: 8px;
     border-width: 1px;
-    border-color: !root.enabled ? #2b4159 : root.danger ? #f16a7b : #06cfff;
-    background: !root.enabled ? #0b1b2d : hit.pressed ? #164c77 : root.danger ? #661f36 : root.selected || hit.has-hover ? #0c426f : @linear-gradient(0deg, #07315c 0%, #0a528b 100%);
+    border-color: !root.enabled ? #52657b : root.danger ? #f16a7b : ProgressPalette.accent;
+    background: !root.enabled ? ProgressPalette.surface : root.danger ? (hit.pressed ? #882c42 : #661f36) : hit.pressed ? ProgressPalette.raised.brighter(0.2) : root.selected || hit.has-hover ? ProgressPalette.raised : @linear-gradient(0deg, ProgressPalette.panel 0%, ProgressPalette.raised 100%);
     VerticalLayout {
         padding: 5px;
         spacing: 1px;
-        if root.glyph != "": Text {
-            text: root.glyph;
-            font-size: 20px;
-            font-weight: 700;
-            color: root.enabled ? #d8faff : #59728b;
-            horizontal-alignment: center;
-            vertical-alignment: center;
+        if root.glyph != "": Rectangle {
+            height: 22px;
+            Glyph {
+                x: (parent.width - self.width) / 2;
+                width: 20px; height: 20px;
+                kind: root.glyph;
+                tint: root.enabled ? #e6faff : #72849b;
+            }
         }
-        Text {
+        if root.text != "":         Text {
             text: root.text;
             color: root.enabled ? #f0f7ff : #59728b;
-            font-size: 12px * Theme.font-scale;
+            font-size: 13px * Theme.font-scale;
             horizontal-alignment: center;
             vertical-alignment: center;
             overflow: elide;
         }
     }
     hit := TouchArea {
+        width: parent.width; height: parent.height;
         enabled: root.enabled;
         mouse-cursor: pointer;
-        clicked => { root.clicked(); }
+        clicked => { focus.focus(); root.clicked(); }
     }
     // Preserve keyboard activation and a visible focus indicator.
     focus := FocusScope {
         enabled: root.enabled;
         key-pressed(event) => {
-            if (event.text == " " || event.text == "\n") { root.clicked(); return accept; }
+            if (event.text == " " || (event.text == "\n" || event.text == "\r")) { root.clicked(); return accept; }
             return reject;
         }
     }
@@ -60,9 +72,9 @@ export component ProgressMetric inherits Rectangle {
     in property <string> label;
     in property <string> value;
     in property <bool> good;
-    background: #061d34;
+    background: ProgressPalette.panel;
     border-width: 1px;
-    border-color: #153f60;
+    border-color: ProgressPalette.line;
     border-radius: 5px;
     min-height: 54px;
     VerticalLayout {

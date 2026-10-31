@@ -15,6 +15,7 @@ mod media_import;
 mod options;
 mod playlist;
 mod preview;
+mod progress_colors;
 mod scheduler;
 mod sound;
 mod torrent_ui;
@@ -595,6 +596,8 @@ fn main() -> anyhow::Result<()> {
             Timer::single_shot(Duration::from_millis(800), move || browser::open(&ui));
         }
     }
+    #[cfg(feature = "design-preview")]
+    let _ui_live_qa = start_ui_live_qa(&ui);
     slint::run_event_loop_until_quit()?;
     preview::clean_all();
 
@@ -3330,6 +3333,14 @@ pub(crate) fn open_progress(ui: &Ui, id: u64) {
     let settings = ui.ctx.mgr.settings();
     set_theme_of(d.global::<Theme>(), &Look::of(&settings));
     d.global::<Theme>().set_mode(9);
+    {
+        let windows = ui.progress.clone();
+        progress_colors::bind(&d, move |colors| {
+            for (window, _, _) in windows.borrow().values() {
+                colors.apply(window);
+            }
+        });
+    }
     // the tabs' controls are set once, so typing in them isn't overwritten
     d.set_limit_on(v.speed_limit_kb.is_some());
     d.set_limit_kb(v.speed_limit_kb.unwrap_or(500).min(1_000_000) as i32);
@@ -3867,6 +3878,7 @@ fn show_design_preview_sample() -> anyhow::Result<()> {
     i18n::apply(if preview_english { "en" } else { "ar" });
     set_theme_of(d.global::<Theme>(), &Look::of(&Settings::default()));
     d.global::<Theme>().set_mode(9);
+    progress_colors::bind(&d, |_| {});
     let sample_state = std::env::args()
         .find_map(|a| a.strip_prefix("--preview-state=").map(str::to_owned))
         .unwrap_or_else(|| "downloading".into());
@@ -3875,6 +3887,19 @@ fn show_design_preview_sample() -> anyhow::Result<()> {
         d.global::<Theme>().set_rtl(false);
     } else {
         d.global::<Theme>().set_rtl(true);
+    }
+    if std::env::args().any(|a| a == "--preview-purple") {
+        d.global::<ProgressPalette>()
+            .set_accent(slint::Color::from_rgb_u8(201, 149, 255));
+        d.global::<ProgressPalette>()
+            .set_secondary(slint::Color::from_rgb_u8(120, 83, 239));
+        d.global::<ProgressPalette>()
+            .set_surface(slint::Color::from_rgb_u8(24, 16, 45));
+        d.set_show_colors(true);
+        d.set_color_preset(1);
+        d.set_accent_hex("#C995FF".into());
+        d.set_secondary_hex("#7853EF".into());
+        d.set_surface_hex("#18102D".into());
     }
     d.set_known_size(true);
     d.set_folder_available(true);
@@ -3977,4 +4002,50 @@ fn show_design_preview_sample() -> anyhow::Result<()> {
     });
     d.run()?;
     Ok(())
+}
+
+// Only a disposable local HTTP fixture is accepted by this preview-only harness.
+#[cfg(feature = "design-preview")]
+fn start_ui_live_qa(ui: &Ui) -> Option<slint::Timer> {
+    let url =
+        std::env::args().find_map(|a| a.strip_prefix("--ui-live-test=").map(str::to_owned))?;
+    let parsed = url::Url::parse(&url).ok()?;
+    if parsed.scheme() != "http" || parsed.host_str() != Some("127.0.0.1") {
+        return None;
+    }
+    let id = ui.ctx.mgr.add(NewDownload {
+        url,
+        file_name: Some("UI-LIVE-QA.bin".into()),
+        start: true,
+        ..Default::default()
+    });
+    open_progress(ui, id);
+    if let Some((d, _, _)) = ui.progress.borrow().get(&id) {
+        d.window()
+            .set_position(slint::LogicalPosition::new(0.0, 0.0));
+        d.window().set_size(slint::LogicalSize::new(980.0, 720.0));
+    }
+    let timer = slint::Timer::default();
+    let ui = ui.clone();
+    timer.start(
+        slint::TimerMode::Repeated,
+        Duration::from_millis(200),
+        move || {
+            if let Some(v) = ui.ctx.mgr.get(id) {
+                let data = if let Some((d, _, _)) = ui.progress.borrow().get(&id) {
+                    serde_json::json!({"state":d.get_state(), "downloaded":v.downloaded,
+                    "show_colors":d.get_show_colors(), "preset":d.get_color_preset(),
+                    "pinned":d.get_pinned(), "show_details":d.get_show_details(),
+                    "tab":d.get_tab(), "color_message":d.get_color_message().as_str(),
+                    "limit_on":d.get_limit_on(), "limit_kb":d.get_limit_kb(),
+                    "window_visible":d.window().is_visible()})
+                } else {
+                    serde_json::json!({"closed":true,"downloaded":v.downloaded})
+                };
+                let _ =
+                    std::fs::write(default_data_dir().join("ui-live-qa.json"), data.to_string());
+            }
+        },
+    );
+    Some(timer)
 }
