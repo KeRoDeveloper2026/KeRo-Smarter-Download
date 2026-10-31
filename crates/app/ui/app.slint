@@ -2634,12 +2634,12 @@ export component DetailsDialog inherits ThemedWindow {
                     Rectangle { height: 2px; background: @linear-gradient(90deg, #00d9ff 0%, #006bff 55%, #061428 100%); }
                 }
                 Rectangle { horizontal-stretch: 1; }
-                ProgressAction { text: "⌖"; selected: root.pinned; min-width: 34px; min-height: 32px; clicked => { root.pinned = !root.pinned; } }
-                ProgressAction { text: "◉"; min-width: 34px; min-height: 32px; clicked => { root.float-download(); } }
-                ProgressAction { text: "↓"; min-width: 34px; min-height: 32px; clicked => { root.hide-to-tray(); } }
-                ProgressAction { text: "−"; min-width: 34px; min-height: 32px; clicked => { root.minimize(); } }
-                ProgressAction { text: "□"; min-width: 34px; min-height: 32px; clicked => { root.maximize(); } }
-                ProgressAction { text: "×"; min-width: 34px; min-height: 32px; danger: true; clicked => { root.close-clicked(); } }
+                ProgressAction { text: "⌖"; selected: root.pinned; width: 34px; height: 32px; min-width: 34px; min-height: 32px; vertical-stretch: 0; clicked => { root.pinned = !root.pinned; } }
+                ProgressAction { text: "◉"; width: 34px; height: 32px; min-width: 34px; min-height: 32px; vertical-stretch: 0; clicked => { root.float-download(); } }
+                ProgressAction { text: "↓"; width: 34px; height: 32px; min-width: 34px; min-height: 32px; vertical-stretch: 0; clicked => { root.hide-to-tray(); } }
+                ProgressAction { text: "−"; width: 34px; height: 32px; min-width: 34px; min-height: 32px; vertical-stretch: 0; clicked => { root.minimize(); } }
+                ProgressAction { text: "□"; width: 34px; height: 32px; min-width: 34px; min-height: 32px; vertical-stretch: 0; clicked => { root.maximize(); } }
+                ProgressAction { text: "×"; width: 34px; height: 32px; min-width: 34px; min-height: 32px; vertical-stretch: 0; danger: true; clicked => { root.close-clicked(); } }
             }
         }
         Rectangle {
@@ -2696,7 +2696,7 @@ export component DetailsDialog inherits ThemedWindow {
                         model: [@tr("Unlimited"), "128 KB/s", "512 KB/s", "1 MB/s", "2 MB/s", @tr("Custom")];
                         current-index: !root.limit-on ? 0 : root.limit-kb == 128 ? 1 : root.limit-kb == 512 ? 2 : root.limit-kb == 1024 ? 3 : root.limit-kb == 2048 ? 4 : 5;
                         selected(v) => {
-                            if (v == 5) { root.tab = 1; }
+                            if (v == 5) { root.limit-on = true; root.limit-changed(); root.tab = 1; }
                             else { root.limit-on = v != 0; root.limit-kb = v == 1 ? 128 : v == 2 ? 512 : v == 3 ? 1024 : v == 4 ? 2048 : root.limit-kb; root.limit-changed(); }
                         }
                     }

@@ -1,0 +1,60 @@
+name: Final UI v2 localization and unclipped renders
+on:
+  push:
+    branches: [preview/ui-reference-trial]
+    paths: [.github/workflows/ui-v2-finish.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  package:
+    runs-on: windows-2022
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+        with:
+          toolchain: 1.99.1
+          targets: x86_64-pc-windows-msvc
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          key: platform-Win10_11-x64-${{ hashFiles('tools/prepare-win7.py') }}
+          cache-on-failure: true
+      - name: Build corrected native UI - core tests already passed in run 41204919561
+        shell: pwsh
+        run: ./tools/build-design-preview.ps1
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ui-v2-finished-native-retained
+          path: dist-design-preview/*.zip*
+          retention-days: 14
+      - name: Assemble separate installer from retained successful build
+        shell: pwsh
+        run: ./tools/package-design-installer.ps1
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ui-v2-retained-installer
+          path: dist-trial
+          retention-days: 14
+      - name: Installed app and helper integration checks
+        shell: pwsh
+        run: ./tools/test-design-installer.ps1
+      - name: Capture actual native window with labeled QA states
+        shell: pwsh
+        run: ./tools/capture-ui-v2.ps1
+      - name: Prepare complete trial ZIP
+        shell: pwsh
+        run: |
+          $out='KeRo-UI-Reference-v2-Installable-Win10_11-x64.zip'
+          Compress-Archive -Path dist-trial/* -DestinationPath $out
+          (Get-FileHash $out).Hash.ToLower() | Set-Content "$out.sha256"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: ui-v2-trial-results
+          path: |
+            KeRo-UI-Reference-v2-Installable-Win10_11-x64.zip*
+            dist-trial/verification
+            dist-trial/UI-previews
+          if-no-files-found: ignore
+          retention-days: 14

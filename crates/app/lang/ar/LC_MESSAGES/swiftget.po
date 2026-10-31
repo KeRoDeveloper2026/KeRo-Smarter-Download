@@ -1434,3 +1434,6 @@ msgstr "غير محدود"
 
 msgid "Custom"
 msgstr "مخصص"
+
+msgid "Unknown"
+msgstr "غير معروف"

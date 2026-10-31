@@ -3862,6 +3862,9 @@ fn show_design_preview_sample() -> anyhow::Result<()> {
     let preview_english = std::env::args().any(|a| a == "--preview-english");
     i18n::apply(if preview_english { "en" } else { "ar" });
     let d = DetailsDialog::new()?;
+    // The generated component registers its bundled translation table on init.
+    // Re-apply after creation, matching normal app startup.
+    i18n::apply(if preview_english { "en" } else { "ar" });
     set_theme_of(d.global::<Theme>(), &Look::of(&Settings::default()));
     d.global::<Theme>().set_mode(9);
     let sample_state = std::env::args()
@@ -3910,6 +3913,8 @@ fn show_design_preview_sample() -> anyhow::Result<()> {
         d.set_progress(1.0);
         d.set_downloaded("36.71 MB".into());
         d.set_status(t("Completed").into());
+        d.set_speed("—".into());
+        d.set_eta("—".into());
     }
     d.set_segs(ModelRc::new(VecModel::from(vec![
         SegView {
