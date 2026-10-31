@@ -1,0 +1,51 @@
+name: Inspect retained final UI v2 windows - no rebuild
+on:
+  push:
+    branches: [preview/ui-reference-trial]
+    paths: [.github/workflows/ui-v2-render-retained.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  render:
+    runs-on: windows-2022
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: ui-v2-trial-results
+          run-id: 41206863743
+          github-token: ${{ github.token }}
+          path: retained-results
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: ui-v2-finished-native-retained
+          run-id: 41206863743
+          github-token: ${{ github.token }}
+          path: retained-native
+      - name: Restore retained files without compiling or reinstalling
+        shell: pwsh
+        run: |
+          Expand-Archive retained-results/KeRo-UI-Reference-v2-Installable-Win10_11-x64.zip dist-trial
+          Expand-Archive retained-native/KeRo-Download-Window-Preview-Win10_11-x64.zip trial-stage
+          Rename-Item trial-stage/KeRoDownload.exe KeRoDownloadPreview.exe
+          Remove-Item dist-trial/UI-previews -Recurse -Force
+      - name: Capture native UI after full redraw
+        shell: pwsh
+        run: ./tools/capture-ui-v2.ps1
+      - name: Retain final trial package with corrected captures
+        shell: pwsh
+        run: |
+          $out='KeRo-UI-Reference-v2-Installable-Win10_11-x64.zip'
+          Compress-Archive -Path dist-trial/* -DestinationPath $out
+          (Get-FileHash $out).Hash.ToLower() | Set-Content "$out.sha256"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: ui-v2-final-render-results
+          path: |
+            KeRo-UI-Reference-v2-Installable-Win10_11-x64.zip*
+            dist-trial/UI-previews
+            dist-trial/verification/UI-SAMPLE-RENDERS.json
+          retention-days: 14

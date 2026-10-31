@@ -10,8 +10,10 @@ public class KeroUiV2Capture {
  [DllImport("user32.dll")] public static extern bool SetWindowPos(IntPtr hwnd,IntPtr after,int x,int y,int w,int h,uint flags);
  [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hwnd,int cmd);
  [DllImport("user32.dll")] public static extern int GetSystemMetrics(int index);
+ [DllImport("user32.dll")] public static extern IntPtr SetThreadDpiAwarenessContext(IntPtr context);
 }
 '@
+[KeroUiV2Capture]::SetThreadDpiAwarenessContext([IntPtr](-4)) | Out-Null
 $exe=Join-Path $PWD 'trial-stage/KeRoDownloadPreview.exe'
 $out=Join-Path $PWD 'dist-trial/UI-previews'
 New-Item -ItemType Directory -Force $out | Out-Null
@@ -32,7 +34,11 @@ foreach($state in @('downloading','paused','completed','failed','english')){
   }while((($rect.R-$rect.L) -lt 800 -or ($rect.B-$rect.T) -lt 500 -or $p.MainWindowTitle -notlike '*DESIGN SAMPLE*') -and (Get-Date) -lt $deadline)
   if(($rect.R-$rect.L) -lt 800 -or ($rect.B-$rect.T) -lt 500){throw 'No full native progress window'}
   [KeroUiV2Capture]::ShowWindow($p.MainWindowHandle,9)|Out-Null
-  [KeroUiV2Capture]::SetWindowPos($p.MainWindowHandle,[IntPtr]::Zero,0,0,0,0,0x0041)|Out-Null
+  # Moving a static layered window out of a clipped initial position can keep
+  # its previous compositor surface. A real resize forces a full native redraw.
+  [KeroUiV2Capture]::SetWindowPos($p.MainWindowHandle,[IntPtr]::Zero,0,0,981,721,0x0040)|Out-Null
+  Start-Sleep -Milliseconds 500
+  [KeroUiV2Capture]::SetWindowPos($p.MainWindowHandle,[IntPtr]::Zero,0,0,980,720,0x0040)|Out-Null
   [KeroUiV2Capture]::SetForegroundWindow($p.MainWindowHandle)|Out-Null
   Start-Sleep -Seconds 2
   if(-not[KeroUiV2Capture]::GetWindowRect($p.MainWindowHandle,[ref]$rect)){throw 'No UI bounds'}
