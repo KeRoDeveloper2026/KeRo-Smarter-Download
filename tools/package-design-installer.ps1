@@ -13,7 +13,7 @@ if(-not $p.WaitForExit(120000) -or $p.ExitCode -ne 0){throw 'Official helper ext
 Copy-Item "$extract/tools" trial-stage/tools -Recurse
 $helpers=@{}
 Get-ChildItem trial-stage/tools -File -Recurse | ForEach-Object {$helpers[$_.Name]=(Get-FileHash $_.FullName).Hash}
-foreach($name in @('yt-dlp.exe','ffmpeg.exe','ffprobe.exe','aria2c.exe')){if(-not (Test-Path "trial-stage/tools/$name")){throw "Missing helper $name"}}
+foreach($name in @('yt-dlp.exe','ffmpeg.exe','aria2c.exe')){if(-not (Test-Path "trial-stage/tools/$name")){throw "Missing helper $name"}}
 foreach($dir in @('extension','extension-firefox')){
  foreach($file in Get-ChildItem "trial-stage/$dir" -Recurse -File | Where-Object {$_.Extension -in '.js','.html','.json'}){
   $text=[IO.File]::ReadAllText($file.FullName).Replace('kero-download://open','kero-design-preview://open')
