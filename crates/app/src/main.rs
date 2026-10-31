@@ -3329,6 +3329,7 @@ pub(crate) fn open_progress(ui: &Ui, id: u64) {
     }
     let settings = ui.ctx.mgr.settings();
     set_theme_of(d.global::<Theme>(), &Look::of(&settings));
+    d.global::<Theme>().set_mode(9);
     // the tabs' controls are set once, so typing in them isn't overwritten
     d.set_limit_on(v.speed_limit_kb.is_some());
     d.set_limit_kb(v.speed_limit_kb.unwrap_or(500).min(1_000_000) as i32);
@@ -3440,6 +3441,14 @@ pub(crate) fn open_progress(ui: &Ui, id: u64) {
         d.on_start_resize(move || {
             if let Some(d) = w.upgrade() {
                 winfx::drag_resize_window(d.window());
+            }
+        });
+    }
+    {
+        let w = d.as_weak();
+        d.on_maximize(move || {
+            if let Some(d) = w.upgrade() {
+                d.window().set_maximized(!d.window().is_maximized());
             }
         });
     }
@@ -3687,6 +3696,20 @@ fn fill_floating(b: &FloatingDownload, v: &DownloadView) {
     b.set_rtl(i18n::is_rtl());
 }
 
+// Display no credentials, query tokens, or fragment; copying still uses the original URL.
+fn progress_display_url(raw: &str) -> String {
+    match url::Url::parse(raw) {
+        Ok(mut parsed) if matches!(parsed.scheme(), "http" | "https") => {
+            let _ = parsed.set_username("");
+            let _ = parsed.set_password(None);
+            parsed.set_query(None);
+            parsed.set_fragment(None);
+            parsed.to_string()
+        }
+        _ => t("Download status"),
+    }
+}
+
 fn fill_details(d: &DetailsDialog, model: &VecModel<SegView>, v: &DownloadView) {
     let pct = v.progress();
     d.set_name(v.file_name.clone().into());
@@ -3698,8 +3721,18 @@ fn fill_details(d: &DetailsDialog, model: &VecModel<SegView>, v: &DownloadView) 
         }
         .into(),
     );
-    d.set_percent(format!("{:.0}%", pct * 100.0).into());
-    d.set_url(v.url.clone().into());
+    let known = v.total_size.is_some_and(|size| size > 0);
+    d.set_known_size(known);
+    d.set_folder_available(!v.save_path.as_os_str().is_empty());
+    d.set_percent(
+        if known {
+            format!("{:.2}%", pct * 100.0)
+        } else {
+            "—".into()
+        }
+        .into(),
+    );
+    d.set_url(progress_display_url(&v.url).into());
     let status = match v.status {
         _ if v.waiting => t("No internet connection - it will continue by itself when it is back…"),
         Status::Downloading => t("Receiving data…"),
@@ -3722,7 +3755,7 @@ fn fill_details(d: &DetailsDialog, model: &VecModel<SegView>, v: &DownloadView) 
             v.parts_total
         )
     } else {
-        format!("{} ({:.2} %)", fmt_size(v.downloaded), pct * 100.0)
+        fmt_size(v.downloaded)
     };
     d.set_downloaded(done.into());
     let speed = if v.speed > 0.0 {
@@ -3733,6 +3766,7 @@ fn fill_details(d: &DetailsDialog, model: &VecModel<SegView>, v: &DownloadView) 
     d.set_speed(speed.into());
     d.set_eta(
         v.eta_secs
+            .filter(|_| known && v.status.is_running() && v.speed > 0.0)
             .map(fmt_duration)
             .unwrap_or_else(|| "—".into())
             .into(),
@@ -3759,6 +3793,12 @@ fn fill_details(d: &DetailsDialog, model: &VecModel<SegView>, v: &DownloadView) 
         segs.iter()
             .enumerate()
             .map(|(i, (start, pos, end, active))| SegView {
+                fraction: if end > start {
+                    (pos.saturating_sub(*start) as f64 / (end - start) as f64).clamp(0.0, 1.0)
+                        as f32
+                } else {
+                    0.0
+                },
                 start: *start as f32 / base as f32,
                 done: *pos as f32 / base as f32,
                 number: (i + 1).to_string().into(),
@@ -3780,6 +3820,15 @@ fn fill_details(d: &DetailsDialog, model: &VecModel<SegView>, v: &DownloadView) 
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn progress_url_hides_credentials_and_tokens() {
+        assert_eq!(
+            progress_display_url("https://alice:secret@example.com/a.mp4?token=secret#private"),
+            "https://example.com/a.mp4"
+        );
+        assert!(!progress_display_url("not a url").contains("not a url"));
+    }
+
     #[test]
     fn header_points_to_columns() {
         let w = [280.0, 30.0, 82.0];
@@ -3810,9 +3859,22 @@ mod tests {
 // exposes this mode; normal startup still uses live engine data and callbacks.
 #[cfg(feature = "design-preview")]
 fn show_design_preview_sample() -> anyhow::Result<()> {
-    i18n::apply("ar");
+    let preview_english = std::env::args().any(|a| a == "--preview-english");
+    i18n::apply(if preview_english { "en" } else { "ar" });
     let d = DetailsDialog::new()?;
     set_theme_of(d.global::<Theme>(), &Look::of(&Settings::default()));
+    d.global::<Theme>().set_mode(9);
+    let sample_state = std::env::args()
+        .find_map(|a| a.strip_prefix("--preview-state=").map(str::to_owned))
+        .unwrap_or_else(|| "downloading".into());
+    if std::env::args().any(|a| a == "--preview-english") {
+        i18n::apply("en");
+        d.global::<Theme>().set_rtl(false);
+    } else {
+        d.global::<Theme>().set_rtl(true);
+    }
+    d.set_known_size(true);
+    d.set_folder_available(true);
     d.set_name("DESIGN SAMPLE - safari-5-34-57-2.exe".into());
     d.set_url("https://example.com/design-sample.exe".into());
     d.set_percent("91.66%".into());
@@ -3825,17 +3887,55 @@ fn show_design_preview_sample() -> anyhow::Result<()> {
     d.set_resumable(t("Yes").into());
     d.set_resumable_ok(true);
     d.set_kind("exe".into());
-    d.set_state(1);
+    d.set_state(match sample_state.as_str() {
+        "paused" => 2,
+        "completed" => 3,
+        "failed" => 4,
+        _ => 1,
+    });
+    if sample_state == "paused" {
+        d.set_speed("—".into());
+        d.set_eta("—".into());
+        d.set_status(t("Paused").into());
+    }
+    if sample_state == "failed" {
+        d.set_speed("—".into());
+        d.set_eta("—".into());
+        d.set_error(
+            t("No internet connection - it will continue by itself when it is back…").into(),
+        );
+    }
+    if sample_state == "completed" {
+        d.set_percent("100%".into());
+        d.set_progress(1.0);
+        d.set_downloaded("36.71 MB".into());
+        d.set_status(t("Completed").into());
+    }
     d.set_segs(ModelRc::new(VecModel::from(vec![
         SegView {
-            busy: true,
+            fraction: if sample_state == "completed" {
+                1.0
+            } else {
+                0.90
+            },
+            busy: sample_state == "downloading",
             start: 0.0,
             done: 0.30,
             number: "1".into(),
             downloaded: "1.03 MB".into(),
-            info: t("Receiving data…").into(),
+            info: t(if sample_state == "completed" {
+                "Completed"
+            } else if sample_state == "paused" {
+                "Paused"
+            } else if sample_state == "failed" {
+                "Waiting"
+            } else {
+                "Receiving data…"
+            })
+            .into(),
         },
         SegView {
+            fraction: 1.0,
             busy: false,
             start: 0.333,
             done: 0.60,
@@ -3844,15 +3944,29 @@ fn show_design_preview_sample() -> anyhow::Result<()> {
             info: t("Completed").into(),
         },
         SegView {
-            busy: true,
+            fraction: if sample_state == "completed" {
+                1.0
+            } else {
+                0.83
+            },
+            busy: sample_state == "downloading",
             start: 0.666,
             done: 0.94,
             number: "3".into(),
             downloaded: "359.10 KB".into(),
-            info: t("Receiving data…").into(),
+            info: t(if sample_state == "completed" {
+                "Completed"
+            } else if sample_state == "paused" {
+                "Paused"
+            } else if sample_state == "failed" {
+                "Waiting"
+            } else {
+                "Receiving data…"
+            })
+            .into(),
         },
     ])));
-    d.window().set_size(slint::LogicalSize::new(780.0, 640.0));
+    d.window().set_size(slint::LogicalSize::new(980.0, 720.0));
     d.on_close_clicked(|| {
         let _ = slint::quit_event_loop();
     });

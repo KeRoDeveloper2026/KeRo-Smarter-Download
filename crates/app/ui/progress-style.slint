@@ -9,12 +9,12 @@ export component ProgressAction inherits Rectangle {
     in property <bool> selected;
     out property <bool> hovered: hit.has-hover;
     callback clicked();
-    min-width: 84px;
+    min-width: 66px;
     min-height: 44px;
-    border-radius: 6px;
+    border-radius: 8px;
     border-width: 1px;
     border-color: !root.enabled ? #2b4159 : root.danger ? #f16a7b : #06cfff;
-    background: !root.enabled ? #0b1b2d : hit.pressed ? #164c77 : root.danger ? #661f36 : root.selected || hit.has-hover ? #0c426f : #082c4c;
+    background: !root.enabled ? #0b1b2d : hit.pressed ? #164c77 : root.danger ? #661f36 : root.selected || hit.has-hover ? #0c426f : @linear-gradient(0deg, #07315c 0%, #0a528b 100%);
     VerticalLayout {
         padding: 5px;
         spacing: 1px;

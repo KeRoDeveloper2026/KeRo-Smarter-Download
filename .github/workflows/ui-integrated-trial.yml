@@ -1,0 +1,64 @@
+name: UI reference v2 installer trial - no release
+on:
+  push:
+    branches: [preview/ui-reference-trial]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  trial:
+    runs-on: windows-2022
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+        with:
+          toolchain: 1.99.1
+          targets: x86_64-pc-windows-msvc
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          key: platform-Win10_11-x64-${{ hashFiles('tools/prepare-win7.py') }}
+          cache-on-failure: true
+      - name: Extension regression checks
+        run: node tools/test-extensions.mjs
+      - name: Build the native preview once
+        shell: pwsh
+        run: ./tools/build-design-preview.ps1
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ui-v2-retained-native-preview
+          path: dist-design-preview/*.zip*
+          retention-days: 14
+      - name: Engine and app regression tests
+        env:
+          RUSTFLAGS: -C target-feature=+crt-static
+        run: cargo test --locked -p swiftget-engine -p swiftget --features design-preview --target x86_64-pc-windows-msvc --no-fail-fast
+      - name: Build separate installer with unchanged existing helpers
+        shell: pwsh
+        run: ./tools/package-design-installer.ps1
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ui-v2-retained-installer
+          path: dist-trial
+          retention-days: 14
+      - name: Installed app, helper and extension-protocol checks
+        shell: pwsh
+        run: ./tools/test-design-installer.ps1
+      - name: Native renders - QA sample states
+        shell: pwsh
+        run: ./tools/capture-ui-v2.ps1
+      - name: Prepare complete trial ZIP
+        shell: pwsh
+        run: |
+          $out='KeRo-UI-Reference-v2-Installable-Win10_11-x64.zip'
+          Compress-Archive -Path dist-trial/* -DestinationPath $out
+          (Get-FileHash $out).Hash.ToLower() | Set-Content "$out.sha256"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: ui-v2-trial-results
+          path: |
+            KeRo-UI-Reference-v2-Installable-Win10_11-x64.zip*
+            dist-trial/verification
+          if-no-files-found: ignore
+          retention-days: 14

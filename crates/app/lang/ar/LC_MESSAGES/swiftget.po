@@ -1419,3 +1419,18 @@ msgstr "البحث عن تحديثات"
 
 msgid "Hide"
 msgstr "إخفاء"
+
+msgid "Connection activity"
+msgstr "نشاط الاتصال"
+
+msgid "No connection details available"
+msgstr "لا تتوفر تفاصيل الأجزاء لهذا التحميل"
+
+msgid "Progress"
+msgstr "التقدّم"
+
+msgid "Unlimited"
+msgstr "غير محدود"
+
+msgid "Custom"
+msgstr "مخصص"

@@ -86,6 +86,7 @@ export struct QueueRow {
 
 // one connection of a download (progress window)
 export struct SegView {
+    fraction: float,
     // this connection is receiving right now
     busy: bool,
     start: float,
