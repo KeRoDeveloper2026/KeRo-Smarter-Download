@@ -18,7 +18,7 @@ jobs:
   verify-package-publish:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Verify Chromium and Firefox behavior
         shell: bash
         run: |
@@ -35,7 +35,7 @@ jobs:
           done
       - name: Package all desktop browser variants
         run: python tools/package-extensions.py
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           name: KeRo-Browser-Extensions
           path: dist-extensions/*
